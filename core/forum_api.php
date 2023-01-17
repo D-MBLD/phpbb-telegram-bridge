@@ -26,7 +26,7 @@ class forum_api {
 	*
 	* @param \phpbb\config\config	$config
 	*/
-	public function __construct(\phpbb\config\config $config, 
+	public function __construct(\phpbb\config\config $config,
 								\phpbb\db\driver\driver_interface $db,
 								\phpbb\user $user,
 								\phpbb\auth\auth $auth
@@ -54,13 +54,13 @@ class forum_api {
 	 *  )
 	 * ... //next forum
 	 * )
-	 * 
-	 * The array has the following structure: forum-id -> array of permissions -> array of users 
+	 *
+	 * The array has the following structure: forum-id -> array of permissions -> array of users
 	 */
 	private function getAllowedForums($user_id)
 	{
 		// See http://www.lithotalk.de/docs/auth_api.html for details
-		$permissions = array('f_post', 'f_read');  
+		$permissions = array('f_post', 'f_read');
 		$acls = $this->auth->acl_get_list($user_id, $permissions, false);
 		return $acls;
 	}
@@ -140,7 +140,7 @@ class forum_api {
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
-			$topics[$row['topic_id']] = 
+			$topics[$row['topic_id']] =
 				array( 'title' => $row['topic_title'],
 					   'date' => $row['topic_time'],
 					   'type' => $row['topic_type']);
@@ -160,9 +160,9 @@ class forum_api {
 		$sql = 'SELECT t1.post_id, t1.forum_id, t1.post_subject, t1.post_text, t1.post_time, t1.poster_id, t2.username ';
 		$sql .= ' FROM '. POSTS_TABLE . ' as t1';
 		$sql .= ' LEFT JOIN '. USERS_TABLE . ' as t2 ON t1.poster_id = t2.user_id';
-		$sql .= " WHERE t1.topic_id = $topic_id"; 
-		$sql .= ' AND t1.poster_id <> 0';  //0 = deleted permantly 
-		$sql .= ' AND t1.post_delete_user = 0';  //0 = deleted (marked as deleted) 
+		$sql .= " WHERE t1.topic_id = $topic_id";
+		$sql .= ' AND t1.poster_id <> 0';  //0 = deleted permantly
+		$sql .= ' AND t1.post_delete_user = 0';  //0 = deleted (marked as deleted)
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
@@ -185,7 +185,7 @@ class forum_api {
 		}
 		if (isset($permission['f_post']))
 		{
-			foreach($posts as &$post)
+			foreach ($posts as &$post)
 			{
 				$post['readonly'] = false;
 			}
@@ -195,7 +195,10 @@ class forum_api {
 
 	public function store_message_id($chat_id, $message_id = 0)
 	{
-		if (!$chat_id) return;
+		if (!$chat_id)
+		{
+			return;
+		}
 		$sql = 'INSERT INTO phpbb_eb_telegram_chat' ;
 		$sql .= " (chat_id, message_id) VALUES('$chat_id', '$message_id')";
 		$sql .= ' ON DUPLICATE KEY UPDATE ';
@@ -205,7 +208,10 @@ class forum_api {
 
 	public function store_forum_id($chat_id, $forum_id)
 	{
-		if (!$chat_id) return;
+		if (!$chat_id)
+		{
+			return;
+		}
 		$sql = 'INSERT INTO phpbb_eb_telegram_chat' ;
 		$sql .= " (chat_id, forum_id) VALUES('$chat_id', '$forum_id')";
 		$sql .= ' ON DUPLICATE KEY UPDATE ';
@@ -215,7 +221,10 @@ class forum_api {
 
 	public function store_telegram_chat_state($chat_id, $topic_id = 0, $state = 0, $title = '')
 	{
-		if (!$chat_id) return;
+		if (!$chat_id)
+		{
+			return;
+		}
 		$sql = 'INSERT INTO phpbb_eb_telegram_chat';
 		$sql .= ' (chat_id, message_id, forum_id, topic_id, state, title)';
 		$sql .= " VALUES('$chat_id', 0, 0, '$topic_id', '$state', '$title')";
@@ -234,7 +243,7 @@ class forum_api {
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
-			$telegram_data = array( 'chat_id' => $row['chat_id'], 
+			$telegram_data = array( 'chat_id' => $row['chat_id'],
 							 'message_id' => $row['message_id'],
 							 'state' => $row['state'],
 							 'forum_id' => $row['forum_id'],
@@ -245,7 +254,7 @@ class forum_api {
 		if (isset($telegram_data))
 		{
 			return $telegram_data;
-		} else 
+		} else
 		{
 			return false;
 		}
@@ -308,7 +317,7 @@ class forum_api {
 			$topic_title = $topic_id_or_title;
 		} else
 		{
-			$topic_id  = $topic_id_or_title; 
+			$topic_id  = $topic_id_or_title;
 			$existingPosts = $this->selectTopicPosts($author['user_id'], $topic_id);
 			if (count($existingPosts) == 0)
 			{
@@ -339,7 +348,7 @@ class forum_api {
 			include("{$phpbb_root_path}includes/functions_posting.{$phpEx}");
 		}
 		// variables to hold the parameters for submit_post
-		$poll = $uid = $bitfield = $options = ''; 
+		$poll = $uid = $bitfield = $options = '';
 		// Append info, that post was sent via telegram
 		if (isset($this->config['eb_telegram_footer']))
 		{

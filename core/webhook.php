@@ -88,7 +88,7 @@ class webhook {
 			echo 'Request:\n';
 			print_r($payload);
 			$this->process_input($payload);
-		} catch (Throwable $e) 
+		} catch (Throwable $e)
 		{
 			echo 'Somethin went wrong\n';
 			print_r($e);
@@ -497,14 +497,14 @@ class webhook {
 		if (!isset($command['admin_info']))
 		{
 			return;
-		} 
+		}
 		$postdata = $this->telegram_api->prepareMessage($command['admin_info']);
 		$postdata['chat_id'] = $this->admin_telegram_id;
 		$this->telegram_api->sendOrEditMessage($postdata);
 	}
 
 	/** Return a reference to the given property (even if deep nested) */
-	private function &find_obj_with_prop(&$obj,$property)
+	private function &find_obj_with_prop(&$obj, $property)
 	{
 		if (is_object($obj))
 		{
@@ -514,7 +514,7 @@ class webhook {
 				return $obj->{$property};
 			} else
 			{
-				foreach($obvar as $name => $var)
+				foreach ($obvar as $name => $var)
 				{
 					$result = &$this->find_obj_with_prop($obj->{$name},$property);
 					if ($result)
@@ -536,7 +536,7 @@ class webhook {
 		{
 			$regex = '/.*~t([0-9]*)[^0-9]*/sm';
 		} else 	//Forum-ID
-		{ 
+		{
 			$regex = '/.*~f([0-9]*)[^0-9]*/sm';
 		}
 		preg_match($regex, $buttonData, $matches);
@@ -616,7 +616,7 @@ class webhook {
 				$text = $this->user->lang('TOPIC_LIST_TITLE_EMPTY', $forumName) . PHP_EOL;
 			}
 			$i = 1;
-			foreach($topics as $id => $topic)
+			foreach ($topics as $id => $topic)
 			{
 				$title = $topic['title'];
 				$date = date('d.m.y', $topic['date']);
@@ -658,15 +658,15 @@ class webhook {
 			if (!$forum['readonly'])
 			{
 				$buttons['NEW_LINE1'] = 'NEXT_LINE';
-				$buttons[ $this->user->lang('ADD_TOPIC')] = 'newTopicTitle';
+				$buttons[$this->user->lang('ADD_TOPIC')] = 'newTopicTitle';
 			}
 			$buttons['NEW_LINE2'] = 'NEXT_LINE';
-			$buttons[ $this->user->lang('SHOW_FORUMS')] = 'allForums';
-		} else 
+			$buttons[$this->user->lang('SHOW_FORUMS')] = 'allForums';
+		} else
 		{
 			// Could not read the forum. Please try again;
 			$text .= $this->user->lang('FORUM_NOT_FOUND') . PHP_EOL;
-			$buttons[ $this->user->lang('BACK')] = 'initial';
+			$buttons[$this->user->lang('BACK')] = 'initial';
 		}
 		//Save a chat state, that allows to page through the entries
 		$this->forum_api->store_telegram_chat_state($chat_id, 0, 'T', $page);
@@ -692,7 +692,7 @@ class webhook {
 		//List of forums:\n\n
 		$text = $this->user->lang('FORUM_LIST_TITLE', $this->config['sitename'], $total_count) . PHP_EOL . PHP_EOL;
 		$i = 1;
-		foreach($forums as $forum)
+		foreach ($forums as $forum)
 		{
 			$id = $forum['id'];
 			$title = $forum['title'];
@@ -745,7 +745,7 @@ class webhook {
 		$posts = $this->forum_api->selectTopicPosts($user_id, $topic);
 		$first = true;
 		$readonly = true;
-		foreach($posts as $id => $post)
+		foreach ($posts as $id => $post)
 		{
 			$time = date('d.m.y H:i', $post['time']);
 			$user = $post['username'];

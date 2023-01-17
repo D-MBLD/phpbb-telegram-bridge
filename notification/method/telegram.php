@@ -33,15 +33,15 @@ class telegram extends \phpbb\notification\method\messenger_base
 			\eb\telegram\core\telegram_api $telegram_api,
 			\eb\telegram\core\forum_api $forum_api
 			)
-			{
-					parent::__construct($user_loader, $phpbb_root_path, $php_ext);
-					$this->user 	= $user;
-					$this->config 	= $config;
-					$this->language = $language;
-					$this->telegram_api = $telegram_api;
-					$this->forum_api = $forum_api;
-					$this->language->add_lang('common', 'eb/telegram');
-			}
+		{
+			parent::__construct($user_loader, $phpbb_root_path, $php_ext);
+			$this->user 	= $user;
+			$this->config 	= $config;
+			$this->language = $language;
+			$this->telegram_api = $telegram_api;
+			$this->forum_api = $forum_api;
+			$this->language->add_lang('common', 'eb/telegram');
+		}
 
 	/**
 	* Get notification method name
@@ -56,7 +56,7 @@ class telegram extends \phpbb\notification\method\messenger_base
 	/**
 	* Is this method available for the user?
 	* This is checked on the notifications options.
-   	* The telegram column is only shown, if this returns true.
+	* The telegram column is only shown, if this returns true.
 	*/
 	public function is_available(\phpbb\notification\type\type_interface $notification_type = null)
 	{

@@ -94,7 +94,7 @@ class test {
 
 	private function simulate_button_callback($command, $chat_id)
 	{
-		$json = '{"callback_query":' . 
+		$json = '{"callback_query":' .
 					'{"from":{"id":"' . $chat_id . '"},' .
 					 '"message":{"chat":{"id":"' . $chat_id . '"}},' .
 					 '"data":"' . $command .
@@ -171,7 +171,8 @@ class test {
 		$request->enable_super_globals();
 		$remote_addr = $_SERVER['REMOTE_ADDR'];
 		$request->disable_super_globals();
-		if ($remote_addr != $allowed_ip) {
+		if ($remote_addr != $allowed_ip)
+		{
 			//Return the ip adress, so its easier to adapt the
 			//code during testing.
 			die("Forbidden for $remote_addr");

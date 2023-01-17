@@ -24,7 +24,7 @@ class telegram_api
 	* @param \phpbb\config\config	$config
 	*/
 
-	public function __construct(\phpbb\config\config $config, 
+	public function __construct(\phpbb\config\config $config,
 								\phpbb\language\language $language
 								)
 	{
@@ -36,7 +36,7 @@ class telegram_api
 	{
 		$token = $this->config['eb_telegram_bot_token'];
 		if (empty($token))
-		{  
+		{
 			//echo "Error, Telegram Bot ID is needed.\n";
 			return false;
 		}
@@ -87,7 +87,7 @@ class telegram_api
 			$buttonStack = array();
 			$buttonRow = array();
 			$new_line = true;
-			foreach($buttons as $b_text => $command)
+			foreach ($buttons as $b_text => $command)
 			{
 				$new_line = !$new_line; //New line after every second button
 				if ($command != 'NEXT_LINE')
@@ -113,7 +113,7 @@ class telegram_api
 			$reply_markup_ik = array( 'inline_keyboard' => $buttonStack );
 		}
 
-		$message = 
+		$message =
 			array (
 				'disable_web_page_preview' => 'true',
 				'parse_mode' => 'HTML',
@@ -136,7 +136,7 @@ class telegram_api
 			// <b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
 			$pretext = $this->language->lang('TOPIC_SHORTENED') . PHP_EOL . '...' . PHP_EOL;
 			$len = 4095 - strlen($pretext);
-			while(strlen($text) >= 4069 )
+			while (strlen($text) >= 4069)
 			{
 				$len--;
 				$text = mb_substr($org_text, -$len);
@@ -165,7 +165,7 @@ class telegram_api
 
 	}
 	/** Encode all html-formatting, which is not allowed by telegram.
-	 * 
+	 *
 	 */
 	private function htmlentitiesForTelegram ($text)
 	{
