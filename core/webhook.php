@@ -320,7 +320,7 @@ class webhook {
 			$command['topic_id'] = $this->parse_id_from_button($buttonCallback);
 			$command['action'] = 'newPost';
 			//No update of telegram message, but request answer below of previous post
-			unset($command['message_id']); 
+			unset($command['message_id']);
 		} else if (stripos($buttonCallback, 'newTopicTitle') === 0 )
 		{
 			$command['action'] = 'newTopicTitle';
