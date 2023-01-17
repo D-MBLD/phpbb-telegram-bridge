@@ -1,0 +1,136 @@
+services:
+    notification.method.telegram:
+        class: eb\telegram\notification\method\telegram
+        scope: prototype
+        arguments:
+            - '@user_loader'
+            - '@user'
+            - '@language'
+            - '@config'
+            - %core.root_path%
+            - %core.php_ext%
+            - '@eb.telegram.core.telegram_api'
+            - '@eb.telegram.core.forum_api'
+        tags:
+            - { name: notification.method }
+
+    eb.telegram.notification.method.email:
+        class: eb\telegram\notification\method\email
+        parent: notification.method.email
+        decorates: 'notification.method.email'
+        shared: false
+#        Don't set the tag, it would add a second email-method to the notification options
+#        tags: 
+#            - { name: notification.method }
+
+    eb.telegram.notification.method.board:
+        class: eb\telegram\notification\method\board
+        parent: notification.method.board
+        decorates: 'notification.method.board'
+        shared: false
+#        Don't set the tag, it would add a second method "board notifications" to the notification options
+#        tags: 
+#            - { name: notification.method }
+
+    eb.telegram.notification.type.util:
+        class: eb\telegram\notification\type\util
+        shared: false
+        arguments:
+            - '@text_formatter.utils'
+
+    eb.telegram.notification.type.post:
+        class: eb\telegram\notification\type\post
+#       Parent is needed to define the arguments for the constructor
+        parent: notification.type.post
+        decorates: 'notification.type.post'
+        shared: false
+        tags: [{ name: notification.type }]
+        calls:
+            - ['set_inner', ['@eb.telegram.notification.type.post.inner']]
+
+    eb.telegram.notification.type.topic:
+        class: eb\telegram\notification\type\topic
+#       Parent is needed to define the arguments for the constructor
+        parent: notification.type.topic
+        decorates: 'notification.type.topic'
+        shared: false
+        tags: [{ name: notification.type }]
+        calls:
+            - ['set_inner', ['@eb.telegram.notification.type.topic.inner']]
+
+    eb.telegram.notification.type.forum:
+        class: eb\telegram\notification\type\forum
+#       Parent is needed to define the arguments for the constructor
+        parent: notification.type.forum
+        decorates: 'notification.type.forum'
+        shared: false
+        tags: [{ name: notification.type }]
+        calls:
+            - ['set_inner', ['@eb.telegram.notification.type.forum.inner']]
+
+    eb.telegram.notification.type.bookmark:
+        class: eb\telegram\notification\type\bookmark
+#       Parent is needed to define the arguments for the constructor
+        parent: notification.type.bookmark
+        decorates: 'notification.type.bookmark'
+        shared: false
+        tags: [{ name: notification.type }]
+        calls:
+            - ['set_inner', ['@eb.telegram.notification.type.bookmark.inner']]
+
+    eb.telegram.controller.acp:
+        class: eb\telegram\controller\acp_controller
+        arguments:
+            - '@config'
+            - '@language'
+            - '@log'
+            - '@request'
+            - '@template'
+            - '@user'
+
+    eb.telegram.listener:
+        class: eb\telegram\event\main_listener
+        arguments:
+            - '@request'
+            - '@user'
+            - '@language'
+            - '@controller.helper'
+            - '@template'
+            - '%core.php_ext%'
+        tags:
+            - { name: event.listener }
+
+    eb.telegram.core.forum_api:
+        class: eb\telegram\core\forum_api
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@user'
+            - '@auth'
+
+    eb.telegram.core.telegram_api:
+        class: eb\telegram\core\telegram_api
+        arguments:
+            - '@config'
+            - '@language'
+
+    eb.telegram.core.webhook:
+        class: eb\telegram\core\webhook
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@user'
+            - '@auth'
+            - '@controller.helper'
+            - '@request'
+            - '@eb.telegram.core.telegram_api'
+            - '@eb.telegram.core.forum_api'
+
+    eb.telegram.core.test:
+        class: eb\telegram\core\test
+        arguments:
+            - '@config'
+            - '@request'
+            - '@controller.helper'
+            - '@eb.telegram.core.telegram_api'
+            - '@eb.telegram.core.webhook'

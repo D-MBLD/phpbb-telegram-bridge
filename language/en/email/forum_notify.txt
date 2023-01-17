@@ -1,0 +1,5 @@
+Subject: (ignored in Telegram)
+
+There is a <a href="{U_NEWEST_POST}">new post</a> by <b>{AUTHOR_NAME}</b> for the topic <b>{TOPIC_TITLE}</b> in the forum <b>{FORUM_NAME}</b>:
+
+{TELEGRAM_MESSAGE}

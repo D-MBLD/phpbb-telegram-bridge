@@ -1,0 +1,68 @@
+{% include 'overall_header.html' %}
+
+<h1>{{ lang('ACP_TELEGRAM_TITLE') }}</h1>
+
+{% if S_ERROR %}
+	<div class="errorbox">
+		<h3>{{ lang('WARNING') }}</h3>
+		<p>{{ ERROR_MSG }}</p>
+	</div>
+{% endif %}
+
+<form id="eb_telegram_acp" name="eb_telegram_acp" method="post" action="{{ U_ACTION }}">
+
+	<fieldset>
+		<legend>{{ lang('SETTINGS') }}</legend>
+		<!-- Note: The readonly stuff below, avoids the browser to autofill the user and PW-fields.
+		     See: https://stackoverflow.com/a/37153976/2808624 -->
+		<dl>
+			<dt><label for="<eb_telegram_admin_user>">{{ lang('ACP_TELEGRAM_ADMIN_USER') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_TELEGRAM_ADMIN_USER_DESCR') }}</span></dt>
+			<dd><input readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','');" type="text" id="eb_telegram_admin_user" name="eb_telegram_admin_user" size="64" maxlength="255" value="{ADMIN_USER}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="<eb_telegram_admin_pw>">{{ lang('ACP_TELEGRAM_ADMIN_PW') ~ lang('COLON') }}</label></dt>
+			<dd><input readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','');" type="password" id="eb_telegram_admin_pw" name="eb_telegram_admin_pw" size="64" maxlength="255" value="{ADMIN_PW}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="<eb_telegram_bot_token>">{{ lang('ACP_TELEGRAM_BOT_TOKEN') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_TELEGRAM_BOT_TOKEN_DESCR') }}</span></dt>
+			<dd><input type="text" id="eb_telegram_bot_token" name="eb_telegram_bot_token" size="64" maxlength="255" value="{BOT_TOKEN}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="eb_telegram_secret">{{ lang('ACP_TELEGRAM_SECRET') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_TELEGRAM_SECRET_DESCR')}}</span></dt>
+			<dd><input type="text" id="eb_telegram_secret" placeholder="(A-Z, a-z and 0-9)" name="eb_telegram_secret" size="64" maxlength="255" value="{SECRET}" /></dd>
+		</dl>
+		{% if WEBHOOK %}
+		<dl>
+			<dt><label for="eb_telegram_webhook">{{ lang('ACP_TELEGRAM_WEBHOOK') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_TELEGRAM_WEBHOOK_DESCR')}}</span></dt>
+			<!--
+				<dd><a href="{WEBHOOK}"><input readonly disabled type="text" id="eb_telegram_webhook" name="eb_telegram_webhook" size="64" maxlength="255" value="{WEBHOOK}" /></a></dd>
+			-->
+			<dd><a href="{WEBHOOK}">{WEBHOOK}</a></dd>
+		</dl>
+		{% endif %}
+		<dl>
+			<dt><label for="eb_telegram_footer">{{ lang('ACP_TELEGRAM_FOOTER') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_TELEGRAM_FOOTER_DESCR')}}</span></dt>
+			<dd><input type="text" id="eb_telegram_footer" name="eb_telegram_footer" size="64" maxlength="255" value="{FOOTER}"
+				list="footer_proposal" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="eb_telegram_admin_telegram_id">{{ lang('ACP_TELEGRAM_ADMIN_ID') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_TELEGRAM_ADMIN_ID_DESCR')}}</span></dt>
+			<dd><input type="text" id="eb_telegram_admin_telegram_id" name="eb_telegram_admin_telegram_id" size="64" maxlength="255" value="{ADMIN_TELEGRAM_ID}"/></dd>
+		</dl>
+		<dl>
+			<dt><label for="eb_telegram_admin_echo">{{ lang('ACP_TELEGRAM_ADMIN_ECHO') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_TELEGRAM_ADMIN_ECHO_DESCR')}}</span></dt>
+			<dd><input type="checkbox" class="radio" id="eb_telegram_admin_echo" name="eb_telegram_admin_echo" value="1"<!-- IF ADMIN_TELEGRAM_ECHO --> checked="checked"<!-- ENDIF --> /></dd>
+		</dl>
+	</fieldset>
+
+	<fieldset class="submit-buttons">
+		<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}" />&nbsp;
+		{{ S_FORM_TOKEN }}
+	</fieldset>
+
+	<datalist id="footer_proposal">
+		<option value="{FOOTER_PLACEHOLDER}">
+	</datalist>
+</form>
+
+{% include 'overall_footer.html' %}

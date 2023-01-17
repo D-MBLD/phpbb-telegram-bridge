@@ -1,0 +1,5 @@
+Subject: ~U~{USERNAME}~U~ (wird in Telegram ignoriert)
+
+<b>{AUTHOR_NAME}</b> has written the new topic <b>{TOPIC_TITLE}</b> in the forum <b><a href="{U_FORUM}">{FORUM_NAME}</a></b>:
+
+{TELEGRAM_MESSAGE}

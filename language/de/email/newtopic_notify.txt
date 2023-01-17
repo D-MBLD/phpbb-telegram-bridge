@@ -1,0 +1,4 @@
+Subject: ~U~{USERNAME}~U~ (wird in Telegram ignoriert)
+<b>{AUTHOR_NAME}</b> hat im Forum <b><a href="{U_FORUM}">{FORUM_NAME}</a></b> den neuen Beitrag <b>{TOPIC_TITLE}</b> erfasst:
+
+{TELEGRAM_MESSAGE}
