@@ -142,6 +142,8 @@ class test {
 		$postdata = $this->telegram_api->prepareMessage($text);
 		$postdata['chat_id'] = $this->config['eb_telegram_admin_telegram_id'];
 		//$postdata['message_id'] = 1234;
+		print_r($postdata);
+		echo '=======';
 		$result = $this->telegram_api->sendOrEditMessage($postdata);
 		print_r($result);
 		echo '</pre>';
@@ -153,6 +155,7 @@ class test {
 			$htmlText = '<b attr="unsupportedAttr" attrWithoutValue>Tags are escaped and bold is ignored</b>';
 			$htmlText .= '<br><b attr1="value" attr2 = "value">Bold with unnecessary attributes</b>';
 			$htmlText .= '<br><b>And now bold<i> with nested italic <u>and underlined</u></i> tags</b>';
+			$htmlText .= "<br><b>What happens if a bold text\nspans multiple lines</b>";
 			$htmlText .= PHP_EOL . 'Are quotes \' and double qoutes " also allowed?';
 			$htmlText .= '<br>Link without anchor: https://google.com';
 			$htmlText .= '<br><a href="https://google.com">Link with anchor</a>';

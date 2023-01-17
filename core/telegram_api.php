@@ -179,8 +179,9 @@ class telegram_api
 		//Use https://regexper.com/ to visualize the pattern
 		//("\\" must be replaced by "\" and "/" by "\/" for this tool )
 		//https://regexper.com/#%26lt%3B%28%28list%7Cof%7Callowed%7Ctags%29%28%3F%3A%28%3F%3A%5Cs%2B%5Cw%2B%28%3F%3A%5Cs*%3D%5Cs*%28%3F%3A%5C%22.*%3F%5C%22%7C'.*%3F'%29%29%29%2B%5Cs*%7C%5Cs*%29%29%26gt%3B%28.*%3F%29%26lt%3B%5C%2F%5C2%5Cs*%26gt%3B%0A
-		$pattern = "~&lt;(($allowed_tags_bar_separated)(?:(?:\s+\w+(?:\s*=\s*(?:\".*?\"|'.*?')))+\s*|\s*))&gt;(.*?)&lt;/\\2\s*&gt;~i";
+		$pattern = "~&lt;(($allowed_tags_bar_separated)(?:(?:\s+\w+(?:\s*=\s*(?:\".*?\"|'.*?')))+\s*|\s*))&gt;(.*?)&lt;/\\2\s*&gt;~is";
 		//Groups: 1: Full tag-content including attributs, 2: tag-name, 3: content between tags.
+		//Modifier s: DOTALL, i.e. a dot matches also newline
 		$replacement = '<$1>$3</$2>';
 
 		//If a HTML-Break is already followed by an EOL just remove the HTML-Break
