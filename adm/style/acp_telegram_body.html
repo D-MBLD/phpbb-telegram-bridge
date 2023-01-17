@@ -14,7 +14,7 @@
 	<fieldset>
 		<legend>{{ lang('SETTINGS') }}</legend>
 		<!-- Note: The readonly stuff below, avoids the browser to autofill the user and PW-fields.
-		     See: https://stackoverflow.com/a/37153976/2808624 -->
+			 See: https://stackoverflow.com/a/37153976/2808624 -->
 		<dl>
 			<dt><label for="<eb_telegram_admin_user>">{{ lang('ACP_TELEGRAM_ADMIN_USER') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_TELEGRAM_ADMIN_USER_DESCR') }}</span></dt>
 			<dd><input readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','');" type="text" id="eb_telegram_admin_user" name="eb_telegram_admin_user" size="64" maxlength="255" value="{ADMIN_USER}" /></dd>

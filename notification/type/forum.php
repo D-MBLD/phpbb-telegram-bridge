@@ -19,8 +19,8 @@ namespace eb\telegram\notification\type;
 
 class forum extends \phpbb\notification\type\forum
 {
-    use type_interface_decorator;
-    /* "Inject" the methods get_email_template_variables and create_insert_array */
-    use type_trait;
+	use type_interface_decorator;
+	/* "Inject" the methods get_email_template_variables and create_insert_array */
+	use type_trait;
 
 }

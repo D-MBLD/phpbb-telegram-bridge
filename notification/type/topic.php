@@ -20,9 +20,9 @@ namespace eb\telegram\notification\type;
 
 class topic extends \phpbb\notification\type\topic
 {
-    use type_interface_decorator;
+	use type_interface_decorator;
 
-    /* "Inject" the methods get_email_template_variables and create_insert_array */
-    use type_trait;
+	/* "Inject" the methods get_email_template_variables and create_insert_array */
+	use type_trait;
 
 }

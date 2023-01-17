@@ -70,7 +70,7 @@ $lang = array_merge($lang, [
 	'ACP_TELEGRAM_ADMIN_ID_DESCR'	=> 'If set, all requests sent to the webhook, which can not be interpreted, are forwarded to this telegram user. ' .
 									   'This could help to identify attempts to mis-use the bot, but also legal requests not yet handled by the extension.',
 
-    'ACP_TELEGRAM_ADMIN_ECHO'		=> '<strong>Echo all input to admin id</strong>',
+	'ACP_TELEGRAM_ADMIN_ECHO'		=> '<strong>Echo all input to admin id</strong>',
 	'ACP_TELEGRAM_ADMIN_ECHO_DESCR'	=> 'For debugging all requests to the bot can be echoed to the telegram id above.' .
 									   'To avoid spamming your own account, you may create a group or a channel and use ' . 
 									   'the ID of this account.',

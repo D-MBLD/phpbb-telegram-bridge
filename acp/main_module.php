@@ -22,7 +22,7 @@ class main_module
 	/**
 	 * Main ACP module
 	 *
-	 * @param int    $id   The module ID
+	 * @param int	$id   The module ID
 	 * @param string $mode The module mode (for example: manage or settings)
 	 * @throws \Exception
 	 */

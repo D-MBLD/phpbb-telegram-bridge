@@ -20,7 +20,7 @@ namespace eb\telegram\migrations;
 class delete_method extends \phpbb\db\migration\migration
 {
 
-    /** @var \phpbb\db\driver\driver_interface */
+	/** @var \phpbb\db\driver\driver_interface */
 	// protected $db; availabe from base-class
 
 	public static function depends_on()
@@ -28,11 +28,11 @@ class delete_method extends \phpbb\db\migration\migration
 		return ['\phpbb\db\migration\data\v320\v320'];
 	}
 
-    public function delete_notification_method() {
-        $sql = 'DELETE FROM '. USER_NOTIFICATIONS_TABLE;
-        $sql .= " WHERE method = 'notification.method.telegram'";
-        $result = $this->db->sql_query($sql);
-    }
+	public function delete_notification_method() {
+		$sql = 'DELETE FROM '. USER_NOTIFICATIONS_TABLE;
+		$sql .= " WHERE method = 'notification.method.telegram'";
+		$result = $this->db->sql_query($sql);
+	}
 
 
 

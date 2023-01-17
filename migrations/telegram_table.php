@@ -44,14 +44,14 @@ class telegram_table extends \phpbb\db\migration\migration
 			'add_tables'		=> [
 				$this->table_prefix . 'eb_telegram_chat'	=> [
 					'COLUMNS'=> [
-                        'chat_id'    => ['VCHAR:50', ''],
-                        'message_id' => ['VCHAR:50', ''],
-                        'forum_id'   => ['VCHAR:50', ''],
-                        'topic_id'   => ['VCHAR:50', ''],
-                        'state'      => ['CHAR:1', ''],
-                        'title'      => ['VCHAR:50', ''],
-                    ],
-                    'PRIMARY_KEY' => 'chat_id',
+						'chat_id'    => ['VCHAR:50', ''],
+						'message_id' => ['VCHAR:50', ''],
+						'forum_id'   => ['VCHAR:50', ''],
+						'topic_id'   => ['VCHAR:50', ''],
+						'state'      => ['CHAR:1', ''],
+						'title'      => ['VCHAR:50', ''],
+					],
+					'PRIMARY_KEY' => 'chat_id',
 				],
 			],
 		];

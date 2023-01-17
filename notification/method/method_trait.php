@@ -15,7 +15,7 @@ namespace eb\telegram\notification\method;
 trait method_trait
 {
 
-    /**
+	/**
 	* {@inheritdoc}
 	* We want to inform the users about every new post, such that she can follow the
 	* whole conversation on telegram. 

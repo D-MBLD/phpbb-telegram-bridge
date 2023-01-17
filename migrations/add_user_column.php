@@ -17,31 +17,31 @@ class add_user_column extends \phpbb\db\migration\migration
 		return ['\phpbb\db\migration\data\v320\v320'];
 	}
 
-    public function effectively_installed()
+	public function effectively_installed()
 	{
 		return $this->db_tools->sql_column_exists($this->table_prefix . 'users', 'user_telegram_id');
 	}
 
 
-    public function update_schema()
-    {
-        //return array();
-        return array(
-            'add_columns'    => array(
-                $this->table_prefix . 'users' => array(
-                    'user_telegram_id' => array('VCHAR:32', ''),
-                ),
-            ),
-        );
-    }
-    public function revert_schema()
-    {
-        return array(
-            'drop_columns' => array(
-                $this->table_prefix . 'users' => array(
-                    'user_telegram_id',
-                ),
-            ),
-        );
-    }
+	public function update_schema()
+	{
+		//return array();
+		return array(
+			'add_columns'    => array(
+				$this->table_prefix . 'users' => array(
+					'user_telegram_id' => array('VCHAR:32', ''),
+				),
+			),
+		);
+	}
+	public function revert_schema()
+	{
+		return array(
+			'drop_columns' => array(
+				$this->table_prefix . 'users' => array(
+					'user_telegram_id',
+				),
+			),
+		);
+	}
 }

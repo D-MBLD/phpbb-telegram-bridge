@@ -11,14 +11,14 @@
 namespace eb\telegram\notification\type;
 
 /* Used as notification type, when a new post is added to a topic, where the user 
-   has bookmarked the topic.
+	has bookmarked the topic.
 
-   The decorator pattern is implemented here, such that other extensions can also
-   extend this service.
+	The decorator pattern is implemented here, such that other extensions can also
+	extend this service.
 */
 class bookmark extends \phpbb\notification\type\bookmark
 {
-   use type_interface_decorator;
+	use type_interface_decorator;
 	use type_trait;
 
 }

@@ -17,12 +17,12 @@
 class telegram extends \phpbb\notification\method\messenger_base
 {
 
-        protected $user;
-        protected $config;
-        protected $language;
-        protected $telegram_api;
-        protected $forum_api;
-        
+		protected $user;
+		protected $config;
+		protected $language;
+		protected $telegram_api;
+		protected $forum_api;
+		
 		public function __construct(
 			\phpbb\user_loader $user_loader, 
 			\phpbb\user $user, 
@@ -60,7 +60,7 @@ class telegram extends \phpbb\notification\method\messenger_base
 	*/
 	public function is_available(\phpbb\notification\type\type_interface $notification_type = null)
 	{
-        return true;
+		return true;
 		return ($this->bot_is_configured() && (strlen($this->user->data['user_telegram_id']) > 2));
 	}
 
@@ -204,12 +204,12 @@ class telegram extends \phpbb\notification\method\messenger_base
 			$buttons = array(
 				$this->user->lang('NEW_REPLY') => "newPost~t$topic_id", 
 				$this->user->lang('FULL_TOPIC') => "showTopic~t$topic_id", 
-                $this->user->lang('BACK') => 'initial',
+				$this->user->lang('BACK') => 'initial',
 			);
 		} else {
 			//This was another notification event, no new post or new topic
 			$buttons = array(
-                $this->user->lang('BACK') => 'initial',
+				$this->user->lang('BACK') => 'initial',
 			);
 		}
 

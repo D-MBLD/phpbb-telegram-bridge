@@ -112,7 +112,7 @@ class acp_controller
 		$webhook = false;
 		if ($token && $secret) {
 			$root_url = $this->config['server_protocol'].$this->config['server_name'].$this->config['script_path'];
-            $webhook = sprintf($this->user->lang('ACP_TELEGRAM_WEBHOOK_TEMPLATE'), $token, $root_url, $secret);
+			$webhook = sprintf($this->user->lang('ACP_TELEGRAM_WEBHOOK_TEMPLATE'), $token, $root_url, $secret);
 		}
 
 		// Set output variables for display in the template
