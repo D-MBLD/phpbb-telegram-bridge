@@ -18,7 +18,7 @@ trait method_trait
 	/**
 	* {@inheritdoc}
 	* We want to inform the users about every new post, such that she can follow the
-	* whole conversation on telegram. 
+	* whole conversation on telegram.
 	* Therefore we never return the information about the topics
 	* where the user was already informed about.
 	*/

@@ -23,9 +23,6 @@ namespace eb\telegram\core;
  *    https://<server>/<forum-base>/telegram/test?test=html
  */
 
-$phpbb_root_path = './../../../../';
-$phpEx = substr(strrchr(__FILE__, '.'), 1);
-
 const ALLOWED_CALLER_IP = 'xxx.x.xxx.xxx';
 
 class test {
@@ -64,7 +61,7 @@ class test {
 		//Set the header here, such that the forum does not complain.
 		header('HTTP/1.1 200 OK');
 		header('Content-Type: text/html; charset=utf-8');
-		
+
 		$this->check_caller($this->request, ALLOWED_CALLER_IP);
 		$this->dispatch_request();
 
@@ -72,27 +69,33 @@ class test {
 
 	}
 
-	private function dispatch_request() {
+	private function dispatch_request()
+	{
 		//Simulate text-input or the data of an inline button with the url-parameter 'text' or 'command'
 		$command = $this->request->variable('command','~~~');
 		$text = $this->request->variable('text','~~~');
 		$test = $this->request->variable('test','~~~');
 		$chat_id = $this->request->variable('chat_id', $this->config['eb_telegram_admin_telegram_id']);
-		
-		if ($command != '~~~') {
+
+		if ($command != '~~~')
+		{
 			$this->simulate_button_callback($command, $chat_id);
-		} else if ($text != '~~~') {
+		} else if ($text != '~~~')
+		{
 			$this->simulate_text_input($text, $chat_id);
-		} else if ($test == 'html'){
+		} else if ($test == 'html')
+		{
 			$this->test_html_escape();
-		} else {
+		} else
+		{
 			$this->echo_help_text();
 		}
 	}
 
-	private function simulate_button_callback($command, $chat_id) {
+	private function simulate_button_callback($command, $chat_id)
+	{
 		$json = '{"callback_query":' . 
-					'{"from":{"id":"' . $chat_id . '"},' . 
+					'{"from":{"id":"' . $chat_id . '"},' .
 					 '"message":{"chat":{"id":"' . $chat_id . '"}},' .
 					 '"data":"' . $command .
 				'"}}';
@@ -101,8 +104,9 @@ class test {
 		$this->webhook->process_input($payload, true);
 		echo '</pre>';
 	}
-	
-	private function simulate_text_input($text, $chat_id) {
+
+	private function simulate_text_input($text, $chat_id)
+	{
 		$json = '{"message":' .
 					'{"from":{"id":"' . $chat_id . '"},' .
 					 '"chat":{"id":"' . $chat_id . '"},' .
@@ -113,7 +117,8 @@ class test {
 		echo '</pre>';
 	}
 
-	private function echo_help_text() {
+	private function echo_help_text()
+	{
 		$path = $this->config['server_protocol'] . $this->config['server_name'] . $this->config['script_path'] . '/telegram/test';
 		echo 'You may use one of the following URLs for testing:';
 		echo '<ul>';
@@ -130,7 +135,8 @@ class test {
 		die();
 	}
 
-	private function test_html_escape() {
+	private function test_html_escape()
+	{
 		echo '<pre>';
 		$text = $this->create_complicated_html_text();
 		$postdata = $this->telegram_api->prepareMessage($text);
@@ -141,7 +147,9 @@ class test {
 		echo '</pre>';
 		die("Done");
 	}
-	private function create_complicated_html_text() {
+
+	private function create_complicated_html_text()
+	{
 			$htmlText = '<b attr="unsupportedAttr" attrWithoutValue>Tags are escaped and bold is ignored</b>';
 			$htmlText .= '<br><b attr1="value" attr2 = "value">Bold with unnecessary attributes</b>';
 			$htmlText .= '<br><b>And now bold<i> with nested italic <u>and underlined</u></i> tags</b>';
@@ -154,9 +162,10 @@ class test {
 			return $htmlText;
 	}
 
-	 /** Allow calls to the test-api only by specified IP-Adresses.
-	 */
-	private function check_caller($request, $allowed_ip) {
+	/** Allow calls to the test-api only by specified IP-Adresses.
+	*/
+	private function check_caller($request, $allowed_ip)
+	{
 		//The forum usually does not allow to read the super globals. Therefore
 		//this access must be temporarily enabled.
 		$request->enable_super_globals();
@@ -170,5 +179,3 @@ class test {
 	}
 
 }
-
-?>

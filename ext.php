@@ -33,7 +33,6 @@ class ext extends \phpbb\extension\base
 		//Maybe this needs to be implemented in a migration class with a special disable-method
 		//which is called here. The base class only has db/migration injected, but not DB itself.
 
-		
 		$migration = $this->migrator->get_migration('\eb\telegram\migrations\delete_method');
 		$migration->delete_notification_method();
 		return false;
@@ -44,8 +43,10 @@ class ext extends \phpbb\extension\base
 
 		$migrations = $this->extension_finder->get_classes_from_files($migrations);
 
-		foreach ($migrations as $migration) {
-			if (method_exists($migration, 'delete_notification_method')) {
+		foreach ($migrations as $migration)
+		{
+			if (method_exists($migration, 'delete_notification_method'))
+			{
 				//echo "<br>Found matching $migration in disable_step<br>";
 				$migration->delete_notification_method();
 			}

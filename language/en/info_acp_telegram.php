@@ -65,14 +65,14 @@ $lang = array_merge($lang, [
 	'ACP_TELEGRAM_WEBHOOK'			=> '<strong>URL for webhook registration</strong>',
 	'ACP_TELEGRAM_WEBHOOK_DESCR'	=> 'You can register the webhook by just clicking the link, after bot token and secret string have been saved.',
 	'ACP_TELEGRAM_WEBHOOK_TEMPLATE' => 'https://api.telegram.org/bot%s/setWebhook?url=%s/telegram/webhook&secret_token=%s',
-	
+
 	'ACP_TELEGRAM_ADMIN_ID'			=> '<strong>Telegram id of an admin</strong>',
 	'ACP_TELEGRAM_ADMIN_ID_DESCR'	=> 'If set, all requests sent to the webhook, which can not be interpreted, are forwarded to this telegram user. ' .
 									   'This could help to identify attempts to mis-use the bot, but also legal requests not yet handled by the extension.',
 
 	'ACP_TELEGRAM_ADMIN_ECHO'		=> '<strong>Echo all input to admin id</strong>',
 	'ACP_TELEGRAM_ADMIN_ECHO_DESCR'	=> 'For debugging all requests to the bot can be echoed to the telegram id above.' .
-									   'To avoid spamming your own account, you may create a group or a channel and use ' . 
+									   'To avoid spamming your own account, you may create a group or a channel and use ' .
 									   'the ID of this account.',
 
 	'ACP_TELEGRAM_SETTING_SAVED'	=> 'Telegram bridge data updated',

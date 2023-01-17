@@ -73,8 +73,9 @@ class acp_controller
 		$errors = [];
 
 		// Is the form being submitted to us?
-		if ($this->request->is_set_post('reset')){
-			$message = '<script>jQuery("document").ready(function(){jQuery("#mydialog").dialog("open")});setTimeout(function(){jQuery("#mydialog").fadeOut();window.location.href="index.php";}, 5000);</script>'; 
+		if ($this->request->is_set_post('reset'))
+		{
+			$message = '<script>jQuery("document").ready(function(){jQuery("#mydialog").dialog("open")});setTimeout(function(){jQuery("#mydialog").fadeOut();window.location.href="index.php";}, 5000);</script>';
 			trigger_error($message);
 		}
 		if ($this->request->is_set_post('submit'))
@@ -110,7 +111,8 @@ class acp_controller
 		$token = $this->config['eb_telegram_bot_token'] ?? '';
 		$secret = $this->config['eb_telegram_secret'] ?? '';
 		$webhook = false;
-		if ($token && $secret) {
+		if ($token && $secret)
+		{
 			$root_url = $this->config['server_protocol'].$this->config['server_name'].$this->config['script_path'];
 			$webhook = sprintf($this->user->lang('ACP_TELEGRAM_WEBHOOK_TEMPLATE'), $token, $root_url, $secret);
 		}

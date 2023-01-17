@@ -43,7 +43,7 @@ $lang = array_merge($lang, [
 	'TELEGRAM_ID'			=> 'Deine Telegram ID',
 	'TELEGRAM_ID_DESCR'		=> 'Nimm den passenden bot in deine Telegram Kontakte auf und gib hier deine Telegram-ID ein.',
 	'TELEGRAM_ID_NOT_NUMERIC'	=> 'Die Telegram-ID darf nur aus Ziffern bestehen.',
-	
+
 	//Notification
 	'FULL_TOPIC'	=> 'Beitrag vollst. anzeigen',
 
@@ -74,20 +74,20 @@ $lang = array_merge($lang, [
 
 	//Helpscreen unregistered user
 	//Placeholders: Sitename, Site-URL, telegram-id
-	'HELP_SCREEN_NON_MEMBER' => 'Dieser Service kann nur von registrierten Benutzern des Forums ' . 
-								'<a href="%2$s">%1$s</a> benutzt werden.' . 
-								'<br>Falls du registrierter Benutzer bist, gib deine Telegram-Id (%3$s) in deinem ' . 
+	'HELP_SCREEN_NON_MEMBER' => 'Dieser Service kann nur von registrierten Benutzern des Forums ' .
+								'<a href="%2$s">%1$s</a> benutzt werden.' .
+								'<br>Falls du registrierter Benutzer bist, gib deine Telegram-Id (%3$s) in deinem ' .
 								'Forums-Profil ein.' .
-								'<br>Um Benachrichtigungen zu erhalten, musst du außerdem unter den ' . 
+								'<br>Um Benachrichtigungen zu erhalten, musst du außerdem unter den ' .
 								'Notifikations-Einstellungen die gewünschten Telegram-Notifikationen auswählen.',
 
-	//Button outdated								
+	//Button outdated
 	'BUTTON_OUTDATED' => 'Bitte nutze nur die Tasten der letzten Telegram-Nachricht.',
 	'OK' => 'OK',
 
 	//Illegal Forum was somehow set
 	'ILLEGAL_FORUM' => 'Du hast auf das ausgewählte Forum keinen Zugriff (mehr?).',
-	
+
 	//Send new posts and topics
 	'REQUEST_POST' => 'Sende deine Antwort oder nutze die Abbrechen-Taste.',
 	'REQUEST_TITEL' => 'Sende den Titel deines Beitrags, oder nutze die Abbrechen-Taste.',
@@ -98,5 +98,5 @@ $lang = array_merge($lang, [
 
 	//Illegal call
 	'GROUP_OR_CHANNEL_CALL' => 'Das Forum kann nicht über Gruppen oder Kanäle aufgerufen werden.',
-	
+
 ]);

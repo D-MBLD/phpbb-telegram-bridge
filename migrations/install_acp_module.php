@@ -74,4 +74,3 @@ class install_acp_module extends \phpbb\db\migration\migration
 		];
 	}
 }
-

@@ -34,7 +34,7 @@ class main_listener implements EventSubscriberInterface
 
 	/* @var \phpbb\request\request  */
 	protected $request;
-	
+
 	/* @var \phpbb\user  */
 	protected $user;
 
@@ -92,14 +92,16 @@ class main_listener implements EventSubscriberInterface
 	/**
 	* Modify user data on editing profile in ACP
 	* Event-Data: data, submit, user_id, user_row
-	* Move the telegram-id to the event, such that it can be used 
-	* in the ..._sql_ary events, below. 
+	* Move the telegram-id to the event, such that it can be used
+	* in the ..._sql_ary events, below.
 	*/
 	public function acp_users_modify_profile($event)
 	{
-		if ($event['submit']) {
+		if ($event['submit'])
+		{
 			$telegram =  $this->request->variable('telegram', '');
-		} else {
+		} else
+		{
 			$telegram =  $event['user_row']['user_telegram_id'];
 		}
 		//$telegram =  $this->request->variable('telegram', $event['user_row']['user_telegram_id']);
@@ -115,9 +117,11 @@ class main_listener implements EventSubscriberInterface
 	*/
 	public function ucp_profile_modify_profile_info($event)
 	{
-		if ($event['submit']) {
+		if ($event['submit'])
+		{
 			$telegram =  $this->request->variable('telegram', '');
-		} else {
+		} else
+		{
 			$telegram =  $this->user->data['user_telegram_id'];
 		}
 		// $telegram =  $this->request->variable('telegram', $this->user->data['user_telegram_id']);
@@ -138,7 +142,6 @@ class main_listener implements EventSubscriberInterface
 		));
 	}
 
-
 	/**
 	* Validate user data on editing profile in UCP
 	* Event-Data: data, error, submit
@@ -148,11 +151,13 @@ class main_listener implements EventSubscriberInterface
 		$errors = $event['error'];
 		$error = array();
 		$telegram_id = $event['data']['user_telegram_id'];
-		if ($telegram_id) {
-			if (!is_numeric($telegram_id)) {
+		if ($telegram_id)
+		{
+			if (!is_numeric($telegram_id))
+			{
 				$error[] = 'TELEGRAM_ID_NOT_NUMERIC';
 				$event['error'] = array_merge($errors, $error);
-			} 
+			}
 		}
 	}
 

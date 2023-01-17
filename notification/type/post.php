@@ -10,7 +10,7 @@
 
 namespace eb\telegram\notification\type;
 
-/* Used as notification type, when a new post is added to a topic, where the user 
+/* Used as notification type, when a new post is added to a topic, where the user
    is watching the topic, but not the forum.
 
    The decorator pattern is implemented here, such that other extensions can also

@@ -20,7 +20,8 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 
 	private \phpbb\notification\type\base $inner;
 
-	public function set_inner(\phpbb\notification\type\base $inner) {
+	public function set_inner(\phpbb\notification\type\base $inner)
+	{
 		$this->inner = $inner;
 	}
 
@@ -44,7 +45,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_type();
 	}
-	
+
 	/**
 	 * Set initial data from the database
 	 *
@@ -54,7 +55,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->set_initial_data($data);
 	}
-	
+
 	/**
 	* Get the id of the item
 	*
@@ -64,7 +65,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return parent::get_item_id($type_data);
 	}
-	
+
 	/**
 	 * Get the id of the parent
 	 *
@@ -74,7 +75,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return parent::get_item_parent_id($type_data);
 	}
-	
+
 	/**
 	 * Is this type available to the current user (defines whether or not it will be shown in the UCP Edit notification options)
 	*
@@ -84,7 +85,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->is_available();
 	}
-	
+
 	/**
 	* Find the users who want to receive notifications
 	*
@@ -99,7 +100,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->find_users_for_notification($type_data, $options);
 	}
-	
+
 	/**
 	* Users needed to query before this notification can be displayed
 	*
@@ -109,7 +110,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->users_to_query();
 	}
-	
+
 	/**
 	 * Get the special items to load
 	 *
@@ -119,7 +120,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_load_special();
 	}
-	
+
 	/**
 	 * Load the special items
 	*
@@ -130,7 +131,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->load_special($data, $notifications);
 	}
-	
+
 	/**
 	 * Get the CSS style class of the notification
 	 *
@@ -140,7 +141,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_style_class();
 	}
-	
+
 	/**
 	 * Get the HTML formatted title of this notification
 	 *
@@ -150,7 +151,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_title();
 	}
-	
+
 	/**
 	* Get the HTML formatted reference of the notification
 	*
@@ -160,7 +161,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_reference();
 	}
-	
+
 	/**
 	 * Get the forum of the notification reference
 	 *
@@ -170,7 +171,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_forum();
 	}
-	
+
 	/**
 	* Get the url to this item
 	*
@@ -180,7 +181,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_url();
 	}
-	
+
 	/**
 	* Get the url to redirect after the item has been marked as read
 	*
@@ -190,7 +191,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->get_redirect_url();
 	}
-	
+
 	/**
 	 * URL to unsubscribe to this notification
 	 *
@@ -200,7 +201,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_unsubscribe_url($method);
 	}
-	
+
 	/**
 	 * Get the user's avatar (the user who caused the notification typically)
 	*
@@ -210,7 +211,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_avatar();
 	}
-	
+
 	/**
 	 * Prepare to output the notification to the template
 	 */
@@ -218,7 +219,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->prepare_for_display();
 	}
-	
+
 	/**
 	 * Get email template
 	*
@@ -228,7 +229,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_email_template();
 	}
-	
+
 	/**
 	 * Get email template variables
 	 *
@@ -256,7 +257,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->pre_create_insert_array($type_data, $notify_users);
 	}
-	
+
 	/**
 	 * Function for preparing the data for insertion in an SQL query
 	 *
@@ -279,7 +280,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->get_insert_array();
 	}
-	
+
 	/**
 	 * Function for preparing the data for update in an SQL query
 	 * (The service handles insertion)
@@ -292,7 +293,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->create_update_array($type_data);
 	}
-	
+
 	/**
 	 * Mark this item read
 	*
@@ -303,7 +304,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	{
 		return $this->inner->mark_read($return);
 	}
-	
+
 	/**
 	* Mark this item unread
 	*

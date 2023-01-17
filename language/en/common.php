@@ -46,7 +46,7 @@ $lang = array_merge($lang, [
 
 	//Notification
 	'FULL_TOPIC'	=> 'Show complete topic',
-	
+
 	//Forum list
 	'FORUM_LIST_TITLE'	=> '<u>%1$s has %2$s forums:</u>',
 	'SELECT_A_FORUM'	=> 'Use one of the buttons to select a forum.',
@@ -54,7 +54,7 @@ $lang = array_merge($lang, [
 	'READ_ONLY' => ' (readonly)',
 	'BACK'	=> 'Back',
 	'ILLEGAL_INPUT' => " \xE2\x9A\xA0 Input <b>%s</b> is invalid.",  //"\xE2\x9A\xA0" = ⚠
-	
+
 	//Topic list
 	'TOPIC_LIST_TITLE' => 'The forum <b>%1$s</b> has %2$s topics:',
 	'TOPIC_LIST_TITLE_EMPTY' => 'Currently there are no topics in the forum <b>%s</b>',
@@ -63,7 +63,7 @@ $lang = array_merge($lang, [
 	'FORUM_NOT_FOUND' => 'Could not read the forum (!?). Please try again',
 	'SHOW_FORUMS' => 'Show other forums',
 	'ADD_TOPIC' => 'Add topic',
-	
+
 	//Post list
 	'TOPIC_AT_BY' => '<b>%1$s:</b> Topic created by <b>%2$s</b>:', //time, user
 	'TOPIC_TITLE' => 'Title: <b>%s</b>',
@@ -71,24 +71,23 @@ $lang = array_merge($lang, [
 	'TOPIC_SHORTENED' => '<b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
 	'NEW_REPLY' => 'Send a reply',
 	'ILLEGAL_TOPIC_ID' => 'Illegal attempt to read topic with ID %s',
-	
-	
+
 	//Helpscreen unregistered user
 	//Placeholders: Sitename, Site-URL, telegram-id
-	'HELP_SCREEN_NON_MEMBER' => 'This service can be used by registered members of ' . 
-								'<a href="%2$s">%1$s</a> only.' . 
-								'<br>If you are a member, you must enter your telegram id (%3$s) into your forums profile ' . 
+	'HELP_SCREEN_NON_MEMBER' => 'This service can be used by registered members of ' .
+								'<a href="%2$s">%1$s</a> only.' .
+								'<br>If you are a member, you must enter your telegram id (%3$s) into your forums profile ' .
 								'in order to use the service.' .
 								'<br>Afterwards you should also select the events for which you want to be notified ' .
-								'via telegram in your notification settings.' . 
-								
-	//Button outdated								
+								'via telegram in your notification settings.',
+
+	//Button outdated
 	'BUTTON_OUTDATED' => 'Please use only buttons of the last message.',
 	'OK' => 'OK',
 
 	//Illegal Forum was somehow set
 	'ILLEGAL_FORUM' => 'You don\'t have access to the selected forum.',
-	
+
 	//Send new posts and topics
 	'REQUEST_POST' => 'Send your reply or use the cancel button.',
 	'REQUEST_TITEL' => 'Send the title for your new post or use the cancel button.',
@@ -99,5 +98,5 @@ $lang = array_merge($lang, [
 
 	//Illegal call
 	'GROUP_OR_CHANNEL_CALL' => 'The forum cannot be called via groups or channels.',
-	
+
 ]);

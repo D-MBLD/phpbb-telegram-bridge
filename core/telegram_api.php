@@ -10,7 +10,8 @@
 
  namespace eb\telegram\core;
 
-class telegram_api {
+class telegram_api
+{
 
 	/* @var \phpbb\config\config */
 	protected $config;
@@ -31,9 +32,11 @@ class telegram_api {
 		$this->language = $language;
 	}
 
-	public function sendOrEditMessage($postdata) {
+	public function sendOrEditMessage($postdata)
+	{
 		$token = $this->config['eb_telegram_bot_token'];
-		if (empty($token)) {  
+		if (empty($token))
+		{  
 			//echo "Error, Telegram Bot ID is needed.\n";
 			return false;
 		}
@@ -52,17 +55,20 @@ class telegram_api {
 		sending a new one. */
 		$update = isset($postdata['message_id']);
 
-		if ($update) {
+		if ($update)
+		{
 			$result = file_get_contents("https://api.telegram.org/bot$token/editMessageText", false, $context);
 			//else try sendMessage
-			if ($result === false || !strpos($http_response_header[0], '200')) {
+			if ($result === false || !strpos($http_response_header[0], '200'))
+			{
 				//Echo can be used here, because this will not be called from the forum, only
 				//from webHook. (Notification does not try an telegram update).
 				echo "Request failed ($http_response_header[0]) with content:\n";
 				print_r($result);
 				echo "\n";
 				echo "\nRetrying with sendMessage.\n";
-			} else {
+			} else
+			{
 				return $result;
 			}
 		}
@@ -73,29 +79,37 @@ class telegram_api {
 	/** Prepare a text message with optional buttons.
 	 * Buttons are passed as an array with button text as key and command as value.
 	 */
-	public function prepareMessage($text, $buttons = false) {
+	public function prepareMessage($text, $buttons = false)
+	{
 		$text = $this->prepareText($text);
-		if ($buttons) {
+		if ($buttons)
+		{
 			$buttonStack = array();
 			$buttonRow = array();
 			$new_line = true;
-			foreach($buttons as $b_text => $command) {
+			foreach($buttons as $b_text => $command)
+			{
 				$new_line = !$new_line; //New line after every second button
-				if ($command != 'NEXT_LINE') {
+				if ($command != 'NEXT_LINE')
+				{
 					$b_text  = $this->prepare_button_text($b_text);
 					$button = array('text' => $b_text, 'callback_data' => $command);
 					$buttonRow[] = $button;
-				} else {
+				} else
+				{
 					$new_line = true;
 				}
-				if ($new_line) {
+				if ($new_line)
+				{
 					//At most 2 buttons in one row
 					$buttonStack[] = $buttonRow;
 					$buttonRow = array();
 				}
 			}
 			if (count($buttonRow) > 0)
+			{
 				$buttonStack[] = $buttonRow;
+			}
 			$reply_markup_ik = array( 'inline_keyboard' => $buttonStack );
 		}
 
@@ -105,21 +119,25 @@ class telegram_api {
 				'parse_mode' => 'HTML',
 				'text' => $text,
 			);
-		if ($buttons) {
+		if ($buttons)
+		{
 			$message['reply_markup'] = $reply_markup_ik;
 		}
 		//chat_id (message receiver) and optionally message_id will be set later.
 		return $message;
 	}
 
-	private function prepareText($org_text) {
+	private function prepareText($org_text)
+	{
 		$text = $this->htmlentitiesForTelegram($org_text);
 		// Return the text from its XML form to its original plain text form
-		if (strlen($text) >= 4096) {
+		if (strlen($text) >= 4096)
+		{
 			// <b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
 			$pretext = $this->language->lang('TOPIC_SHORTENED') . PHP_EOL . '...' . PHP_EOL;
 			$len = 4095 - strlen($pretext);
-			while(strlen($text) >= 4069 ) {
+			while(strlen($text) >= 4069 )
+			{
 				$len--;
 				$text = mb_substr($org_text, -$len);
 				//To avoid open tags, we need to encode html-chars again, after the text was shortend
@@ -134,9 +152,11 @@ class telegram_api {
 	 * All tags are removed.
 	 * Text is shortened to at most 20 characters. If so, ... is appended.
 	 */
-	private function prepare_button_text($text) {
+	private function prepare_button_text($text)
+	{
 		$text = strip_tags($text);
-		if (strlen($text) > 24) {
+		if (strlen($text) > 24)
+		{
 			$text = mb_substr($text, 0, 20) . ' ...'; //Multibyte-safe cut
 		}
 		//Button-texts do not need html-encoding
@@ -177,11 +197,11 @@ class telegram_api {
 
 		//Now look for correctly opened and closed tags, using the escaped entities for < (&lt;) and > (&gt) and
 		//replace them again by < and >
-		do {
+		do
+		{
 			$text = preg_replace($pattern, $replacement, $text, 1, $count);
 		} while ($count > 0);
 		return $text;
 	}
 
 }
-?>

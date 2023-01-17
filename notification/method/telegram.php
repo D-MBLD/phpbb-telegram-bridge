@@ -12,7 +12,7 @@
 
 /**
 * Send telegram notifications.
-* 
+*
 */
 class telegram extends \phpbb\notification\method\messenger_base
 {
@@ -22,13 +22,13 @@ class telegram extends \phpbb\notification\method\messenger_base
 		protected $language;
 		protected $telegram_api;
 		protected $forum_api;
-		
+
 		public function __construct(
-			\phpbb\user_loader $user_loader, 
-			\phpbb\user $user, 
-			\phpbb\language\language $language, 
-			\phpbb\config\config $config, 
-			$phpbb_root_path, 
+			\phpbb\user_loader $user_loader,
+			\phpbb\user $user,
+			\phpbb\language\language $language,
+			\phpbb\config\config $config,
+			$phpbb_root_path,
 			$php_ext,
 			\eb\telegram\core\telegram_api $telegram_api,
 			\eb\telegram\core\forum_api $forum_api
@@ -60,16 +60,16 @@ class telegram extends \phpbb\notification\method\messenger_base
 	*/
 	public function is_available(\phpbb\notification\type\type_interface $notification_type = null)
 	{
-		return true;
 		return ($this->bot_is_configured() && (strlen($this->user->data['user_telegram_id']) > 2));
 	}
 
-	/* Overwritten: 
+	/* Overwritten:
 	 * Return the users, which where already notified.
 	 * As we want to send a notification for every post, even if the user was
 	 * already notified about the previous one, we return an empty array here.
 	 */
-	public function get_notified_users($notification_type_id, $options) {
+	public function get_notified_users($notification_type_id, $options)
+	{
 		return array();
 	}
 
@@ -136,22 +136,28 @@ class telegram extends \phpbb\notification\method\messenger_base
 			$user = $this->user_loader->get_user($notification->user_id);
 			$telegram_id = $user['user_telegram_id'];
 			if (!$telegram_id)
+			{
 				continue;
+			}
 
 			if ($user['user_type'] == USER_IGNORE || in_array($notification->user_id, $banned_users))
 			{
 				continue;
 			}
 
-			if (method_exists($notification, 'get_telegram_template')) {
+			if (method_exists($notification, 'get_telegram_template'))
+			{
 				$email_template = $notification->get_telegram_template();
-			} else {
+			} else
+			{
 				$email_template = $notification->get_email_template();
 			}
 
 			$template_variables = $notification->get_email_template_variables();
-			if (isset($template_variables['POSTER_ID'])) {
-				if ($template_variables['POSTER_ID'] == $notification->user_id) {
+			if (isset($template_variables['POSTER_ID']))
+			{
+				if ($template_variables['POSTER_ID'] == $notification->user_id)
+				{
 					//If another extension (like eb/postbymail) included the author herself into the notification
 					//recipients, we exclude her again here.
 					continue;
@@ -177,7 +183,8 @@ class telegram extends \phpbb\notification\method\messenger_base
 			$this->send($telegram_id, $this->msg, $template_variables['TOPIC_ID'] ?? null);
 
 			// Store the corresponding forum as currently selected forum for the users telegram communication
-			if (isset($template_variables['FORUM_ID'])) {
+			if (isset($template_variables['FORUM_ID']))
+			{
 				$this->forum_api->store_forum_id($telegram_id,$template_variables['FORUM_ID']);
 			}
 		}
@@ -190,23 +197,28 @@ class telegram extends \phpbb\notification\method\messenger_base
 	 * @param	string	$telegram_id
 	 * @param	string	$msg
 	 */
-	public function send($telegram_id, $msg, $topic_id) {
-		if (!$telegram_id) {  
+	public function send($telegram_id, $msg, $topic_id)
+	{
+		if (!$telegram_id)
+		{
 		   error_log('Error, Telegram ID is needed',0);
 		   return;
 		}
 
-		if (empty($msg)) {  
+		if (empty($msg))
+		{
 		   error_log('Error, No message to send',0);
 		   return;
 		}
-		if (isset($topic_id)) {
+		if (isset($topic_id))
+		{
 			$buttons = array(
-				$this->user->lang('NEW_REPLY') => "newPost~t$topic_id", 
-				$this->user->lang('FULL_TOPIC') => "showTopic~t$topic_id", 
+				$this->user->lang('NEW_REPLY') => "newPost~t$topic_id",
+				$this->user->lang('FULL_TOPIC') => "showTopic~t$topic_id",
 				$this->user->lang('BACK') => 'initial',
 			);
-		} else {
+		} else
+		{
 			//This was another notification event, no new post or new topic
 			$buttons = array(
 				$this->user->lang('BACK') => 'initial',
@@ -216,7 +228,7 @@ class telegram extends \phpbb\notification\method\messenger_base
 		$messageObject = $this->telegram_api->prepareMessage($msg, $buttons);
 		$messageObject['chat_id'] = $telegram_id;
 		$this->telegram_api->sendOrEditMessage($messageObject);
-		//Clear the message-id, such that using the button, results in 
+		//Clear the message-id, such that using the button, results in
 		//a new answer rather than overwriting this notification.
 		$this->forum_api->store_message_id($telegram_id);
 	}
