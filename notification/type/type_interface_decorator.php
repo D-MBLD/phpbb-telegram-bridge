@@ -57,26 +57,6 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	}
 
 	/**
-	* Get the id of the item
-	*
-	* @param array $type_data The type specific data
-	*/
-	static public function get_item_id($type_data)
-	{
-		return parent::get_item_id($type_data);
-	}
-
-	/**
-	 * Get the id of the parent
-	 *
-	 * @param array $type_data The type specific data
-	 */
-	static public function get_item_parent_id($type_data)
-	{
-		return parent::get_item_parent_id($type_data);
-	}
-
-	/**
 	 * Is this type available to the current user (defines whether or not it will be shown in the UCP Edit notification options)
 	*
 	* @return bool True/False whether or not this is available to the user
