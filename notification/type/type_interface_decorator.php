@@ -18,7 +18,8 @@
 trait type_interface_decorator //implements \phpbb\notification\type\type_interface
 {
 
-	private \phpbb\notification\type\base $inner;
+	/* @var \phpbb\notification\type\base */
+	private $inner;
 
 	public function set_inner(\phpbb\notification\type\base $inner)
 	{

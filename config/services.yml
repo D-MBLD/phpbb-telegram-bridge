@@ -1,5 +1,5 @@
 services:
-    notification.method.telegram:
+    eb.telegram.notification.method.telegram:
         class: eb\telegram\notification\method\telegram
         scope: prototype
         arguments:
@@ -132,5 +132,6 @@ services:
             - '@config'
             - '@request'
             - '@controller.helper'
+            - '@template'
             - '@eb.telegram.core.telegram_api'
             - '@eb.telegram.core.webhook'

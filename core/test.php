@@ -11,8 +11,6 @@
 namespace eb\telegram\core;
 
 /** Provides some test features for the telegram bridge.
- *  In order to use them, at first you need to set your IP-Adress in the constant ALLOWED_CALLER_IP below, such that only you can call the tests.
- *  (No worries, just call one of the links below, and you will see your IP-adress.)
  *  Then the following test calls are possible (after the extension was configured in the ACP):
  *  - Simulate a text input:
  *    https://<server>/<forum-base>/telegram/test?chat_id=<your telegram id>&text=<some text input>
@@ -22,8 +20,6 @@ namespace eb\telegram\core;
  *  - Test html-formatting and escaping by sending a complicated test to the configured telegram admin id.
  *    https://<server>/<forum-base>/telegram/test?test=html
  */
-
-const ALLOWED_CALLER_IP = 'xxx.x.xxx.xxx';
 
 class test {
 
@@ -39,12 +35,16 @@ class test {
 	/* @var \phpbb\controller\helper   */
 	private $helper;
 
+	/* @var \phpbb\template\template   */
+	private $template;
+
 	/**
 	* Constructor
 	*/
 	public function __construct(\phpbb\config\config $config,
 								\phpbb\request\request $request,
 								\phpbb\controller\helper $helper,
+								\phpbb\template\template $template,
 								\eb\telegram\core\telegram_api $telegram_api,
 								\eb\telegram\core\webhook $webhook
 								)
@@ -52,20 +52,28 @@ class test {
 		$this->config = $config;
 		$this->request = $request;
 		$this->helper = $helper;
+		$this->template = $template;
+
 		$this->telegram_api = $telegram_api;
 		$this->webhook = $webhook;
 	}
 
+	private $text_lines;
+
 	public function handle()
 	{
 		//Set the header here, such that the forum does not complain.
-		header('HTTP/1.1 200 OK');
-		header('Content-Type: text/html; charset=utf-8');
+		$this->text_lines = array();
 
-		$this->check_caller($this->request, ALLOWED_CALLER_IP);
-		$this->dispatch_request();
+		$output = $this->dispatch_request();
 
-		return $this->helper->render('blank.html', 'Telegram Webhook');
+		foreach ($output as $line)
+		{
+			$this->template->assign_block_vars ( 'TEXT_LINES', array (
+				'LINE' => $line,
+				) );
+		}
+		return $this->helper->render('test.html', 'Telegram Webhook');
 
 	}
 
@@ -79,16 +87,16 @@ class test {
 
 		if ($command != '~~~')
 		{
-			$this->simulate_button_callback($command, $chat_id);
+			return $this->simulate_button_callback($command, $chat_id);
 		} else if ($text != '~~~')
 		{
-			$this->simulate_text_input($text, $chat_id);
+			return $this->simulate_text_input($text, $chat_id);
 		} else if ($test == 'html')
 		{
-			$this->test_html_escape();
+			return $this->test_html_escape();
 		} else
 		{
-			$this->echo_help_text();
+			return $this->create_help_text();
 		}
 	}
 
@@ -100,9 +108,7 @@ class test {
 					 '"data":"' . $command .
 				'"}}';
 		$payload = json_decode($json);
-		echo '<pre>';
 		$this->webhook->process_input($payload, true);
-		echo '</pre>';
 	}
 
 	private function simulate_text_input($text, $chat_id)
@@ -112,74 +118,63 @@ class test {
 					 '"chat":{"id":"' . $chat_id . '"},' .
 					 '"text":"' . $text . '"}}';
 		$payload = json_decode($json);
-		echo '<pre>';
 		$this->webhook->process_input($payload, true);
-		echo '</pre>';
 	}
 
-	private function echo_help_text()
+	private function create_help_text()
 	{
+		$text_lines = array();
 		$path = $this->config['server_protocol'] . $this->config['server_name'] . $this->config['script_path'] . '/telegram/test';
-		echo 'You may use one of the following URLs for testing:';
-		echo '<ul>';
-		echo '<li> send a html formatted test message to the configured admin telegram user:';
-		echo "<br>   <a href=\"$path?test=html\">$path?test=html</a>";
-		echo '</li>';
-		echo '<li> simulate how the bot sends a text called from the given chat_id:';
-		echo "<br>   <a href=\"$path?chat_id=&lt;chat_id&gt;&amp;text=&lt;some text&gt;\">$path?chat_id=&lt;chat_id&gt;&amp;text=&lt;some text&gt;</a>";
-		echo '</li>';
-		echo '<li> simulate how the bot sends a button callback from the given chat_id:';
-		echo "<br>   <a href=\"$path?chat_id=&lt;chat_id&gt;&amp;command=&lt;button callback data&gt;\">$path?chat_id=&lt;chat_id&gt;&amp;command=&lt;button callback data&gt;</a>";
-		echo '</li>';
-		echo '</ul>';
-		die();
+		$text_lines[] = 'You may use one of the following URLs for testing:';
+		$text_lines[] = '<ul>';
+		$text_lines[] = '<li> send a html formatted test message to the configured admin telegram user:';
+		$text_lines[] = "<br>   <a href=\"$path?test=html\">$path?test=html</a>";
+		$text_lines[] = '</li>';
+		$text_lines[] = '<li> simulate how the bot sends a text called from the given chat_id:';
+		$text_lines[] = "<br>   <a href=\"$path?chat_id=&lt;chat_id&gt;&amp;text=&lt;some text&gt;\">$path?chat_id=&lt;chat_id&gt;&amp;text=&lt;some text&gt;</a>";
+		$text_lines[] = '</li>';
+		$text_lines[] = '<li> simulate how the bot sends a button callback from the given chat_id:';
+		$text_lines[] = "<br>   <a href=\"$path?chat_id=&lt;chat_id&gt;&amp;command=&lt;button callback data&gt;\">$path?chat_id=&lt;chat_id&gt;&amp;command=&lt;button callback data&gt;</a>";
+		$text_lines[] = '</li>';
+		$text_lines[] = '</ul>';
+		return $text_lines;
 	}
 
 	private function test_html_escape()
 	{
-		echo '<pre>';
+		$output = array();
 		$text = $this->create_complicated_html_text();
 		$postdata = $this->telegram_api->prepareMessage($text);
 		$postdata['chat_id'] = $this->config['eb_telegram_admin_telegram_id'];
+		$output[] = '<b>Sending following data to telegram:</b>';
+		$data = print_r($postdata, true);
+		$data = \str_replace(PHP_EOL, '<br>', $data);
+		$data = \str_replace(' ', '&nbsp;', $data);
+		$output[] = $data;
 		//$postdata['message_id'] = 1234;
-		print_r($postdata);
-		echo '=======';
 		$result = $this->telegram_api->sendOrEditMessage($postdata);
-		print_r($result);
-		echo '</pre>';
-		die("Done");
+		$output[] = '<b>Response from telegram:</b>';
+		$result = \json_decode($result);
+		$result = \json_encode($result, JSON_PRETTY_PRINT);
+		$result = \str_replace(PHP_EOL, "<br>", $result);
+		$result = \str_replace(' ', '&nbsp;', $result);
+		$output[] = $result;
+		return $output;
 	}
 
 	private function create_complicated_html_text()
 	{
-			$htmlText = '<b attr="unsupportedAttr" attrWithoutValue>Tags are escaped and bold is ignored</b>';
-			$htmlText .= '<br><b attr1="value" attr2 = "value">Bold with unnecessary attributes</b>';
-			$htmlText .= '<br><b>And now bold<i> with nested italic <u>and underlined</u></i> tags</b>';
-			$htmlText .= "<br><b>What happens if a bold text\nspans multiple lines</b>";
-			$htmlText .= PHP_EOL . 'Are quotes \' and double qoutes " also allowed?';
-			$htmlText .= '<br>Link without anchor: https://google.com';
-			$htmlText .= '<br><a href="https://google.com">Link with anchor</a>';
-			$htmlText .= '<br>Illegal code tag (surrounding \'pre\' missing): <code class="language-java">Java-Code</code>';
-			$htmlText .= '<br>Selfclosing b-tag: <b/> No bold expected here.';
-			$htmlText .= PHP_EOL . 'Unopened tag:</b> illegal tag: <jkkk></jkkk>';
-			return $htmlText;
-	}
-
-	/** Allow calls to the test-api only by specified IP-Adresses.
-	*/
-	private function check_caller($request, $allowed_ip)
-	{
-		//The forum usually does not allow to read the super globals. Therefore
-		//this access must be temporarily enabled.
-		$request->enable_super_globals();
-		$remote_addr = $_SERVER['REMOTE_ADDR'];
-		$request->disable_super_globals();
-		if ($remote_addr != $allowed_ip)
-		{
-			//Return the ip adress, so its easier to adapt the
-			//code during testing.
-			die("Forbidden for $remote_addr");
-		}
+		$htmlText = 'Shouldn\'t be bold:<b attr="unsupportedAttr" attrWithoutValue>Tags are escaped and bold</b> is ignored';
+		$htmlText .= '<br><b attr1="value" attr2 = "value">Bold with unnecessary attributes</b>';
+		$htmlText .= '<br><b>And now bold<i> with nested italic <u>and underlined</u></i> tags</b>';
+		$htmlText .= "<br><b>What happens if a bold text\nspans multiple lines</b>";
+		$htmlText .= PHP_EOL . 'Are quotes \' and double qoutes " also allowed?';
+		$htmlText .= '<br>Link without anchor: https://google.com';
+		$htmlText .= '<br><a href="https://google.com">Link with anchor</a>';
+		$htmlText .= '<br>Illegal code tag (surrounding \'pre\' missing): <code class="language-java">Java-Code</code>';
+		$htmlText .= '<br>Selfclosing b-tag: <b/> No bold expected here.';
+		$htmlText .= PHP_EOL . 'Unopened tag:</b> illegal tag: <jkkk></jkkk>';
+		return $htmlText;
 	}
 
 }

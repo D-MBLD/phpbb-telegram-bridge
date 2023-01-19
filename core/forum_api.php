@@ -113,11 +113,6 @@ class forum_api {
 			}
 		}
 		$db->sql_freeresult($result);
-		/*
-		echo "\nallowedForums:\n";
-		print_r($forums);
-		echo "\n";
-		*/
 		return $forums;
 	}
 
@@ -328,9 +323,6 @@ class forum_api {
 		}
 		$forums = $this->selectAllForums($author['user_id'], $forum_id);
 		$forum = reset($forums);
-		echo "\nForums in post:\n";
-		print_r($forums);
-		echo "\n";
 		if (!$forum || $forum['readonly'])
 		{
 			return false;

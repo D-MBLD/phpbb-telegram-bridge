@@ -2,11 +2,11 @@
 # The path defines an URL (relative to the forums root). 
 # When this URL is called (GET), the method (here "handle") 
 # of the controller service will be called.
-telegram_web_hook:
+eb_telegram_web_hook:
     path: /telegram/webhook
     defaults: { _controller: "eb.telegram.core.webhook:handle"}
 
 # For various tests. 
-test:
+eb_test:
     path: /telegram/test
     defaults: { _controller: "eb.telegram.core.test:handle"}
