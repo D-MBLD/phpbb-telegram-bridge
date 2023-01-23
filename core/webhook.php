@@ -35,6 +35,8 @@ class webhook {
 	/** Telegram-ID of the administrator, where all unidentfied calls are returned to. */
 	private $admin_telegram_id;
 
+	public $debug_output = array();
+
 
 	/**
 	* Constructor
@@ -69,9 +71,6 @@ class webhook {
 		$this->echo_to_admin =  $this->config['eb_telegram_admin_echo'];
 	}
 
-	//Set to false in productive code
-	private $allow_debug = true;
-
 	private $test_call; //Called via URL rather than via webhook.
 	//Following calls are supported:
 	//https://<base-URL>/forum/telegram/webhook?text=some_text  for simulating Text-Input
@@ -81,20 +80,18 @@ class webhook {
 	{
 		//header('HTTP/1.1 200 OK');
 		//header('Content-Type: text/plain; charset=utf-8');
-		echo '<pre>';
 		try {
 
 			$payload = $this->parse_request();
-			echo 'Request:\n';
-			print_r($payload);
+			$this->debug_output[] = 'Request:';
+			$this->log_obj($payload);
 			$this->process_input($payload);
 		} catch (Throwable $e)
 		{
-			echo 'Somethin went wrong\n';
-			print_r($e);
+			$this->debug_output[] = 'Something went wrong';
+			$this->log_obj($e);
 		}
-		echo '\nDone\n';
-		echo '</pre>';
+		$this->debug_output[] = 'Done';
 		return $this->helper->render('blank.html', 'Telegram Webhook');
 	}
 
@@ -110,21 +107,21 @@ class webhook {
 	public function process_input($payload, $test_call = false)
 	{
 		$this->test_call = $test_call;
-		echo "Payload:\n";
-		print_r($payload);
+		$this->debug_output[] = 'Payload:';
+		$this->log_obj($payload);
 		$command = $this->validate_input($payload);
-		echo "Command after validation:\n";
-		print_r($command);
+		$this->debug_output[] = 'Command after validation:';
+		$this->log_obj($command);
 		$command = $this->create_command($command);
-		echo "Command after process:\n";
-		print_r($command);
+		$this->debug_output[] = 'Command after process:';
+		$this->log_obj($command);
 		$postdata = $this->execute_command($command);
-		echo "Sending:\n";
-		print_r($postdata);
-		echo "\n";
+		$this->debug_output[] = 'Sending:';
+		$this->log_obj($postdata);
 		if ($postdata)
 		{
 			$result = $this->telegram_api->sendOrEditMessage($postdata);
+			$this->debug_output = array_merge($this->debug_output, $this->telegram_api->debug_output);
 			//Save the message id, such that it can be used for an update.
 			if ($result)
 			{
@@ -133,11 +130,7 @@ class webhook {
 				{
 					$message_id = $result_obj->result->message_id;
 					$this->forum_api->store_message_id($postdata['chat_id'], $message_id);
-				} else
-				{
-					echo "\nResponse:\n";
-					print_r($result_obj);
-				}
+				} 
 			}
 		}
 		//There may be also an admin-info contained, which is send to the admin
@@ -367,12 +360,13 @@ class webhook {
 			//Entered text should be a paging command for a list of topics or forums
 			//Last page number is stored in the title-field.
 			$command['action'] = $chat_state == 'T' ? 'allForumTopics' : 'allForums';
-			if ($text == '+')
+			if (strlen(trim(str_replace('+', '', $text, $count))) == 0)
 			{
-				$command['page'] = $command['title'] + 1;
-			} else if ($text == '-')
+				//String contains only plus-signs and blanks
+				$command['page'] = $command['title'] + $count;
+			} else if (strlen(trim(str_replace('-', '', $text, $count))) == 0)
 			{
-				$command['page'] = $command['title'] - 1;
+				$command['page'] = $command['title'] - $count;
 			} else
 			{
 				//Stay at the same page
@@ -746,7 +740,7 @@ class webhook {
 		$posts = $this->forum_api->selectTopicPosts($user_id, $topic);
 		$first = true;
 		$readonly = true;
-		foreach ($posts as $id => $post)
+		foreach ($posts as $post)
 		{
 			$time = date('d.m.y H:i', $post['time']);
 			$user = $post['username'];
@@ -838,6 +832,12 @@ class webhook {
 		// The forum cannot be called via groups or channels.
 		$text = $this->user->lang('GROUP_OR_CHANNEL_CALL') . PHP_EOL;
 		return $this->telegram_api->prepareMessage($text);
+	}
+
+	private function log_obj($obj) {
+		$lines = explode(PHP_EOL, print_r($obj, true));
+		$indented_lines = str_replace(' ', '&nbsp;', $lines);
+		$this->debug_output = array_merge($this->debug_output, $indented_lines);
 	}
 
 }

@@ -18,10 +18,10 @@ class telegram_api
 	/* @var \phpbb\language\language */
 	protected $language;
 
+	public $debug_output = array();
+
 	/**
 	* Constructor
-	*
-	* @param \phpbb\config\config	$config
 	*/
 
 	public function __construct(\phpbb\config\config $config,
@@ -37,7 +37,7 @@ class telegram_api
 		$token = $this->config['eb_telegram_bot_token'];
 		if (empty($token))
 		{
-			//echo "Error, Telegram Bot ID is needed.\n";
+			$this->debug_output[] = "Error, Telegram Bot ID is needed.";
 			return false;
 		}
 
@@ -61,19 +61,35 @@ class telegram_api
 			//else try sendMessage
 			if ($result === false || !strpos($http_response_header[0], '200'))
 			{
-				//Echo can be used here, because this will not be called from the forum, only
-				//from webHook. (Notification does not try an telegram update).
-				echo "Request failed ($http_response_header[0]) with content:\n";
-				print_r($result);
-				echo "\n";
-				echo "\nRetrying with sendMessage.\n";
+				$this->log_result($result, $http_response_header[0], true);
 			} else
 			{
+				$this->log_result($result, $http_response_header[0], false);
 				return $result;
 			}
 		}
 		$result = file_get_contents("https://api.telegram.org/bot$token/sendMessage", false, $context);
+		$this->log_result($result, $http_response_header[0], false);
 		return $result;
+	}
+
+	private function log_result($result, $http_status, $retry) {
+		$json = \json_decode($result);
+		$json_lines = explode(PHP_EOL, json_encode($json, JSON_PRETTY_PRINT));
+		$json_lines = str_replace(' ', '&nbsp;', $json_lines);
+		if ($result === false || !strpos($http_status, '200'))
+		{
+			$this->debug_output[] = "Request failed ($http_status) with content:";
+			$this->debug_output = array_merge($this->debug_output, $json_lines);
+			if ($retry)
+			{
+				$this->debug_output[] = "Retrying with sendMessage.";
+			}
+		} else
+		{
+			$this->debug_output[] = "Telegram response:";
+			$this->debug_output = array_merge($this->debug_output, $json_lines);
+		}
 	}
 
 	/** Prepare a text message with optional buttons.
@@ -191,6 +207,8 @@ class telegram_api
 		$text = str_replace('<br/>', PHP_EOL, $text);
 		$text = str_replace('<br>', PHP_EOL, $text);
 		//Now remove all tags, which we do not allow. (Exception list contains all allowed tags.)
+		//This would not be necessary for "normal" text. But when the forum sends notifications,
+		//a lot of additional tags are surrounding the text, BB-Codes, links etc.
 		$text = strip_tags($text, $allowed_tags);
 
 		//Escape all html entities (including the allowed tags, which are still contained)

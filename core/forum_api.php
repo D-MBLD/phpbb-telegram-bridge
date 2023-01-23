@@ -145,32 +145,34 @@ class forum_api {
 	}
 
 	/** Read all posts of a given topic.
-	 * Result is an array which maps the post_id to an array with title, text, user_id and time.
+	 * Result is an array which maps the post_id to an array with text, username and time.
+	 * Only the first entry contains in addition the title and the readonly-flag.
 	 */
 	public function selectTopicPosts($user_id, $topic_id)
 	{
 		$db = $this->db;
 		$posts = array();
 
-		$sql = 'SELECT t1.post_id, t1.forum_id, t1.post_subject, t1.post_text, t1.post_time, t1.poster_id, t2.username ';
+		$sql = 'SELECT t1.post_id, t1.forum_id, t1.post_text, t1.post_time, t1.poster_id, t2.username, t3.topic_title ';
 		$sql .= ' FROM '. POSTS_TABLE . ' as t1';
 		$sql .= ' LEFT JOIN '. USERS_TABLE . ' as t2 ON t1.poster_id = t2.user_id';
+		$sql .= ' LEFT JOIN '. TOPICS_TABLE . ' as t3 ON t1.topic_id = t3.topic_id';
 		$sql .= " WHERE t1.topic_id = $topic_id";
 		$sql .= ' AND t1.poster_id <> 0';  //0 = deleted permantly
 		$sql .= ' AND t1.post_delete_user = 0';  //0 = deleted (marked as deleted)
+		$sql .= ' ORDER BY t1.post_id';  //Old to new
 		$result = $db->sql_query($sql);
+		$forum_id = 0;
+		$title = '';
 		while ($row = $db->sql_fetchrow($result))
 		{
 			$forum_id = $row['forum_id'];
-			$posts[$row['post_id']] = array( 'title' => $row['post_subject'],
-											'text' => $row['post_text'],
-											'user_id' => $row['poster_id'],
-											'username' => $row['username'],
-											'time' => $row['post_time'],
-											'readonly' => true );
+			$title = $row['topic_title'];
+			$posts[] = array('text' => $row['post_text'],
+							'username' => $row['username'],
+							'time' => $row['post_time']);
 		}
 		$db->sql_freeresult($result);
-		ksort($posts, SORT_NUMERIC); //From old to new (reading top down)
 		//Check permission given by folder
 		$permissions = $this->getAllowedForums($user_id);
 		$permission = $permissions[$forum_id] ?? false;
@@ -178,13 +180,8 @@ class forum_api {
 		{
 			return array();
 		}
-		if (isset($permission['f_post']))
-		{
-			foreach ($posts as &$post)
-			{
-				$post['readonly'] = false;
-			}
-		}
+		$posts[0]['title'] = $title;
+		$posts[0]['readonly'] = !isset($permission['f_post']);
 		return $posts;
 	}
 

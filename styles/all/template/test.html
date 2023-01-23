@@ -1,5 +1,31 @@
 <!-- INCLUDE overall_header.html -->
 <!-- IF not S_IS_BOT and S_USER_LOGGED_IN -->
+<form id="eb_telegram_test" name="eb_telegram_test" method="post" action="{{ U_ACTION }}">
+
+	<fieldset>
+		<legend><b>Simulate receiving and sending of telegram messages</b></legend>
+		<dl>
+			<dt><label for="test_chat_id">Chat-ID</label><br /><span>The telegram ID of the simulated sender, which will also receive the answer</span></dt>
+			<dd><input type="text" id="test_chat_id" name="test_chat_id" size="64" maxlength="255" value="{TEST_CHAT_ID}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="test_command">Simulate button callback data</label><br /><span>Simulate that the user pressed the button with this button-callback-data to simulate.</span></dt>
+			<dd><input type="text" id="test_command" name="test_command" size="64" maxlength="255" value="{TEST_COMMAND}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="test_text">Simulate sent text</label><br /><span>Enter a text as if it was sent by telegram. If a button callback is entered above, the text is ignored.</span></dt>
+			<dd><input type="text" id="test_text" name="test_text" size="64" maxlength="255" value="{TEST_TEXT}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="test_send">Send arbitrary text</label><br /><span>Enter a text which is directly send to the telegram chat.<br>The text is ignored if one of the callback or text field above is filled.</span></dt>
+			<dd><textarea name="test_send" id="test_send" rows="3" size="64" cols="20" class="inputbox">{TEST_SEND}</textarea>
+			</dd>
+		</dl>
+	<fieldset class="submit-buttons">
+		<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}" />&nbsp;
+		{{ S_FORM_TOKEN }}
+	</fieldset>
+</form>
 
 <div class="panel">
 	<div class="inner">

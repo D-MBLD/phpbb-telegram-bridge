@@ -62,12 +62,56 @@ class test {
 
 	public function handle()
 	{
-		//Set the header here, such that the forum does not complain.
-		$this->text_lines = array();
+		// Create a form key for preventing CSRF attacks
+		add_form_key('eb_telegram_test');
+		$textlines = array();
+		$html_text = $this->create_complicated_html_text();
+		$chat_id = $this->config['eb_telegram_admin_telegram_id'];
 
-		$output = $this->dispatch_request();
 
-		foreach ($output as $line)
+		if ($this->request->is_set_post('submit'))
+		{
+			// Test if the submitted form is valid
+			if (!check_form_key('eb_telegram_test'))
+			{
+				$textlines[] = 'Invalid form id (outdated?). Try again.';
+			} else
+			{
+				// If no errors, process the form data
+				// Set the options the user configured
+				$chat_id = $this->request->variable('test_chat_id', '');
+				$text = $this->request->variable('test_text', '', true); //Multibyte = true (Umlaute, etc.)
+				$command = $this->request->variable('test_command', '');
+				$html_text = $this->request->raw_variable('test_send', ''); //Raw without escaping
+				
+				if (!$chat_id)
+				{
+					$textlines[] = "Error: Chat-ID must be supplied";
+				} else if($command)
+				{
+					$textlines = $this->simulate_button_callback($command, $chat_id);
+				} else if($text)
+				{
+					$textlines = $this->simulate_text_input($text, $chat_id);
+				} else if($html_text)
+				{
+					$textlines = $this->test_html_escape($html_text, $chat_id);
+				} else 
+				{
+					$textlines[] = "Error: Either text or command must be supplied";
+				}
+			}
+		}
+		$textlines[] = "<b>Text:</b>";
+		$textlines[] = $text;
+	
+		$this->template->assign_vars([
+			'TEST_CHAT_ID'	=> $chat_id ?? '',
+			'TEST_TEXT'		=> $text ?? '',
+			'TEST_COMMAND'	=> $command ?? '',
+			'TEST_SEND'		=> $html_text ?? ''
+		]);
+		foreach ($textlines as $line)
 		{
 			$this->template->assign_block_vars ( 'TEXT_LINES', array (
 				'LINE' => $line,
@@ -77,38 +121,17 @@ class test {
 
 	}
 
-	private function dispatch_request()
-	{
-		//Simulate text-input or the data of an inline button with the url-parameter 'text' or 'command'
-		$command = $this->request->variable('command','~~~');
-		$text = $this->request->variable('text','~~~');
-		$test = $this->request->variable('test','~~~');
-		$chat_id = $this->request->variable('chat_id', $this->config['eb_telegram_admin_telegram_id']);
-
-		if ($command != '~~~')
-		{
-			return $this->simulate_button_callback($command, $chat_id);
-		} else if ($text != '~~~')
-		{
-			return $this->simulate_text_input($text, $chat_id);
-		} else if ($test == 'html')
-		{
-			return $this->test_html_escape();
-		} else
-		{
-			return $this->create_help_text();
-		}
-	}
-
 	private function simulate_button_callback($command, $chat_id)
 	{
 		$json = '{"callback_query":' .
-					'{"from":{"id":"' . $chat_id . '"},' .
-					 '"message":{"chat":{"id":"' . $chat_id . '"}},' .
+					'{"from": {"id":"' . $chat_id . '"},' .
+					' "message":{"chat":{"id":"' . $chat_id . '"},' .
+					 '           "message_id":"0"},' .
 					 '"data":"' . $command .
 				'"}}';
 		$payload = json_decode($json);
 		$this->webhook->process_input($payload, true);
+		return $this->webhook->debug_output;
 	}
 
 	private function simulate_text_input($text, $chat_id)
@@ -119,62 +142,49 @@ class test {
 					 '"text":"' . $text . '"}}';
 		$payload = json_decode($json);
 		$this->webhook->process_input($payload, true);
+		return $this->webhook->debug_output;
 	}
 
-	private function create_help_text()
-	{
-		$text_lines = array();
-		$path = $this->config['server_protocol'] . $this->config['server_name'] . $this->config['script_path'] . '/telegram/test';
-		$text_lines[] = 'You may use one of the following URLs for testing:';
-		$text_lines[] = '<ul>';
-		$text_lines[] = '<li> send a html formatted test message to the configured admin telegram user:';
-		$text_lines[] = "<br>   <a href=\"$path?test=html\">$path?test=html</a>";
-		$text_lines[] = '</li>';
-		$text_lines[] = '<li> simulate how the bot sends a text called from the given chat_id:';
-		$text_lines[] = "<br>   <a href=\"$path?chat_id=&lt;chat_id&gt;&amp;text=&lt;some text&gt;\">$path?chat_id=&lt;chat_id&gt;&amp;text=&lt;some text&gt;</a>";
-		$text_lines[] = '</li>';
-		$text_lines[] = '<li> simulate how the bot sends a button callback from the given chat_id:';
-		$text_lines[] = "<br>   <a href=\"$path?chat_id=&lt;chat_id&gt;&amp;command=&lt;button callback data&gt;\">$path?chat_id=&lt;chat_id&gt;&amp;command=&lt;button callback data&gt;</a>";
-		$text_lines[] = '</li>';
-		$text_lines[] = '</ul>';
-		return $text_lines;
-	}
-
-	private function test_html_escape()
+	private function test_html_escape($text, $chat_id)
 	{
 		$output = array();
-		$text = $this->create_complicated_html_text();
+		$output[] = '<b>Original text:</b>';
+		$output = array_merge($output, explode(PHP_EOL, $text));
 		$postdata = $this->telegram_api->prepareMessage($text);
-		$postdata['chat_id'] = $this->config['eb_telegram_admin_telegram_id'];
+		$postdata['chat_id'] = $chat_id;
 		$output[] = '<b>Sending following data to telegram:</b>';
 		$data = print_r($postdata, true);
 		$data = \str_replace(PHP_EOL, '<br>', $data);
 		$data = \str_replace(' ', '&nbsp;', $data);
-		$output[] = $data;
+		$output = array_merge($output, explode(PHP_EOL, $data));
 		//$postdata['message_id'] = 1234;
 		$result = $this->telegram_api->sendOrEditMessage($postdata);
 		$output[] = '<b>Response from telegram:</b>';
 		$result = \json_decode($result);
 		$result = \json_encode($result, JSON_PRETTY_PRINT);
-		$result = \str_replace(PHP_EOL, "<br>", $result);
 		$result = \str_replace(' ', '&nbsp;', $result);
-		$output[] = $result;
+		$output = array_merge($output, explode(PHP_EOL, $result));
 		return $output;
 	}
 
 	private function create_complicated_html_text()
 	{
-		$htmlText = 'Shouldn\'t be bold:<b attr="unsupportedAttr" attrWithoutValue>Tags are escaped and bold</b> is ignored';
-		$htmlText .= '<br><b attr1="value" attr2 = "value">Bold with unnecessary attributes</b>';
-		$htmlText .= '<br><b>And now bold<i> with nested italic <u>and underlined</u></i> tags</b>';
-		$htmlText .= "<br><b>What happens if a bold text\nspans multiple lines</b>";
-		$htmlText .= PHP_EOL . 'Are quotes \' and double qoutes " also allowed?';
-		$htmlText .= '<br>Link without anchor: https://google.com';
-		$htmlText .= '<br><a href="https://google.com">Link with anchor</a>';
-		$htmlText .= '<br>Illegal code tag (surrounding \'pre\' missing): <code class="language-java">Java-Code</code>';
-		$htmlText .= '<br>Selfclosing b-tag: <b/> No bold expected here.';
-		$htmlText .= PHP_EOL . 'Unopened tag:</b> illegal tag: <jkkk></jkkk>';
-		return $htmlText;
+		$htmlText = array();
+		$htmlText[] = 'Various tags which should be escaped:';
+		$htmlText[] = '<b attrWithoutValue>no bold expected here</b>';
+		$htmlText[] = 'Unopened bold tag: </b>';
+		$htmlText[] = 'Unknown tag <abc>(abc)</abc>';
+		$htmlText[] = 'Self closing bold tag: <b/> No bold expected here';
+		$htmlText[] = 'Tags which should work:';
+		$htmlText[] = 'Bold <b attr1 = "value">tag contains unnecessary</b> attributes.';
+		$htmlText[] = 'Nested <b>bold<i> italic <u>underlined</u></i> tags.</b> End nesting.';
+		$htmlText[] = "Bold <b>tag spanning";
+		$htmlText[] = "multiple</b> lines";
+		$htmlText[] = 'Special characters:';
+		$htmlText[] = 'quotes: \' ", Umlauts: äöüÄÖÜ?';
+		$htmlText[] = 'Link without anchor: https://google.com';
+		$htmlText[] = '<a href="https://google.com">Link with anchor</a>';
+		return implode(PHP_EOL, $htmlText);
 	}
 
 }

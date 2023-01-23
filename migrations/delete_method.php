@@ -31,7 +31,7 @@ class delete_method extends \phpbb\db\migration\migration
 	public function delete_notification_method()
 	{
 		$sql = 'DELETE FROM '. USER_NOTIFICATIONS_TABLE;
-		$sql .= " WHERE method = 'notification.method.telegram'";
+		$sql .= " WHERE method = 'eb.telegram.notification.method.telegram'";
 		$result = $this->db->sql_query($sql);
 	}
 
