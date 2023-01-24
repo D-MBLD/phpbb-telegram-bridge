@@ -73,7 +73,8 @@ class telegram_api
 		return $result;
 	}
 
-	private function log_result($result, $http_status, $retry) {
+	private function log_result($result, $http_status, $retry)
+	{
 		$json = \json_decode($result);
 		$json_lines = explode(PHP_EOL, json_encode($json, JSON_PRETTY_PRINT));
 		$json_lines = str_replace(' ', '&nbsp;', $json_lines);

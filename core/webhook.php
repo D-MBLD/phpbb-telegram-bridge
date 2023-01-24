@@ -130,7 +130,7 @@ class webhook {
 				{
 					$message_id = $result_obj->result->message_id;
 					$this->forum_api->store_message_id($postdata['chat_id'], $message_id);
-				} 
+				}
 			}
 		}
 		//There may be also an admin-info contained, which is send to the admin
@@ -834,7 +834,8 @@ class webhook {
 		return $this->telegram_api->prepareMessage($text);
 	}
 
-	private function log_obj($obj) {
+	private function log_obj($obj)
+	{
 		$lines = explode(PHP_EOL, print_r($obj, true));
 		$indented_lines = str_replace(' ', '&nbsp;', $lines);
 		$this->debug_output = array_merge($this->debug_output, $indented_lines);

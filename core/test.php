@@ -68,7 +68,6 @@ class test {
 		$html_text = $this->create_complicated_html_text();
 		$chat_id = $this->config['eb_telegram_admin_telegram_id'];
 
-
 		if ($this->request->is_set_post('submit'))
 		{
 			// Test if the submitted form is valid
@@ -83,20 +82,20 @@ class test {
 				$text = $this->request->variable('test_text', '', true); //Multibyte = true (Umlaute, etc.)
 				$command = $this->request->variable('test_command', '');
 				$html_text = $this->request->raw_variable('test_send', ''); //Raw without escaping
-				
+
 				if (!$chat_id)
 				{
 					$textlines[] = "Error: Chat-ID must be supplied";
-				} else if($command)
+				} else if ($command)
 				{
 					$textlines = $this->simulate_button_callback($command, $chat_id);
-				} else if($text)
+				} else if ($text)
 				{
 					$textlines = $this->simulate_text_input($text, $chat_id);
-				} else if($html_text)
+				} else if ($html_text)
 				{
 					$textlines = $this->test_html_escape($html_text, $chat_id);
-				} else 
+				} else
 				{
 					$textlines[] = "Error: Either text or command must be supplied";
 				}
@@ -104,7 +103,7 @@ class test {
 		}
 		$textlines[] = "<b>Text:</b>";
 		$textlines[] = $text;
-	
+
 		$this->template->assign_vars([
 			'TEST_CHAT_ID'	=> $chat_id ?? '',
 			'TEST_TEXT'		=> $text ?? '',
