@@ -50,6 +50,9 @@ class main_listener implements EventSubscriberInterface
 	/** @var string phpEx */
 	protected $php_ext;
 
+	/** @var string eb\telegram\core\forum_api */
+	protected $forum_api;
+
 	/** A map post_id => poster_id for temporarily storing the poster of a new post,
 	 * while it is reset for notificaton selection (i.e. the poster himself also receives
 	 * a notification)
@@ -64,7 +67,13 @@ class main_listener implements EventSubscriberInterface
 	 * @param \phpbb\template\template	$template	Template object
 	 * @param string                    $php_ext    phpEx
 	 */
-	public function __construct(\phpbb\request\request $request, \phpbb\user $user, \phpbb\language\language $language, \phpbb\controller\helper $helper, \phpbb\template\template $template, $php_ext)
+	public function __construct(\phpbb\request\request $request,
+								\phpbb\user $user,
+								\phpbb\language\language $language,
+								\phpbb\controller\helper $helper,
+								\phpbb\template\template $template,
+								$php_ext,
+								\eb\telegram\core\forum_api $forum_api)
 	{
 		$this->request  = $request;
 		$this->user     = $user;
@@ -72,6 +81,7 @@ class main_listener implements EventSubscriberInterface
 		$this->helper   = $helper;
 		$this->template = $template;
 		$this->php_ext  = $php_ext;
+		$this->forum_api = $forum_api;
 	}
 
 	/**
@@ -108,7 +118,7 @@ class main_listener implements EventSubscriberInterface
 		$event['user_row'] = array_merge($event['user_row'], array(
 			'user_telegram_id'	=> $telegram,
 		));
-		$this->add_field($telegram);
+		$this->set_template_field($telegram);
 	}
 
 	/**
@@ -129,13 +139,13 @@ class main_listener implements EventSubscriberInterface
 			'user_telegram_id'	=> $telegram,
 		));
 
-		$this->add_field($telegram);
+		$this->set_template_field($telegram);
 	}
 
 	/**
 	 * Add the TelegramID field to profile
 	 */
-	private function add_field($telegram_id)
+	private function set_template_field($telegram_id)
 	{
 		$this->template->assign_vars(array(
 			'TELEGRAM'		=> $telegram_id,
@@ -156,6 +166,12 @@ class main_listener implements EventSubscriberInterface
 			if (!is_numeric($telegram_id))
 			{
 				$error[] = 'TELEGRAM_ID_NOT_NUMERIC';
+				$event['error'] = array_merge($errors, $error);
+			}
+			$users = $this->forum_api->find_telegram_user($telegram_id);
+			$users = array_filter($users, function($val) {return $val['user_id'] != $this->user->user_id;});
+			if (count($users) > 0) {
+				$error[] = 'TELEGRAM_ID_ALREADY_USED';
 				$event['error'] = array_merge($errors, $error);
 			}
 		}

@@ -40,6 +40,7 @@ $lang = array_merge($lang, [
 	//Used in the html events (Prefixed with L_)
 	'TELEGRAM_ID'			=> 'Your Telegram ID',
 	'TELEGRAM_ID_DESCR'		=> 'Add the bot (ask your admin for the name) to your Telegram contacts and enter your Telegram ID here.',
-	'TELEGRAM_ID_NOT_NUMERIC'	=> 'The telegram id must be numeric.',
+	'TELEGRAM_ID_NOT_NUMERIC'	=> '<b><font color="red">The telegram id must be numeric.</font></b>',
+	'TELEGRAM_ID_ALREADY_USED'	=> '<b><font color="red">Same telegram id is already used by another user!</font></b>',
 
 ]);
