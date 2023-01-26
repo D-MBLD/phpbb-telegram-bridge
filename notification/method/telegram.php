@@ -116,10 +116,14 @@ class telegram extends \phpbb\notification\method\messenger_base
 		// Load all the users we need
 		$this->user_loader->load_users($user_ids);
 
-		//Load all telegram chat states. Only users with verified telegram ids 
+		//Load all telegram chat states. Only users with verified telegram ids
 		//are receiving a notification
 		$verified_telegram_users = $this->forum_api->select_telegram_chat_state();
-		$verified_telegram_users = array_filter($verified_telegram_users, function($val) {return $val['state'] != 'V';});
+		$verified_telegram_users = array_filter($verified_telegram_users,
+												function($val)
+												{
+													return $val['state'] != 'V';
+												});
 		//Make chat_id the index of the array
 		$verified_chat_ids = array_column($verified_telegram_users, null, 'chat_id');
 

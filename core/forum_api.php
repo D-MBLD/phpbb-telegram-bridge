@@ -302,7 +302,8 @@ class forum_api {
 		return $users;
 	}
 
-	public function send_email($user) {
+	public function send_email($user)
+	{
 		$bytes = random_bytes(6);
 		$code = substr(strtr(base64_encode($bytes), '+/', '-_'), 0, 6);
 		if (!class_exists('messenger'))

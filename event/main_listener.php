@@ -169,7 +169,7 @@ class main_listener implements EventSubscriberInterface
 				$event['error'] = array_merge($errors, $error);
 			}
 			$users = $this->forum_api->find_telegram_user($telegram_id);
-			$users = array_filter($users, function($val) 
+			$users = array_filter($users, function($val)
 										{
 											return $val['user_id'] != $this->user->user_id;
 										});

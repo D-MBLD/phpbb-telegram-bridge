@@ -252,7 +252,8 @@ class webhook {
 			}
 			$command['chatState'] = $telegram_data['state'];
 			$command['title'] = $telegram_data['title'];
-		} else {
+		} else
+		{
 			$command['chatState'] = 'V'; //Verification pending
 		}
 		return $command;
@@ -297,7 +298,8 @@ class webhook {
 			if ($buttonCallback == 'requestEmail')
 			{
 				$command['action'] = 'registrationEmailed';
-			} else {
+			} else
+			{
 				$command['action'] = 'registrationFailed';
 			}
 		} else if (stripos($buttonCallback, 'allForums') === 0 )
@@ -357,7 +359,8 @@ class webhook {
 			if (isset($command['title']) && $text == $command['title'])
 			{
 				$command['action'] = 'registrationOk';
-			} else {
+			} else
+			{
 				$command['action'] = 'registrationFailed';
 			}
 		} else if ($chat_state == '0')
@@ -627,7 +630,8 @@ class webhook {
 		{
 			$this->forum_api->store_telegram_chat_state($chat_id, 0, 'V');
 			$text = $this->user->lang('HELP_SCREEN_REGISTRATION_FAILED');
-			if ($email) {
+			if ($email)
+			{
 				$text = $this->user->lang('ILLEGAL_CODE') . '<br>' . $text;
 			}
 			$buttons[$this->user->lang('REQUEST_EMAIL')] = 'requestEmail';
