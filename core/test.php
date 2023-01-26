@@ -64,10 +64,14 @@ class test {
 	{
 		// Create a form key for preventing CSRF attacks
 		add_form_key('eb_telegram_test');
-		$textlines = array();
-		$html_text = $this->create_complicated_html_text();
+		$textlines = array();		
 		$chat_id = $this->config['eb_telegram_admin_telegram_id'];
-
+		
+		if ($this->request->is_set_post('fill'))
+		{
+			$html_text = $this->create_complicated_html_text();
+			$chat_id = $this->request->variable('test_chat_id', '');
+		}
 		if ($this->request->is_set_post('submit'))
 		{
 			// Test if the submitted form is valid

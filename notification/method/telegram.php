@@ -116,6 +116,13 @@ class telegram extends \phpbb\notification\method\messenger_base
 		// Load all the users we need
 		$this->user_loader->load_users($user_ids);
 
+		//Load all telegram chat states. Only users with verified telegram ids 
+		//are receiving a notification
+		$verified_telegram_users = $this->forum_api->select_telegram_chat_state();
+		$verified_telegram_users = array_filter($verified_telegram_users, function($val) {return $val['state'] != 'V';});
+		//Make chat_id the index of the array
+		$verified_chat_ids = array_column($verified_telegram_users, null, 'chat_id');
+
 		// global $config, $phpbb_container; //not sure if necessary. May be needed by functions_messenger
 
 		if (!class_exists('messenger'))
@@ -135,7 +142,7 @@ class telegram extends \phpbb\notification\method\messenger_base
 
 			$user = $this->user_loader->get_user($notification->user_id);
 			$telegram_id = $user['user_telegram_id'];
-			if (!$telegram_id)
+			if (!$telegram_id || !isset($verified_chat_ids[$telegram_id]))
 			{
 				continue;
 			}

@@ -10,7 +10,7 @@ services:
             - %core.root_path%
             - %core.php_ext%
             - '@eb.telegram.core.telegram_api'
-            - '@eb.telegram.core.telegram_api'
+            - '@eb.telegram.core.forum_api'
         tags:
             - { name: notification.method }
 

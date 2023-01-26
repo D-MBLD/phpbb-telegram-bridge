@@ -79,7 +79,7 @@ $lang = array_merge($lang, [
 	'in order to use the service.' .
 	'<br>Afterwards you should also select the events for which you want to be notified ' .
 	'via telegram in your notification settings.',
-	
+
 	//Registration screens
 	'HELP_SCREEN_REGISTERED' => '<b>Your telegram id has been sucessfully verified.</b>' .
 								'<br>Don\'t forget to select the events for which you want to receive notifications.' .

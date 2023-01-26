@@ -233,15 +233,19 @@ class forum_api {
 		$this->db->sql_query($sql);
 	}
 
-	public function select_telegram_chat_state($chat_id)
+	public function select_telegram_chat_state($chat_id = false)
 	{
+		$telegram_data = array();
 		$db = $this->db;
 		$sql = 'SELECT chat_id, message_id, forum_id, topic_id, state, title FROM phpbb_eb_telegram_chat';
-		$sql .= " WHERE chat_id = $chat_id";
+		if ($chat_id)
+		{
+			$sql .= " WHERE chat_id = $chat_id";
+		}
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
-			$telegram_data = array( 'chat_id' => $row['chat_id'],
+			$telegram_data[] = array( 'chat_id' => $row['chat_id'],
 							 'message_id' => $row['message_id'],
 							 'state' => $row['state'],
 							 'forum_id' => $row['forum_id'],
@@ -251,7 +255,7 @@ class forum_api {
 		$db->sql_freeresult($result);
 		if (isset($telegram_data))
 		{
-			return $telegram_data;
+			return $chat_id ? $telegram_data[0] : $telegram_data;
 		} else
 		{
 			return false;

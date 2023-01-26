@@ -252,6 +252,8 @@ class webhook {
 			}
 			$command['chatState'] = $telegram_data['state'];
 			$command['title'] = $telegram_data['title'];
+		} else {
+			$command['chatState'] = 'V'; //Verification pending
 		}
 		return $command;
 	}
@@ -292,7 +294,8 @@ class webhook {
 		$buttonCallback = $command['buttonCallback'];
 		if (($command['chatState'] ?? 'V') == 'V') //Chat-ID not yet verified
 		{
-			if ($buttonCallback == 'requestEmail') {
+			if ($buttonCallback == 'requestEmail')
+			{
 				$command['action'] = 'registrationEmailed';
 			} else {
 				$command['action'] = 'registrationFailed';
@@ -349,7 +352,7 @@ class webhook {
 		the text, that means no message_id (from previous message) must be provided,
 		such that sendMessage instead of editMessage will be called. */
 		unset($command['message_id']);
-		if (!isset($chat_state) || $chat_state == 'V') //Chat-ID not yet verified
+		if ($chat_state == 'V') //Chat-ID not yet verified
 		{
 			if (isset($command['title']) && $text == $command['title'])
 			{
