@@ -32,12 +32,6 @@ services:
 #        tags: 
 #            - { name: notification.method }
 
-    eb.telegram.notification.type.util:
-        class: eb\telegram\notification\type\util
-        shared: false
-        arguments:
-            - '@text_formatter.utils'
-
     eb.telegram.notification.type.post:
         class: eb\telegram\notification\type\post
 #       Parent is needed to define the arguments for the constructor
@@ -108,6 +102,8 @@ services:
             - '@dbal.conn'
             - '@user'
             - '@auth'
+            - %core.root_path%
+            - %core.php_ext%
 
     eb.telegram.core.telegram_api:
         class: eb\telegram\core\telegram_api

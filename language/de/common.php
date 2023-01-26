@@ -74,11 +74,30 @@ $lang = array_merge($lang, [
 	//Helpscreen unregistered user
 	//Placeholders: Sitename, Site-URL, telegram-id
 	'HELP_SCREEN_NON_MEMBER' => 'Dieser Service kann nur von registrierten Benutzern des Forums ' .
-								'<a href="%2$s">%1$s</a> benutzt werden.' .
-								'<br>Falls du registrierter Benutzer bist, gib deine Telegram-Id (%3$s) in deinem ' .
-								'Forums-Profil ein.' .
-								'<br>Um Benachrichtigungen zu erhalten, musst du außerdem unter den ' .
-								'Notifikations-Einstellungen die gewünschten Telegram-Notifikationen auswählen.',
+	'<a href="%2$s">%1$s</a> benutzt werden.' .
+	'<br>Falls du registrierter Benutzer bist, gib deine Telegram-Id (%3$s) in deinem ' .
+	'Forums-Profil ein.' .
+	'<br>Um Benachrichtigungen zu erhalten, musst du außerdem unter den ' .
+	'Notifikations-Einstellungen die gewünschten Telegram-Notifikationen auswählen.',
+
+	//Registration Screens
+	'HELP_SCREEN_REGISTERED' => '<b>Deine Telegram-ID wurde erfolgreich verifiziert.</b>' .
+								'<br>Vergiss nicht in deinem Profil die Ereignisse auszuwählen, für die du ' .
+								'Benachrichtigungen erhalten möchtest. ' .
+								'Gehe hierzu in dein Profil, wähle "Profil ändern", dann "Einstellungen->Benachrichtigungen einstellen" und ' .
+								'wähle in der Telegram-Spalte die Ereignisse aus.',
+
+	'ILLEGAL_CODE' => " \xE2\x9A\xA0 Der Code war falsch. Bitte fordere einen neuen Code an.", //"\xE2\x9A\xA0" = ⚠
+	'HELP_SCREEN_REGISTRATION_FAILED' => '<b>Deine Telegram-ID ist noch nicht verifiziert.</b>' .
+								'<br>Nutze die Taste um eine E-Mail an deine hinterlegte Adresse zu senden. ' .
+								'Die E-Mail enthält einen Code, den du per Telegram senden musst.',
+
+	'HELP_SCREEN_EMAILED' => 	'<b>E-Mail wurde gesendet.</b>' .
+								'<br>Prüfe deine Inbox und evtl. auch die Spam-Ordner. ' .
+								'<br>Sende dann sofort den Code als Nachricht.' .
+								'<br>Sende dazwischen keine anderen Nachrichten, sonst musst du erneut einen Code anfordern.' ,
+
+	'REQUEST_EMAIL'	=> 'E-Mail anfordern',
 
 	//Button outdated
 	'BUTTON_OUTDATED' => 'Bitte nutze nur die Tasten der letzten Telegram-Nachricht.',

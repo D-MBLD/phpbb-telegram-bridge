@@ -74,11 +74,29 @@ $lang = array_merge($lang, [
 	//Helpscreen unregistered user
 	//Placeholders: Sitename, Site-URL, telegram-id
 	'HELP_SCREEN_NON_MEMBER' => 'This service can be used by registered members of ' .
-								'<a href="%2$s">%1$s</a> only.' .
-								'<br>If you are a member, you must enter your telegram id (%3$s) into your forums profile ' .
-								'in order to use the service.' .
-								'<br>Afterwards you should also select the events for which you want to be notified ' .
-								'via telegram in your notification settings.',
+	'<a href="%2$s">%1$s</a> only.' .
+	'<br>If you are a member, you must enter your telegram id (%3$s) into your forums profile ' .
+	'in order to use the service.' .
+	'<br>Afterwards you should also select the events for which you want to be notified ' .
+	'via telegram in your notification settings.',
+	
+	//Registration screens
+	'HELP_SCREEN_REGISTERED' => '<b>Your telegram id has been sucessfully verified.</b>' .
+								'<br>Don\'t forget to select the events for which you want to receive notifications.' .
+								'Therfore select and edit your profile in the forum, go to ' .
+								'"Settings->Edit notification options" and select the events in the telegram column.',
+	'ILLEGAL_CODE' => " \xE2\x9A\xA0 The entered Code was wrong. Please request a new one.", //"\xE2\x9A\xA0" = ⚠
+	'HELP_SCREEN_REGISTRATION_FAILED' => '<b>Your telegram id is not yet verified.</b>' .
+								'<br>Use the button to request an email to the address stored with your forums profile. ' .
+								'The email will contain a code, which you need to send once via telegram to the forum ' .
+								'in order to verify your telegram id.',
+
+	'HELP_SCREEN_EMAILED' => 	'<b>Email was sent.</b>' .
+								'<br>Check your inbox and if necessary also your spam folders. ' .
+								'<br>Then send the code as message.' .
+								'<br>Don\'t send other messages in between. Otherwise you have to request a new code.',
+
+	'REQUEST_EMAIL'	=> 'Send email',
 
 	//Button outdated
 	'BUTTON_OUTDATED' => 'Please use only buttons of the last message.',

@@ -20,6 +20,8 @@ class forum_api {
 	protected $user;
 	/* @var \phpbb\auth\auth  */
 	protected $auth;
+	protected $phpbb_root_path;
+	protected $php_ext;
 
 	/**
 	* Constructor
@@ -29,13 +31,17 @@ class forum_api {
 	public function __construct(\phpbb\config\config $config,
 								\phpbb\db\driver\driver_interface $db,
 								\phpbb\user $user,
-								\phpbb\auth\auth $auth
+								\phpbb\auth\auth $auth,
+								$phpbb_root_path,
+								$php_ext
 								)
 	{
 		$this->config = $config;
 		$this->db = $db;
 		$this->user = $user;
 		$this->auth = $auth;
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->php_ext = $php_ext;
 	}
 
 	/** Returns an array of forum_ids (key), where the user is allowed to
@@ -99,7 +105,7 @@ class forum_api {
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
-			$permission = $allowed_forums[$row['forum_id']];
+			$permission = $allowed_forums[$row['forum_id']] ?? false;
 			if ($permission)
 			{
 				$readonly =  (!isset($permission['f_post']));
@@ -280,10 +286,9 @@ class forum_api {
 		$db = $this->db;
 		$users = array();
 
-		$sql = 'SELECT user_id, username, user_telegram_id FROM '. USERS_TABLE ;
+		$sql = 'SELECT user_id, username, user_email, user_telegram_id FROM '. USERS_TABLE ;
 		$sql .= ' WHERE ( user_type = 0 OR user_type = 3)';
 		$sql .= " AND user_telegram_id = '$telegram_id'";
-		$result = $db->sql_query ( $sql );
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
@@ -292,6 +297,29 @@ class forum_api {
 		$db->sql_freeresult($result);
 		return $users;
 	}
+
+	public function send_email($user) {
+		$bytes = random_bytes(6);
+		$code = substr(strtr(base64_encode($bytes), '+/', '-_'), 0, 6);
+		if (!class_exists('messenger'))
+		{
+			include($this->phpbb_root_path . 'includes/functions_messenger.' . $this->php_ext);
+		}
+		$messenger = new \messenger();
+		$messenger->template('@eb_telegram/verify_telegram_id', $user['user_lang'], '', '');
+
+		$messenger->set_addresses($user);
+
+		$messenger->assign_vars(array(
+			'USERNAME' => $user['username'],
+			'CODE' => $code,
+			'FORUM_NAME' => $this->config['sitename'],
+		));
+
+		$messenger->send(NOTIFY_EMAIL);
+		return $code;
+	}
+
 
 	/* Insert a new post either as new topic, or as answer to an existing topic.
 	In case of a new topic, parameter new_topic must be set to true.

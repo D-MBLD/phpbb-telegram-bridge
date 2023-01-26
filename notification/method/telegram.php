@@ -116,7 +116,7 @@ class telegram extends \phpbb\notification\method\messenger_base
 		// Load all the users we need
 		$this->user_loader->load_users($user_ids);
 
-		global $config, $phpbb_container;
+		// global $config, $phpbb_container; //not sure if necessary. May be needed by functions_messenger
 
 		if (!class_exists('messenger'))
 		{

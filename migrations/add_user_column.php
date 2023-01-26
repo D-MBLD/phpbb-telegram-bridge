@@ -23,6 +23,9 @@ class add_user_column extends \phpbb\db\migration\migration
 	}
 
 
+	/** Add a field to the user table, which contains the telegram id as entered
+	 * by the user into his profile.
+	 */
 	public function update_schema()
 	{
 		//return array();

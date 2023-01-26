@@ -101,8 +101,6 @@ class test {
 				}
 			}
 		}
-		$textlines[] = "<b>Text:</b>";
-		$textlines[] = $text;
 
 		$this->template->assign_vars([
 			'TEST_CHAT_ID'	=> $chat_id ?? '',

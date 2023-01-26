@@ -1,0 +1,14 @@
+Subject: Bitte verifiziere deine Telegram-ID
+
+Lieber {USERNAME},
+
+um sicherzustellen, dass die im Forum in deinem Profil eingetragene Telegram-ID auch
+tatsächlich dir gehört, sende bitte einmalig den folgenden Code per Telegram ans Forum:
+
+{CODE}
+
+Wenn deine ID verifiziert ist, kannst du per Telegram mit dem Forum kommunizieren und
+Benachrichtigungen vom Forum erhalten.
+
+Gesendet von 
+{FORUM_NAME}

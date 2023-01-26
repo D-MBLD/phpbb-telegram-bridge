@@ -1,0 +1,13 @@
+Subject: Please verify your telegram ID
+
+Dear {USERNAME},
+
+in order to be sure, that the telegram ID which was entered into your profile in the forum is really yours,
+you need to send once the following code to the forum:
+
+{CODE}
+
+Once your ID was verified, you can communicate with the forum via telegram.
+
+Send from 
+{FORUM_NAME}

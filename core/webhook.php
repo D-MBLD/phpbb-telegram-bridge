@@ -220,9 +220,11 @@ class webhook {
 		if (count($users) == 0)
 		{
 			$command['action'] = 'howToRegister';
+			$command['admin_info'] = '<b>Request from unregistered user:</b><br>'.json_encode($input, JSON_PRETTY_PRINT);
 			return $command;
 		}
-		$command['user'] = $users[0];
+		$user = $users[0];
+		$command['user'] = $user;
 		$telegram_data = $this->forum_api->select_telegram_chat_state($caller);
 		if ($telegram_data)
 		{
@@ -274,7 +276,7 @@ class webhook {
 		}
 		//In all cases where a forum is preselected, check that the user
 		//has access to that forum.
-		if ($command['action'] != 'allForums')
+		if (isset($command['forum_id']))
 		{
 			if (!$this->has_permission($command['user']['user_id'], $command['forum_id']))
 			{
@@ -288,7 +290,14 @@ class webhook {
 	private function create_command_for_button_callback($command)
 	{
 		$buttonCallback = $command['buttonCallback'];
-		if (stripos($buttonCallback, 'allForums') === 0 )
+		if (($command['chatState'] ?? 'V') == 'V') //Chat-ID not yet verified
+		{
+			if ($buttonCallback == 'requestEmail') {
+				$command['action'] = 'registrationEmailed';
+			} else {
+				$command['action'] = 'registrationFailed';
+			}
+		} else if (stripos($buttonCallback, 'allForums') === 0 )
 		{
 			$command['action'] = 'allForums';
 		} else if (stripos($buttonCallback, 'allForumTopics') === 0 )
@@ -340,7 +349,15 @@ class webhook {
 		the text, that means no message_id (from previous message) must be provided,
 		such that sendMessage instead of editMessage will be called. */
 		unset($command['message_id']);
-		if (!$chat_state || $chat_state == '0')
+		if (!isset($chat_state) || $chat_state == 'V') //Chat-ID not yet verified
+		{
+			if (isset($command['title']) && $text == $command['title'])
+			{
+				$command['action'] = 'registrationOk';
+			} else {
+				$command['action'] = 'registrationFailed';
+			}
+		} else if ($chat_state == '0')
 		{
 			$command['action'] = 'initial';
 		} else if ($chat_state == '1')
@@ -392,6 +409,16 @@ class webhook {
 		{
 			$postdata = $this->onHowToRegister($command['chat_id']);
 			unset($command['message_id']);
+		} else if ($action == 'registrationEmailed')
+		{
+			$postdata = $this->onRegistration($command['user'], $command['chat_id'], true, true);
+		} else if ($action == 'registrationOk')
+		{
+			$postdata = $this->onRegistration($command['user'], $command['chat_id'], true, false);
+		} else if ($action == 'registrationFailed')
+		{
+			//If an email was sent before, the title contains a code.
+			$postdata = $this->onRegistration($command['user'], $command['chat_id'], false, $command['title']);
 		} else if ($action == 'buttonOutdated')
 		{
 			$postdata = $this->onButtonOutdated();
@@ -572,6 +599,37 @@ class webhook {
 		// Register your telegram id %s "
 		$text = $this->user->lang('HELP_SCREEN_NON_MEMBER', $this->config['sitename'], $this->config['site_home_url'], $chat_id);
 		return $this->telegram_api->prepareMessage($text);
+	}
+
+	/** Various registration situations.
+	 * $ok = true and $email = true: Request Email
+	 * $ok = true and $email = false: Registration ok
+	 * $ok = false and $email = true: Registration failed after email was sent
+	 * $ok = false and $email = false: Registration failed, no email was sent immediately before
+	 */
+	private function onRegistration($user, $chat_id, $ok, $email)
+	{
+		$buttons = array();
+		if ($ok && $email)
+		{
+			$code = $this->forum_api->send_email($user);
+			$this->forum_api->store_telegram_chat_state($chat_id, 0, 'V', $code);
+			$text = $this->user->lang('HELP_SCREEN_EMAILED');
+		} else if ($ok)
+		{
+			$this->forum_api->store_telegram_chat_state($chat_id);
+			$text = $this->user->lang('HELP_SCREEN_REGISTERED');
+			$buttons[$this->user->lang('OK')] = 'initial';
+		} else
+		{
+			$this->forum_api->store_telegram_chat_state($chat_id, 0, 'V');
+			$text = $this->user->lang('HELP_SCREEN_REGISTRATION_FAILED');
+			if ($email) {
+				$text = $this->user->lang('ILLEGAL_CODE') . '<br>' . $text;
+			}
+			$buttons[$this->user->lang('REQUEST_EMAIL')] = 'requestEmail';
+		}
+		return $this->telegram_api->prepareMessage($text, $buttons);
 	}
 
 	/** Show all topics in the forum given by its ID.
