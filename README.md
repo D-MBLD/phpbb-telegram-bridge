@@ -19,10 +19,10 @@ Go to "ACP" > "Extensions" and select "Telegram Bridge Settings".
 Enter all settings there and press the link, which is provided for registering the webHook.
 
 ## Testing
-Send any text to the bot. It should react with the information, that you need to enter
+Send an arbitrary text to the bot. It should react with the information, that you need to enter
 your telegram-ID into your profile.
-Also don't forget to select in your profile notification settings the notifications you want to
-receive via telegram. And inform your users, to do the same, if they want to use the telegram bridge.
+Also don't forget to select in your profile notification settings the events for which you want to
+receive notifications via telegram. And inform your users, to do the same, if they want to use the telegram bridge.
 
 ## Side effects
 In order to be able to follow the full conversation on telegram, a notification is send on every new post, even if the forum was not visited in the meantime.
@@ -31,6 +31,10 @@ Therefore you may also consider to change the corresponding email-texts under <f
 If you want to include the full post text also into the emails, you may use the placeholder {TELEGRAM_MESSAGE}.
 Corresponding email templates are bookmark.txt, forum_notify.txt, topic_notify.txt and newtopic_notify.txt.
 
+## Disclaimer
+I did my best to ensure, that no user gets unauthorized access to read forums or to post into forums via telegram.
+But I do not give any guarantee. If you install this extension, it is on your own responsibility.
+ 
 ## License
 
 [GNU General Public License v2](license.txt)
