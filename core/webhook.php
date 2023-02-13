@@ -404,7 +404,8 @@ class webhook {
 		return $command;
 	}
 
-	private function execute_command($command)
+	/** Note: Command is passed by reference because admin_info may be added. */
+	private function execute_command(&$command)
 	{
 		$action = $command['action'];
 		if ($action == 'adminInfo')
@@ -461,12 +462,13 @@ class webhook {
 		} else if ($action == 'saveNewPost')
 		{
 			$saved = $this->forum_api->insertNewPost(false, $command['forum_id'], $command['topic_id'], $command['text'], $command['user']);
-			if ($saved)
+			if ($saved === true)
 			{
 				$postdata = $this->onShowTopic($command['user']['user_id'], $command['topic_id']);
 			} else
 			{
 				$postdata = $this->onSaveFailed();
+				$command['admin_info'] = $saved;
 			}
 		} else if ($action == 'newTopicTitle')
 		{

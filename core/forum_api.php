@@ -359,10 +359,19 @@ class forum_api {
 		}
 
 		// Login is needed, when a new post is sent.
-		// This is taken from the configuration for the eb/posbymail extension.
-		$userName = $this->config['postbymail_forumuser'];
-		$pw = $this->config['postbymail_forumpw'];
-		$auth->login($userName, $pw, false);
+		$userName = $this->config['eb_telegram_admin_user'];
+		$pw = $this->config['eb_telegram_admin_pw'];
+
+		$login_result = $auth->login($userName, $pw, false);
+
+		//Check for successful login
+		if ($login_result['status'] != LOGIN_SUCCESS) {
+			$author = $author['username'];
+			$error = $login_result['error_msg'];
+			return "Check configuration of telegram bridge." . 
+					" Login of admin user failed, when $author tried to send a new post or topic." . 
+					" Error-Message: $error";
+		}
 
 		// Now submit the post
 		if (!function_exists('submit_post'))
@@ -425,10 +434,16 @@ class forum_api {
 		{
 			$action = 'reply';
 		}
-		$done = submit_post($action, $topic_title, $author['username'], POST_NORMAL, $poll, $data);
+		$url = submit_post($action, $topic_title, $author['username'], POST_NORMAL, $poll, $data);
 		//Reset the original user information
 		$user->data['user_id'] = $userOrigId;
 		$user->data['username'] = $userOrigName;
-		return $done;
+		return $url ? true : false;
+	}
+
+	private function print_formatted($obj) {
+		$tmp = print_r($obj, true);
+		$tmp = \str_replace("\n", "\n<br>", $tmp);
+		echo "\n<br>$tmp\n<br>";
 	}
 }
