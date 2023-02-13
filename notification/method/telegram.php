@@ -50,7 +50,7 @@ class telegram extends \phpbb\notification\method\messenger_base
 	*/
 	public function get_type()
 	{
-		return 'notification.method.telegram';
+		return 'eb.telegram.notification.method.telegram';
 	}
 
 	/**

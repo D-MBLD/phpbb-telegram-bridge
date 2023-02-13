@@ -38,7 +38,7 @@ $lang = array_merge($lang, [
 
 	'EB_TELEGRAM_NOTIFICATION'	=> 'Telegram Bridge notification',
 	//Automatically compiled as column title in notification method selection
-	'NOTIFICATION_METHOD_TELEGRAM'	=> 'Telegram',
+	'EB_TELEGRAM_NOTIFICATION_METHOD_TELEGRAM'	=> 'Telegram',
 	//Used in the html events (Prefixed with L_)
 	'TELEGRAM_ID'			=> 'Your Telegram ID',
 	'TELEGRAM_ID_DESCR'		=> 'Add the bot (ask your admin for the name) to your Telegram contacts and enter your Telegram ID here.',
