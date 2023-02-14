@@ -135,7 +135,7 @@ class forum_api {
 
 		$sql = 'SELECT topic_id, topic_title, topic_time, topic_type FROM '. TOPICS_TABLE;
 		$sql .= " WHERE forum_id = $forum_id";
-		$sql .= ' AND topic_delete_user = 0';
+		$sql .= ' AND topic_visibility = ' . ITEM_APPROVED;
 		$sql .= ' ORDER BY topic_type DESC,'; //Announcements first
 		$sql .= ' topic_last_post_time DESC'; //latest active Topic first
 		$result = $db->sql_query($sql);

@@ -170,7 +170,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	*/
 	public function get_redirect_url()
 	{
-		return $this->get_redirect_url();
+		return $this->inner->get_redirect_url();
 	}
 
 	/**
