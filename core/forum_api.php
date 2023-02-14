@@ -365,11 +365,12 @@ class forum_api {
 		$login_result = $auth->login($userName, $pw, false);
 
 		//Check for successful login
-		if ($login_result['status'] != LOGIN_SUCCESS) {
+		if ($login_result['status'] != LOGIN_SUCCESS)
+		{
 			$author = $author['username'];
 			$error = $login_result['error_msg'];
-			return "Check configuration of telegram bridge." . 
-					" Login of admin user failed, when $author tried to send a new post or topic." . 
+			return "Check configuration of telegram bridge." .
+					" Login of admin user failed, when $author tried to send a new post or topic." .
 					" Error-Message: $error";
 		}
 
@@ -441,7 +442,8 @@ class forum_api {
 		return $url ? true : false;
 	}
 
-	private function print_formatted($obj) {
+	private function print_formatted($obj)
+	{
 		$tmp = print_r($obj, true);
 		$tmp = \str_replace("\n", "\n<br>", $tmp);
 		echo "\n<br>$tmp\n<br>";
