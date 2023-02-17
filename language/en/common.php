@@ -57,7 +57,7 @@ $lang = array_merge($lang, [
 	//Topic list
 	'TOPIC_LIST_TITLE' => 'The forum <b>%1$s</b> has %2$s topics:',
 	'TOPIC_LIST_TITLE_EMPTY' => 'Currently there are no topics in the forum <b>%s</b>',
-	'SELECT_TOPIC' => 'Use on of the buttons to select a topic',
+	'SELECT_TOPIC' => 'Use one of the buttons to select a topic.',
 	'SELECT_NEXT_PAGE' => 'Send a \'+\'- or \'-\'-sign, to show next/previous page.',
 	'FORUM_NOT_FOUND' => 'Could not read the forum (!?). Please try again',
 	'SHOW_FORUMS' => 'Show other forums',
