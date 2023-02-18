@@ -191,16 +191,15 @@ class forum_api {
 		return $posts;
 	}
 
-	public function store_message_id($chat_id, $message_id = 0)
+	public function update_message_id($chat_id, $message_id = 0)
 	{
 		if (!$chat_id)
 		{
 			return;
 		}
-		$sql = 'INSERT INTO phpbb_eb_telegram_chat' ;
-		$sql .= " (chat_id, message_id) VALUES('$chat_id', '$message_id')";
-		$sql .= ' ON DUPLICATE KEY UPDATE ';
-		$sql .= " message_id = '$message_id'";
+		$sql = 'UPDATE phpbb_eb_telegram_chat' ;
+		$sql .= ' SET message_id = \'' . $this->db->sql_escape($message_id) . '\'';
+		$sql .= ' WHERE chat_id = \'' . $this->db->sql_escape($chat_id) . '\'';;
 		$this->db->sql_query($sql);
 	}
 

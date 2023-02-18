@@ -129,7 +129,7 @@ class webhook {
 				if ($result_obj->ok)
 				{
 					$message_id = $result_obj->result->message_id;
-					$this->forum_api->store_message_id($postdata['chat_id'], $message_id);
+					$this->forum_api->update_message_id($postdata['chat_id'], $message_id);
 				}
 			}
 		}

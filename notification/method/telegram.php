@@ -241,7 +241,7 @@ class telegram extends \phpbb\notification\method\messenger_base
 		$this->telegram_api->sendOrEditMessage($messageObject);
 		//Clear the message-id, such that using the button, results in
 		//a new answer rather than overwriting this notification.
-		$this->forum_api->store_message_id($telegram_id);
+		$this->forum_api->update_message_id($telegram_id);
 	}
 
 }
