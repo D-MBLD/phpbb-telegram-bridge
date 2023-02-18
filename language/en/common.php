@@ -107,7 +107,7 @@ $lang = array_merge($lang, [
 
 	//Send new posts and topics
 	'REQUEST_POST' => 'Send your reply or use the cancel button.',
-	'REQUEST_TITEL' => 'Send the title for your new post or use the cancel button.',
+	'REQUEST_TITLE' => 'Send the title for your new post or use the cancel button.',
 	'REQUEST_TEXT_FOR_TITLE' => 'Send the text for your new post with title <b>%s</b> or use the cancel button.',
 	'CANCEL' => 'Cancel',
 	'TOPIC_SAVED' => 'The following topic was saved:',

@@ -855,7 +855,7 @@ class webhook {
 	private function onNewTopicTitle()
 	{
 		// Send the title for your new post or use the cancel button
-		$text = $this->user->lang('REQUEST_TITEL');
+		$text = $this->user->lang('REQUEST_TITLE');
 		$buttons = array($this->user->lang('CANCEL') => 'initial');
 		return $this->telegram_api->prepareMessage($text, $buttons);
 	}

@@ -108,7 +108,7 @@ $lang = array_merge($lang, [
 
 	//Send new posts and topics
 	'REQUEST_POST' => 'Sende deine Antwort oder nutze die Abbrechen-Taste.',
-	'REQUEST_TITEL' => 'Sende den Titel deines Beitrags, oder nutze die Abbrechen-Taste.',
+	'REQUEST_TITLE' => 'Sende den Titel deines Beitrags, oder nutze die Abbrechen-Taste.',
 	'REQUEST_TEXT_FOR_TITLE' => 'Sende den Text zu deinem neuen Beitrag <b>%s</b>, oder nutze die Abbrechen-Taste.',
 	'CANCEL' => 'Abbrechen',
 	'TOPIC_SAVED' => 'Der folgende Beitrag wurde gespeichert:',
