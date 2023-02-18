@@ -2,8 +2,7 @@
 
 ## Installation
 
-Create in the extension directory (usually forum/ext) the subdirectories eb/telegram and copy the code
-into that directory.
+Create in the extension directory (usually forum/ext) the subdirectories eb/telegram. Download the code as zip (See "code"-button in GitHub) and extract everything below "phpbb-telegram-bridge-master" directly into the eb/telegram subdirectory.
 
 ## Create a Telegram Bot
 
@@ -17,6 +16,7 @@ Go to "ACP" > "Customise" > "Extensions" and enable the "Telegram Bridge" extens
 
 Go to "ACP" > "Extensions" and select "Telegram Bridge Settings".
 Enter all settings there and press the link, which is provided for registering the webHook.
+When pressing the link, the telegram server should return a message containing the information "Webhook was set".
 
 ## Testing
 Send an arbitrary text to the bot. It should react with the information, that you need to enter
