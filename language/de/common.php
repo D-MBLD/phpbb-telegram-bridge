@@ -49,7 +49,7 @@ $lang = array_merge($lang, [
 	//Forum list
 	'FORUM_LIST_TITLE'	=> '<u>In %1$s gibt es %2$s Foren:</u>',
 	'SELECT_A_FORUM'	=> 'Nutze die Tasten um ein Forum auszuwählen.',
-	'LAST_POST'	=> 'Letzter Eintrag am %1$s von <b>%2$s</b>:',
+	'EBT_LAST_POST'	=> 'Letzter Eintrag am %1$s von <b>%2$s</b>:',
 	'READ_ONLY' => ' (nur lesen)',
 	'BACK'	=> 'Zurück',
 	'ILLEGAL_INPUT' => " \xE2\x9A\xA0 Die Eingabe <b>%s</b> ist ungültig.", //"\xE2\x9A\xA0" = ⚠

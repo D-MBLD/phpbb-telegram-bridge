@@ -765,7 +765,7 @@ class webhook {
 			$readonly = $forum['readonly'] ? $this->user->lang('READ_ONLY') : '';
 			$text .= " $num: <b>$title</b>$readonly" . PHP_EOL;
 			//Last post at %s by <b>%s</b>
-			$text .= $this->user->lang('LAST_POST', $lastTopicDate, $lastTopicAuthor) . PHP_EOL;
+			$text .= $this->user->lang('EBT_LAST_POST', $lastTopicDate, $lastTopicAuthor) . PHP_EOL;
 			$text .= $lastTopicTitle . PHP_EOL;
 			$text .= '<u>___________________________________</u>' . PHP_EOL;
 

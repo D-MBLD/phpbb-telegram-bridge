@@ -49,7 +49,7 @@ $lang = array_merge($lang, [
 	//Forum list
 	'FORUM_LIST_TITLE'	=> '<u>%1$s has %2$s forums:</u>',
 	'SELECT_A_FORUM'	=> 'Use one of the buttons to select a forum.',
-	'LAST_POST'	=> 'Last post at %1$s by <b>%2$s</b>:',
+	'EBT_LAST_POST'	=> 'Last post at %1$s by <b>%2$s</b>:',
 	'READ_ONLY' => ' (readonly)',
 	'BACK'	=> 'Back',
 	'ILLEGAL_INPUT' => " \xE2\x9A\xA0 Input <b>%s</b> is invalid.",  //"\xE2\x9A\xA0" = ⚠
