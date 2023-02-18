@@ -199,7 +199,7 @@ class forum_api {
 		}
 		$sql = 'UPDATE phpbb_eb_telegram_chat' ;
 		$sql .= ' SET message_id = \'' . $this->db->sql_escape($message_id) . '\'';
-		$sql .= ' WHERE chat_id = \'' . $this->db->sql_escape($chat_id) . '\'';;
+		$sql .= ' WHERE chat_id = \'' . $this->db->sql_escape($chat_id) . '\'';
 		$this->db->sql_query($sql);
 	}
 
