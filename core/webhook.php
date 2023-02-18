@@ -605,7 +605,16 @@ class webhook {
 	{
 		// "This service can be used only by members of (%s for link and %s for sitename)
 		// Register your telegram id %s "
-		$text = $this->user->lang('HELP_SCREEN_NON_MEMBER', $this->config['sitename'], $this->config['site_home_url'], $chat_id);
+		$home_url = $this->config['site_home_url'];
+		if (!$home_url)
+		{
+			$server_name = $this->config['server_name'];
+			$server_name = rtrim($server_name, '/');
+			$script_path = $this->config['script_path'];
+			$script_path = rtrim($script_path, '/');
+			$home_url = $this->config['server_protocol'] . $server_name . $script_path;
+		}
+		$text = $this->user->lang('HELP_SCREEN_NON_MEMBER', $this->config['sitename'], $home_url, $chat_id);
 		return $this->telegram_api->prepareMessage($text);
 	}
 
