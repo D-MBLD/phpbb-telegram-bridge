@@ -113,11 +113,7 @@ class acp_controller
 		$webhook = false;
 		if ($token && $secret)
 		{
-			$server_name = $this->config['server_name'];
-			$server_name = rtrim($server_name, '/');
-			$script_path = $this->config['script_path'];
-			$script_path = rtrim($script_path, '/');
-			$root_url = $this->config['server_protocol'] . $server_name . $script_path;
+			$root_url = generate_board_url();
 			$webhook = sprintf($this->user->lang('ACP_TELEGRAM_WEBHOOK_TEMPLATE'), $token, $root_url, $secret);
 		}
 

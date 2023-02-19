@@ -608,11 +608,7 @@ class webhook {
 		$home_url = $this->config['site_home_url'];
 		if (!$home_url)
 		{
-			$server_name = $this->config['server_name'];
-			$server_name = rtrim($server_name, '/');
-			$script_path = $this->config['script_path'];
-			$script_path = rtrim($script_path, '/');
-			$home_url = $this->config['server_protocol'] . $server_name . $script_path;
+			$home_url = generate_board_url();
 		}
 		$text = $this->user->lang('HELP_SCREEN_NON_MEMBER', $this->config['sitename'], $home_url, $chat_id);
 		return $this->telegram_api->prepareMessage($text);
