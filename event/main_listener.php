@@ -169,9 +169,10 @@ class main_listener implements EventSubscriberInterface
 				$event['error'] = array_merge($errors, $error);
 			}
 			$users = $this->forum_api->find_telegram_user($telegram_id);
-			$users = array_filter($users, function($val)
+			$current_users_id = $this->user->data['user_id'];
+			$users = array_filter($users, function($val) use ($current_users_id)
 										{
-											return $val['user_id'] != $this->user->user_id;
+											return $val['user_id'] != $current_users_id;
 										});
 			if (count($users) > 0)
 			{
