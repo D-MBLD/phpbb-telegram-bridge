@@ -75,7 +75,7 @@ $lang = array_merge($lang, [
 	//Placeholders: Sitename, Site-URL, telegram-id
 	'HELP_SCREEN_NON_MEMBER' => 'Dieser Service kann nur von registrierten Benutzern des Forums ' .
 	'<a href="%2$s">%1$s</a> benutzt werden.' .
-	'<br>Falls du registrierter Benutzer bist, gib deine Telegram-Id (%3$s) in deinem ' .
+	'<br>Falls du registrierter Benutzer bist, gib deine Telegram-Id (<code>%3$s</code>) in deinem ' .
 	'Forums-Profil ein.' .
 	'<br>Um Benachrichtigungen zu erhalten, musst du außerdem unter den ' .
 	'Notifikations-Einstellungen die gewünschten Telegram-Notifikationen auswählen.',
