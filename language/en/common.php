@@ -76,9 +76,7 @@ $lang = array_merge($lang, [
 	'HELP_SCREEN_NON_MEMBER' => 'This service can be used by registered members of ' .
 	'<a href="%2$s">%1$s</a> only.' .
 	'<br>If you are a member, you must enter your telegram id (<code>%3$s</code>) into your forums profile ' .
-	'in order to use the service.' .
-	'<br>Afterwards you should also select the events for which you want to be notified ' .
-	'via telegram in your notification settings.',
+	'in order to use the service.',
 
 	//Registration screens
 	'HELP_SCREEN_REGISTERED' => '<b>Your telegram id has been sucessfully verified.</b>' .
