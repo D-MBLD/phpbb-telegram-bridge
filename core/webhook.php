@@ -331,6 +331,8 @@ class webhook {
 		} else if (stripos($buttonCallback, 'newTopicTitle') === 0 )
 		{
 			$command['action'] = 'newTopicTitle';
+			//No update of telegram message, but request title below of display with forum content
+			unset($command['message_id']);
 		} else if ($buttonCallback == 'initial')
 		{
 			$command['action'] = 'initial';
