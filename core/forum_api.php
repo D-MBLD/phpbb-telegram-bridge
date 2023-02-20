@@ -289,7 +289,7 @@ class forum_api {
 		$db = $this->db;
 		$users = array();
 
-		$sql = 'SELECT user_id, username, user_email, user_telegram_id FROM '. USERS_TABLE ;
+		$sql = 'SELECT user_id, username, user_colour, user_email, user_telegram_id FROM '. USERS_TABLE ;
 		$sql .= ' WHERE ( user_type = 0 OR user_type = 3)';
 		$sql .= " AND user_telegram_id = '$telegram_id'";
 		$result = $db->sql_query($sql);
@@ -419,11 +419,13 @@ class forum_api {
 		}
 
 		//To achieve, that the post occurs under the correct user,
-		//we need to temporarily replace user_id and username.
-		$userOrigId = $user->data['user_id'];
-		$userOrigName = $user->data['username'];
-		$user->data['user_id'] = $author['user_id'];
-		$user->data['username'] = $author['username'];
+		//we need to temporarily replace user_id, username and even the colour.
+		$userOrigData = $user->data;
+		$relevantUserProps = array('user_id', 'username' , 'user_colour');
+		foreach($relevantUserProps as $prop)
+		{
+			$user->data[$prop] = $author[$prop];
+		}
 		//See https://wiki.phpbb.com/Function.submit_post
 		//and https://wiki.phpbb.com/Using_phpBB3%27s_Basic_Functions
 		//topic_title from here will be used for the title of the POST
@@ -436,8 +438,10 @@ class forum_api {
 		}
 		$url = submit_post($action, $topic_title, $author['username'], POST_NORMAL, $poll, $data);
 		//Reset the original user information
-		$user->data['user_id'] = $userOrigId;
-		$user->data['username'] = $userOrigName;
+		foreach($relevantUserProps as $prop)
+		{
+			$user->data[$prop] = $userOrigData[$prop];
+		}
 		return $url ? true : false;
 	}
 
