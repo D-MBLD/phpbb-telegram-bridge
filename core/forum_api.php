@@ -232,6 +232,13 @@ class forum_api {
 		$this->db->sql_query($sql);
 	}
 
+	public function delete_telegram_chat_state($chat_id)
+	{
+		$sql = 'DELETE FROM phpbb_eb_telegram_chat' ;
+		$sql .= ' WHERE chat_id = \'' . $this->db->sql_escape($chat_id) . '\'';
+		$this->db->sql_query($sql);	
+	}
+
 	public function select_telegram_chat_state($chat_id = false)
 	{
 		$telegram_data = array();

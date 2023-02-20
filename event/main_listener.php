@@ -161,6 +161,7 @@ class main_listener implements EventSubscriberInterface
 		$errors = $event['error'];
 		$error = array();
 		$telegram_id = $event['data']['user_telegram_id'];
+		$previous_id = $this->user->data['user_telegram_id'];
 		if ($telegram_id)
 		{
 			if (!is_numeric($telegram_id))
@@ -179,6 +180,11 @@ class main_listener implements EventSubscriberInterface
 				$error[] = 'TELEGRAM_ID_ALREADY_USED';
 				$event['error'] = array_merge($errors, $error);
 			}
+		}
+		if (empty($errors) && $previous_id && $telegram_id != $previous_id)
+		{
+			//Telegram id is changed 
+			$users = $this->forum_api->delete_telegram_chat_state($previous_id);
 		}
 	}
 
