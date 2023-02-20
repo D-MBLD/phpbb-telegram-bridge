@@ -26,9 +26,10 @@ class main_listener implements EventSubscriberInterface
 			'core.user_setup'						 => 'load_language_on_setup',
 			'core.ucp_profile_modify_profile_info'	 => 'ucp_profile_modify_profile_info',
 			'core.ucp_profile_info_modify_sql_ary'	 => 'ucp_profile_info_modify_sql_ary',
+			'core.ucp_profile_validate_profile_info' => 'ucp_profile_validate_profile_info',
 			'core.acp_users_modify_profile'			 => 'acp_users_modify_profile',
 			'core.acp_users_profile_modify_sql_ary'	 => 'acp_users_profile_modify_sql_ary',
-			'core.ucp_profile_validate_profile_info' => 'ucp_profile_validate_profile_info',
+			'core.acp_users_profile_validate' 		 => 'acp_users_profile_validate',
 		];
 	}
 
@@ -107,18 +108,18 @@ class main_listener implements EventSubscriberInterface
 	*/
 	public function acp_users_modify_profile($event)
 	{
+		$telegram_id_old = $event['user_row']['user_telegram_id'];
 		if ($event['submit'])
 		{
-			$telegram =  $this->request->variable('telegram', '', true);
+			$telegram_id_new = $this->request->variable('telegram', '', true);
+			$event['data'] = array_merge($event['data'], array(
+				'user_telegram_id'	=> $telegram_id_new,
+			));
 		} else
 		{
-			$telegram =  $event['user_row']['user_telegram_id'];
+			$telegram_id_new = $telegram_id_old;
 		}
-		//$telegram =  $this->request->variable('telegram', $event['user_row']['user_telegram_id']);
-		$event['user_row'] = array_merge($event['user_row'], array(
-			'user_telegram_id'	=> $telegram,
-		));
-		$this->set_template_field($telegram);
+		$this->set_template_field($telegram_id_new);
 	}
 
 	/**
@@ -160,19 +161,43 @@ class main_listener implements EventSubscriberInterface
 	*/
 	public function ucp_profile_validate_profile_info($event)
 	{
-		$errors = $event['error'];
-		$error = array();
 		$telegram_id = $event['data']['user_telegram_id'];
 		$previous_id = $this->user->data['user_telegram_id'];
-		if ($telegram_id)
+		$current_users_id = $this->user->data['user_id'];
+		$this->users_profile_validate($event, $current_users_id, $previous_id, $telegram_id);
+	}
+
+	/**
+	* Validate user data on editing profile in ACP
+	* Event-Data: data, error, user_id, user_row
+	*/
+	public function acp_users_profile_validate($event)
+	{
+		$previous_id = $event['user_row']['user_telegram_id'];
+		$telegram_id = $event['data']['user_telegram_id'];
+		$this->users_profile_validate($event, $event['user_id'], $previous_id, $telegram_id);
+		//For saving, the user_row is used
+		$event['user_row'] = array_merge($event['user_row'], array(
+			'user_telegram_id'	=> $telegram_id,
+		));
+	}
+
+	/**
+	* Validate user data on editing profile in ACP
+	* Event-Data: data, error, user_id, user_row
+	*/
+	private function users_profile_validate($event, $current_users_id, $previous_telegram_id, $new_telegram_id)
+	{
+		$errors = $event['error'];
+		$error = array();
+		if ($new_telegram_id)
 		{
-			if (!is_numeric($telegram_id))
+			if (!is_numeric($new_telegram_id))
 			{
 				$error[] = 'TELEGRAM_ID_NOT_NUMERIC';
 				$event['error'] = array_merge($errors, $error);
 			}
-			$users = $this->forum_api->find_telegram_user($telegram_id);
-			$current_users_id = $this->user->data['user_id'];
+			$users = $this->forum_api->find_telegram_user($new_telegram_id);
 			$users = array_filter($users, function($val) use ($current_users_id)
 										{
 											return $val['user_id'] != $current_users_id;
@@ -183,10 +208,10 @@ class main_listener implements EventSubscriberInterface
 				$event['error'] = array_merge($errors, $error);
 			}
 		}
-		if (empty($errors) && $previous_id && $telegram_id != $previous_id)
+		if (empty($errors) && $previous_telegram_id && $new_telegram_id != $previous_telegram_id)
 		{
-			//Telegram id is changed 
-			$users = $this->forum_api->delete_telegram_chat_state($previous_id);
+			//Telegram id is changed, remove chat state for old id
+			$users = $this->forum_api->delete_telegram_chat_state($previous_telegram_id);
 		}
 	}
 
