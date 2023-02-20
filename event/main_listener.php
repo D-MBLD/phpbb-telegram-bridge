@@ -109,7 +109,7 @@ class main_listener implements EventSubscriberInterface
 	{
 		if ($event['submit'])
 		{
-			$telegram =  $this->request->variable('telegram', '');
+			$telegram =  $this->request->variable('telegram', '', true);
 		} else
 		{
 			$telegram =  $event['user_row']['user_telegram_id'];
@@ -129,7 +129,9 @@ class main_listener implements EventSubscriberInterface
 	{
 		if ($event['submit'])
 		{
-			$telegram =  $this->request->variable('telegram', '');
+			//Although field requires numeric entry, multibyte is set to true
+			//such that wrong entries are not replaced with ?-signs.
+			$telegram =  $this->request->variable('telegram', '', true);
 		} else
 		{
 			$telegram =  $this->user->data['user_telegram_id'];
