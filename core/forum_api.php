@@ -44,31 +44,54 @@ class forum_api {
 		$this->php_ext = $php_ext;
 	}
 
-	/** Returns an array of forum_ids (key), where the user is allowed to
-	 * post to. (And then usually to read also)
-	 * Example for the array structure:
+	/** Returns an array of forum_ids (key) and readonly-flag.
+	 * Only forums, which are at least readable are returned.
+	 * (Taking parent readability/visibility also into account)
+	 * 
+	 * Example:
 	 * Array
-	 *(
-	 * [43] => Array  //forum_id
 	 * (
-	 *   [f_post] => Array
-	 *	(
-	 *	 [0] => 636 //user-id
-	 *	 ... More users if user_id was not set
-	 *	)
-	 *   ... //More permissions if requested
-	 *  )
-	 * ... //next forum
+	 *	[43] => false	//Posting is allowed
+	 *	[11] => true	//read-only forum
+	 *	... all forums with at least read permission
 	 * )
-	 *
-	 * The array has the following structure: forum-id -> array of permissions -> array of users
 	 */
 	private function getAllowedForums($user_id)
 	{
-		// See http://www.lithotalk.de/docs/auth_api.html for details
-		$permissions = array('f_post', 'f_read');
-		$acls = $this->auth->acl_get_list($user_id, $permissions, false);
-		return $acls;
+		$acls = $this->auth->acl_get_list($user_id, ['f_read', 'f_post'], false);
+		$acls_read_or_list = $this->auth->acl_get_list($user_id, ['f_read', 'f_list'], false);
+		/* The acl-arrays have the following structure: forum-id -> array of permissions -> array of users
+		 * See http://www.lithotalk.de/docs/auth_api.html for details
+		 */
+		
+		$db = $this->db;
+		$parent_relation = array();
+		$sql = 'SELECT forum_id, parent_id FROM '. FORUMS_TABLE;
+		$sql .= ' WHERE parent_id != 0'; 
+		$result = $db->sql_query($sql);
+		while ($row = $db->sql_fetchrow($result))
+		{
+			$parent_relation[$row['parent_id']][] = $row['forum_id'];
+		}
+		$db->sql_freeresult($result);
+		//Remove the permission, if the parent does not have at least the read or list permission also
+		foreach($parent_relation as $parent_id => $children) {
+			if (!isset($acls_read_or_list[$parent_id]))
+			{
+				// No permission for parent. Remove permission of all children
+				foreach ($children as $child)
+				{
+					unset($acls[$child]);
+				}
+			}
+		}
+		//Convert into an easier to use array
+		$permissions = array();
+		foreach($acls as $forum_id => $rights)
+		{
+			$permissions[$forum_id] =  (!isset($rights['f_post']));
+		}
+		return $permissions;
 	}
 
 	public function getForumName($user_id, $forum_id)
@@ -105,16 +128,15 @@ class forum_api {
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
-			$permission = $allowed_forums[$row['forum_id']] ?? false;
-			if ($permission)
+			$forum_id = $row['forum_id'];
+			if (isset($allowed_forums[$forum_id]))
 			{
-				$readonly =  (!isset($permission['f_post']));
-				$forums[] = array( 'id' => $row['forum_id'],
+				$forums[] = array( 'id' => $forum_id,
 								'title' => $row['forum_name'],
 								'lastTopicTitle' => $row['forum_last_post_subject'],
 								'lastTopicDate' => $row['forum_last_post_time'],
 								'lastTopicAuthor' => $row['forum_last_poster_name'],
-								'readonly' => $readonly
+								'readonly' => $allowed_forums[$forum_id]
 				);
 			}
 		}
@@ -172,22 +194,21 @@ class forum_api {
 		$title = '';
 		while ($row = $db->sql_fetchrow($result))
 		{
-			$forum_id = $row['forum_id'];
-			$title = $row['topic_title'];
+			$forum_id = $row['forum_id']; //Same for all rows
+			$title = $row['topic_title']; //Same for all rows
 			$posts[] = array('text' => $row['post_text'],
 							'username' => $row['username'],
 							'time' => $row['post_time']);
 		}
 		$db->sql_freeresult($result);
-		//Check permission given by folder
+		//Check permission for the forum
 		$permissions = $this->getAllowedForums($user_id);
-		$permission = $permissions[$forum_id] ?? false;
-		if (!$permission)
+		if (!isset($permissions[$forum_id]))
 		{
 			return array();
 		}
 		$posts[0]['title'] = $title;
-		$posts[0]['readonly'] = !isset($permission['f_post']);
+		$posts[0]['readonly'] = $permissions[$forum_id];
 		return $posts;
 	}
 
