@@ -243,13 +243,15 @@ class forum_api {
 		{
 			return;
 		}
+		$title_escaped = $this->db->sql_escape($title);
+		
 		$sql = 'INSERT INTO phpbb_eb_telegram_chat';
 		$sql .= ' (chat_id, message_id, forum_id, topic_id, state, title)';
 		$sql .= " VALUES('$chat_id', 0, 0, '$topic_id', '$state', '$title')";
 		$sql .= ' ON DUPLICATE KEY UPDATE';
 		$sql .= " topic_id = '$topic_id'";
 		$sql .= ", state = '$state'";
-		$sql .= ", title = '$title'";
+		$sql .= ", title = '$title_escaped'";
 		$this->db->sql_query($sql);
 	}
 
