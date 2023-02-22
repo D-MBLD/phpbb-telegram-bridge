@@ -159,14 +159,15 @@ class forum_api {
 	 * before !
 	 * (Currently implemented in webhook->onAllForumTopics)
 	 */
-	public function selectForumTopics($forum_id)
+	public function selectForumTopics($user_id, $forum_id)
 	{
 		$db = $this->db;
 		$topics = array();
-
-		$sql = 'SELECT topic_id, topic_title, topic_time, topic_type FROM '. TOPICS_TABLE;
+		
+		$sql = 'SELECT topic_id, topic_title, topic_time, topic_type, topic_visibility FROM '. TOPICS_TABLE;
 		$sql .= " WHERE forum_id = $forum_id";
-		$sql .= ' AND topic_visibility = ' . ITEM_APPROVED;
+		$sql .= ' AND topic_visibility != ' . ITEM_DELETED;
+		$sql .= ' AND (topic_visibility = ' . ITEM_APPROVED . " OR topic_poster = $user_id)";
 		$sql .= ' ORDER BY topic_type DESC,'; //Announcements first
 		$sql .= ' topic_last_post_time DESC'; //latest active Topic first
 		$result = $db->sql_query($sql);
@@ -175,7 +176,9 @@ class forum_api {
 			$topics[$row['topic_id']] =
 				array( 'title' => $row['topic_title'],
 					   'date' => $row['topic_time'],
-					   'type' => $row['topic_type']);
+					   'type' => $row['topic_type'],
+					   'approved' => $row['topic_visibility'] == ITEM_APPROVED
+					);
 		}
 		$db->sql_freeresult($result);
 		return $topics;
@@ -190,14 +193,13 @@ class forum_api {
 		$db = $this->db;
 		$posts = array();
 
-		$sql = 'SELECT t1.post_id, t1.forum_id, t1.post_text, t1.post_time, t1.poster_id, t1.post_visibility, t2.username, t3.topic_title ';
+		$sql = 'SELECT t1.post_id, t1.forum_id, t1.post_text, t1.post_time, t1.poster_id, t1.post_visibility, t2.username, t3.topic_title, t3.topic_status ';
 		$sql .= ' FROM '. POSTS_TABLE . ' as t1';
 		$sql .= ' LEFT JOIN '. USERS_TABLE . ' as t2 ON t1.poster_id = t2.user_id';
 		$sql .= ' LEFT JOIN '. TOPICS_TABLE . ' as t3 ON t1.topic_id = t3.topic_id';
 		$sql .= " WHERE t1.topic_id = $topic_id";
-		$sql .= ' AND t1.poster_id <> 0';  //0 = deleted permantly
-		$sql .= ' AND t1.post_delete_user = 0';  //0 = deleted (marked as deleted)
-		$sql .= " AND (t1.post_visibility = 1 OR t1.poster_id = $user_id)";
+		$sql .= ' AND t1.post_visibility != ' . ITEM_DELETED;
+		$sql .= ' AND (t1.post_visibility = ' . ITEM_APPROVED . " OR t1.poster_id = $user_id)";
 		$sql .= ' ORDER BY t1.post_id';  //Old to new
 		$result = $db->sql_query($sql);
 		$forum_id = 0;
@@ -206,6 +208,7 @@ class forum_api {
 		{
 			$forum_id = $row['forum_id']; //Same for all rows
 			$title = $row['topic_title']; //Same for all rows
+			$locked = $row['topic_status'] == ITEM_LOCKED; //Same for all rows
 			$posts[] = array('text' => $row['post_text'],
 							'username' => $row['username'],
 							'time' => $row['post_time'],
@@ -220,7 +223,7 @@ class forum_api {
 			return array();
 		}
 		$posts[0]['title'] = $title;
-		$posts[0]['readonly'] = $permissions[$forum_id]['readonly'];
+		$posts[0]['readonly'] = $permissions[$forum_id]['readonly'] || $locked;
 		return $posts;
 	}
 

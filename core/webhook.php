@@ -661,7 +661,7 @@ class webhook {
 			//Store the selected forum.
 			$this->forum_api->store_forum_id($chat_id, $forum_id);
 
-			$topics = $this->forum_api->selectForumTopics($forum_id );
+			$topics = $this->forum_api->selectForumTopics($user_id, $forum_id );
 			$total_count = count($topics);
 			while ($page * 6 >= $total_count)
 			{
@@ -687,6 +687,12 @@ class webhook {
 			$i = 1;
 			foreach ($topics as $id => $topic)
 			{
+				$not_approved = '';
+				if (!$topic['approved'])
+				{
+					$not_approved = $this->user->lang('TOPIC_UNAPPROVED');
+					$not_approved = "(<i><b>$not_approved</b></i>)" . PHP_EOL;
+				}
 				$title = $topic['title'];
 				$date = date('d.m.y', $topic['date']);
 				$num = $i + $page * 6;
@@ -702,6 +708,7 @@ class webhook {
 				{
 					$text .= " $num: $title ($date)\n";
 				}
+				$text .= $not_approved;
 				$buttonText = "$num: $title";
 				$buttons[$buttonText] = "showTopic~t$id";
 				$i++;
@@ -818,6 +825,12 @@ class webhook {
 		{
 			$time = date('d.m.y H:i', $post['time']);
 			$user = $post['username'];
+			$not_approved = '';
+			if (!$post['approved'])
+			{
+				$not_approved = $this->user->lang('POST_UNAPPROVED_EXPLAIN');
+				$not_approved = "<i><b>$not_approved</b></i>" . PHP_EOL;
+			}
 			if ($first)
 			{
 				$title = $post['title'];
@@ -825,6 +838,7 @@ class webhook {
 				$text .= $this->user->lang('TOPIC_AT_BY', $time, $user) . PHP_EOL;
 				// "Titel: <b>$title</b>\n";
 				$text .= $this->user->lang('TOPIC_TITLE', $title) . PHP_EOL;
+				$text .= $not_approved;
 				$text .= $post['text'];
 				$readonly = $post['readonly'];
 				$first = false;
@@ -832,6 +846,7 @@ class webhook {
 			{
 				// "<b>$time:</b> Reply from <b>$user</b>\n";
 				$text .= $this->user->lang('REPLY_AT_BY', $time, $user) . PHP_EOL;
+				$text .= $not_approved;
 				$text .= $post['text'];
 			}
 			$text .= PHP_EOL . '<u>___________________________________</u>' . PHP_EOL;
