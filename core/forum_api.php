@@ -44,30 +44,32 @@ class forum_api {
 		$this->php_ext = $php_ext;
 	}
 
-	/** Returns an array of forum_ids (key) and readonly-flag.
-	 * Only forums, which are at least readable are returned.
-	 * (Taking parent readability/visibility also into account)
+	/** Returns an array of forum_ids (key) and assigned arrays with values
+	 * for readonly and moderated.
+	 * Only forums with at least read-permission are returned.
+	 * If a parent-forum has no read or list permission, the children forums are 
+	 * not listed (even if they would have more permissions).
 	 * 
 	 * Example:
 	 * Array
 	 * (
-	 *	[43] => false	//Posting is allowed
-	 *	[11] => true	//read-only forum
+	 *	[43] => ['readonly' => true],	//Moderated does not matter
+	 *	[11] => ['readonly' => false, 'moderated' => true],
 	 *	... all forums with at least read permission
 	 * )
 	 */
-	private function getAllowedForums($user_id)
+	private function getForumsPermissions($user_id)
 	{
-		$acls = $this->auth->acl_get_list($user_id, ['f_read', 'f_post'], false);
+		$acls = $this->auth->acl_get_list($user_id, ['f_read', 'f_post', 'f_noapprove'], false);
 		$acls_read_or_list = $this->auth->acl_get_list($user_id, ['f_read', 'f_list'], false);
 		/* The acl-arrays have the following structure: forum-id -> array of permissions -> array of users
 		 * See http://www.lithotalk.de/docs/auth_api.html for details
 		 */
-		
+
 		$db = $this->db;
 		$parent_relation = array();
 		$sql = 'SELECT forum_id, parent_id FROM '. FORUMS_TABLE;
-		$sql .= ' WHERE parent_id != 0'; 
+		$sql .= ' WHERE parent_id != 0';
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
@@ -75,7 +77,8 @@ class forum_api {
 		}
 		$db->sql_freeresult($result);
 		//Remove the permission, if the parent does not have at least the read or list permission also
-		foreach($parent_relation as $parent_id => $children) {
+		foreach($parent_relation as $parent_id => $children)
+		{
 			if (!isset($acls_read_or_list[$parent_id]))
 			{
 				// No permission for parent. Remove permission of all children
@@ -87,9 +90,14 @@ class forum_api {
 		}
 		//Convert into an easier to use array
 		$permissions = array();
-		foreach($acls as $forum_id => $rights)
+		foreach ($acls as $forum_id => $rights)
 		{
-			$permissions[$forum_id] =  (!isset($rights['f_post']));
+			if (!isset($rights['f_post']) && !isset($rights['f_read']))
+			{
+				continue;
+			}
+			$permissions[$forum_id]['readonly'] = !isset($rights['f_post']);
+			$permissions[$forum_id]['moderated'] = !isset($rights['f_noapprove']);
 		}
 		return $permissions;
 	}
@@ -112,7 +120,7 @@ class forum_api {
 	 */
 	public function selectAllForums($user_id, $forum_id = 0)
 	{
-		$allowed_forums = $this->getAllowedForums($user_id);
+		$forum_permissions = $this->getForumsPermissions($user_id);
 
 		$db = $this->db;
 		$forums = array();
@@ -129,14 +137,15 @@ class forum_api {
 		while ($row = $db->sql_fetchrow($result))
 		{
 			$forum_id = $row['forum_id'];
-			if (isset($allowed_forums[$forum_id]))
+			if (isset($forum_permissions[$forum_id]))
 			{
 				$forums[] = array( 'id' => $forum_id,
 								'title' => $row['forum_name'],
 								'lastTopicTitle' => $row['forum_last_post_subject'],
 								'lastTopicDate' => $row['forum_last_post_time'],
 								'lastTopicAuthor' => $row['forum_last_poster_name'],
-								'readonly' => $allowed_forums[$forum_id]
+								'readonly' => $forum_permissions[$forum_id]['readonly'],
+								'moderated' => $forum_permissions[$forum_id]['moderated']
 				);
 			}
 		}
@@ -181,13 +190,14 @@ class forum_api {
 		$db = $this->db;
 		$posts = array();
 
-		$sql = 'SELECT t1.post_id, t1.forum_id, t1.post_text, t1.post_time, t1.poster_id, t2.username, t3.topic_title ';
+		$sql = 'SELECT t1.post_id, t1.forum_id, t1.post_text, t1.post_time, t1.poster_id, t1.post_visibility, t2.username, t3.topic_title ';
 		$sql .= ' FROM '. POSTS_TABLE . ' as t1';
 		$sql .= ' LEFT JOIN '. USERS_TABLE . ' as t2 ON t1.poster_id = t2.user_id';
 		$sql .= ' LEFT JOIN '. TOPICS_TABLE . ' as t3 ON t1.topic_id = t3.topic_id';
 		$sql .= " WHERE t1.topic_id = $topic_id";
 		$sql .= ' AND t1.poster_id <> 0';  //0 = deleted permantly
 		$sql .= ' AND t1.post_delete_user = 0';  //0 = deleted (marked as deleted)
+		$sql .= " AND (t1.post_visibility = 1 OR t1.poster_id = $user_id)";
 		$sql .= ' ORDER BY t1.post_id';  //Old to new
 		$result = $db->sql_query($sql);
 		$forum_id = 0;
@@ -198,17 +208,19 @@ class forum_api {
 			$title = $row['topic_title']; //Same for all rows
 			$posts[] = array('text' => $row['post_text'],
 							'username' => $row['username'],
-							'time' => $row['post_time']);
+							'time' => $row['post_time'],
+							'approved' => $row['post_visibility'] == ITEM_APPROVED);
 		}
 		$db->sql_freeresult($result);
 		//Check permission for the forum
-		$permissions = $this->getAllowedForums($user_id);
+		$permissions = $this->getForumsPermissions($user_id);
+
 		if (!isset($permissions[$forum_id]))
 		{
 			return array();
 		}
 		$posts[0]['title'] = $title;
-		$posts[0]['readonly'] = $permissions[$forum_id];
+		$posts[0]['readonly'] = $permissions[$forum_id]['readonly'];
 		return $posts;
 	}
 
@@ -244,7 +256,7 @@ class forum_api {
 			return;
 		}
 		$title_escaped = $this->db->sql_escape($title);
-		
+
 		$sql = 'INSERT INTO phpbb_eb_telegram_chat';
 		$sql .= ' (chat_id, message_id, forum_id, topic_id, state, title)';
 		$sql .= " VALUES('$chat_id', 0, 0, '$topic_id', '$state', '$title')";
@@ -257,9 +269,9 @@ class forum_api {
 
 	public function delete_telegram_chat_state($chat_id)
 	{
-		$sql = 'DELETE FROM phpbb_eb_telegram_chat' ;
+		$sql = 'DELETE FROM phpbb_eb_telegram_chat';
 		$sql .= ' WHERE chat_id = \'' . $this->db->sql_escape($chat_id) . '\'';
-		$this->db->sql_query($sql);	
+		$this->db->sql_query($sql);
 	}
 
 	public function select_telegram_chat_state($chat_id = false)
@@ -440,8 +452,8 @@ class forum_api {
 			'post_time'         => 0,
 			'forum_name'        => $forum['title'], //For email notification
 			'enable_indexing'   => true,
-			'force_approved_state' => true,
-			'force_visibility'  => true,
+			'force_approved_state' => $forum['moderated'] ? ITEM_UNAPPROVED : ITEM_APPROVED,
+			//'force_visibility'  => false, //Same as force_approved
 		);
 		if ($topic_id)
 		{
@@ -452,7 +464,7 @@ class forum_api {
 		//we need to temporarily replace user_id, username and even the colour.
 		$userOrigData = $user->data;
 		$relevantUserProps = array('user_id', 'username' , 'user_colour');
-		foreach($relevantUserProps as $prop)
+		foreach ($relevantUserProps as $prop)
 		{
 			$user->data[$prop] = $author[$prop];
 		}
@@ -468,7 +480,7 @@ class forum_api {
 		}
 		$url = submit_post($action, $topic_title, $author['username'], POST_NORMAL, $poll, $data);
 		//Reset the original user information
-		foreach($relevantUserProps as $prop)
+		foreach ($relevantUserProps as $prop)
 		{
 			$user->data[$prop] = $userOrigData[$prop];
 		}
