@@ -64,7 +64,7 @@ $lang = array_merge($lang, [
 	'ADD_TOPIC' => 'Add topic',
 
 	//Post list
-	'TOPIC_AT_BY' => '<b>%1$s:</b> Topic created by <b>%2$s</b>:', //time, user
+	'TOPIC_AT_BY' => '<b>%1$s:</b> Topic created by <b>%2$s</b>', //time, user
 	'TOPIC_TITLE' => 'Title: <b>%s</b>',
 	'REPLY_AT_BY' => '<b>%1$s:</b> Reply from <b>%2$s</b>', //time, user
 	'TOPIC_SHORTENED' => '<b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
