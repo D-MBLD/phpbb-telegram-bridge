@@ -47,9 +47,9 @@ class forum_api {
 	/** Returns an array of forum_ids (key) and assigned arrays with values
 	 * for readonly and moderated.
 	 * Only forums with at least read-permission are returned.
-	 * If a parent-forum has no read or list permission, the children forums are 
+	 * If a parent-forum has no read or list permission, the children forums are
 	 * not listed (even if they would have more permissions).
-	 * 
+	 *
 	 * Example:
 	 * Array
 	 * (
@@ -77,7 +77,7 @@ class forum_api {
 		}
 		$db->sql_freeresult($result);
 		//Remove the permission, if the parent does not have at least the read or list permission also
-		foreach($parent_relation as $parent_id => $children)
+		foreach ($parent_relation as $parent_id => $children)
 		{
 			if (!isset($acls_read_or_list[$parent_id]))
 			{
@@ -163,7 +163,7 @@ class forum_api {
 	{
 		$db = $this->db;
 		$topics = array();
-		
+
 		$sql = 'SELECT topic_id, topic_title, topic_time, topic_type, topic_visibility FROM '. TOPICS_TABLE;
 		$sql .= " WHERE forum_id = $forum_id";
 		$sql .= ' AND topic_visibility != ' . ITEM_DELETED;
