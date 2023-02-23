@@ -10,6 +10,8 @@
 
  /** Note: Any language file starting with info_acp is automatically loaded into the
   * ACP modules.
+  * As some of the variables are also used in UCP, the file is also loaded
+  * in the core.user_setup event.
    */
 if (!defined('IN_PHPBB'))
 {
@@ -38,14 +40,27 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, [
-	//Used in the event acp_users_proile_after.html (Prefixed with L_)
+	//Column header for notifications ???
+	//'UCP_TELEGRAM_COLUMN'		=> 'Telegram',
+
+	//Used in the event ucp_profile_profile_info_after.html (Prefixed with L_)
 	'TELEGRAM_ID'					=> 'Your Telegram ID',
-	'TELEGRAM_ID_DESCR'				=> 'Add the bot (ask your admin for the name) to your Telegram contacts and enter your Telegram ID here.',
+	'TELEGRAM_ID_DESCR'				=> 'Enter your telegram id (numeric id, not name) and add the forums bot (@%s) to your telegram contacts. ' .
+									   'If you don\'t know your id, send an arbitrary message to the bot.',
+	
+	//Used in the event acp_users_profile_after.html (Prefixed with L_)
+	'ACP_UP_TELEGRAM_ID'			=> 'Telegram id',
+	'ACP_UP_TELEGRAM_ID_DESCR'		=> 'Users numeric telegram id.',
+
+	//Used in both events acp_users_profile_after.html and ucp_profile_profile_info_after.html (Prefixed with L_)
 	'TELEGRAM_ID_NOT_NUMERIC'		=> 'The telegram id must be numeric.',
+	'TELEGRAM_ID_ALREADY_USED'		=> '<b><font color="red">Same telegram id is already used by another user!</font></b>',
 
+	//Used in the event acp_users_profile_after.html and ucp_profile_profile_info_after.html (Prefixed with L_)
 
+	//Language entries for the ACP-Module
 	'ACP_TELEGRAM_TITLE'			=> 'Telegram Bridge Module',
-	'ACP_TELEGRAM'					=> 'Telegram Bridge Settings',
+	'ACP_TELEGRAM'					=> 'Settings',
 
 	'LOG_ACP_TELEGRAM_SETTINGS'		=> '<strong>Telegram Bridge settings updated</strong>',
 

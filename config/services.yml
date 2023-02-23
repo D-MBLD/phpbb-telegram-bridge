@@ -87,11 +87,9 @@ services:
         arguments:
             - '@request'
             - '@user'
-            - '@language'
-            - '@controller.helper'
             - '@template'
-            - '%core.php_ext%'
             - '@eb.telegram.core.forum_api'
+            - '@eb.telegram.core.telegram_api'
         tags:
             - { name: event.listener }
 

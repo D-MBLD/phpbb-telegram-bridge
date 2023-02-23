@@ -39,20 +39,14 @@ class main_listener implements EventSubscriberInterface
 	/* @var \phpbb\user  */
 	protected $user;
 
-	/* @var \phpbb\language\language */
-	protected $language;
-
-	/* @var \phpbb\controller\helper */
-	protected $helper;
-
 	/* @var \phpbb\template\template */
 	protected $template;
 
-	/** @var string phpEx */
-	protected $php_ext;
-
 	/** @var string eb\telegram\core\forum_api */
 	protected $forum_api;
+
+	/** @var string eb\telegram\core\telegram_api */
+	protected $telegram_api;
 
 	/** A map post_id => poster_id for temporarily storing the poster of a new post,
 	 * while it is reset for notificaton selection (i.e. the poster himself also receives
@@ -62,27 +56,18 @@ class main_listener implements EventSubscriberInterface
 
 	/**
 	 * Constructor
-	 *
-	 * @param \phpbb\language\language	$language	Language object
-	 * @param \phpbb\controller\helper	$helper		Controller helper object
-	 * @param \phpbb\template\template	$template	Template object
-	 * @param string                    $php_ext    phpEx
 	 */
 	public function __construct(\phpbb\request\request $request,
 								\phpbb\user $user,
-								\phpbb\language\language $language,
-								\phpbb\controller\helper $helper,
 								\phpbb\template\template $template,
-								$php_ext,
-								\eb\telegram\core\forum_api $forum_api)
+								\eb\telegram\core\forum_api $forum_api,
+								\eb\telegram\core\telegram_api $telegram_api)
 	{
 		$this->request  = $request;
 		$this->user     = $user;
-		$this->language = $language;
-		$this->helper   = $helper;
 		$this->template = $template;
-		$this->php_ext  = $php_ext;
 		$this->forum_api = $forum_api;
+		$this->telegram_api = $telegram_api;
 	}
 
 	/**
@@ -95,11 +80,11 @@ class main_listener implements EventSubscriberInterface
 		$lang_set_ext = $event['lang_set_ext'];
 		$lang_set_ext[] = [
 			'ext_name' => 'eb/telegram',
-			'lang_set' => 'common',
+			'lang_set' => ['common','info_acp_telegram'],
 		];
 		$event['lang_set_ext'] = $lang_set_ext;
 	}
-
+	
 	/**
 	* Modify user data on editing profile in ACP
 	* Event-Data: data, submit, user_id, user_row
@@ -128,31 +113,31 @@ class main_listener implements EventSubscriberInterface
 	*/
 	public function ucp_profile_modify_profile_info($event)
 	{
+		$telegram_id =  $this->user->data['user_telegram_id'];
 		if ($event['submit'])
 		{
 			//Although field requires numeric entry, multibyte is set to true
 			//such that wrong entries are not replaced with ?-signs.
-			$telegram =  $this->request->variable('telegram', '', true);
-		} else
-		{
-			$telegram =  $this->user->data['user_telegram_id'];
+			$telegram_id =  $this->request->variable('telegram', $telegram_id, true);
 		}
-		// $telegram =  $this->request->variable('telegram', $this->user->data['user_telegram_id']);
 		$event['data'] = array_merge($event['data'], array(
-			'user_telegram_id'	=> $telegram,
+			'user_telegram_id'	=> $telegram_id,
 		));
-
-		$this->set_template_field($telegram);
+		$bot_name = $this->telegram_api->get_bot_name();
+		$this->set_template_field($telegram_id, $bot_name);
 	}
-
+	
 	/**
 	 * Add the TelegramID field to profile
 	 */
-	private function set_template_field($telegram_id)
+	private function set_template_field($telegram_id, $bot_name = false)
 	{
 		$this->template->assign_vars(array(
 			'TELEGRAM'		=> $telegram_id,
 		));
+		if ($bot_name) {
+			$this->template->assign_vars(array('TELEGRAM_BOT_NAME' => $bot_name));
+		}
 	}
 
 	/**

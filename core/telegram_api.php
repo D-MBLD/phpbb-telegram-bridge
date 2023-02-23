@@ -32,6 +32,28 @@ class telegram_api
 		$this->language = $language;
 	}
 
+	/** Get the name of the bot */
+	public function get_bot_name() {
+		$token = $this->config['eb_telegram_bot_token'];
+
+		$opts = array('http' =>
+		array(
+			'method'  => 'GET',
+			'ignore_errors' => true, //Return content, even in case of "Bad request"
+			)
+		);
+		$context  = stream_context_create($opts);
+		$result = file_get_contents("https://api.telegram.org/bot$token/getMe", false, $context);
+		$result_obj = json_decode($result);
+		if ($result_obj->ok)
+		{
+			return $result_obj->result->username;
+		} else
+		{
+			return false;
+		}
+	}
+
 	public function sendOrEditMessage($postdata)
 	{
 		$token = $this->config['eb_telegram_bot_token'];
