@@ -47,7 +47,7 @@ $lang = array_merge($lang, [
 	'TELEGRAM_ID'					=> 'Deine Telegram ID',
 	'TELEGRAM_ID_DESCR'				=> 'Nimm den Forums-Bot (@%s) in deine Telegram Kontakte auf und gib hier deine Telegram-ID ein. ' .
 									   'Sende dem Bot eine beliebige Nachricht, um deine ID zu erfahren.',
-	
+
 	//Used in the event acp_users_profile_after.html (Prefixed with L_)
 	'ACP_UP_TELEGRAM_ID'					=> 'Telegram ID',
 	'ACP_UP_TELEGRAM_ID_DESCR'				=> 'Numerische Telegram-ID des Benutzers.',

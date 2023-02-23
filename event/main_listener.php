@@ -84,7 +84,7 @@ class main_listener implements EventSubscriberInterface
 		];
 		$event['lang_set_ext'] = $lang_set_ext;
 	}
-	
+
 	/**
 	* Modify user data on editing profile in ACP
 	* Event-Data: data, submit, user_id, user_row
@@ -126,7 +126,7 @@ class main_listener implements EventSubscriberInterface
 		$bot_name = $this->telegram_api->get_bot_name();
 		$this->set_template_field($telegram_id, $bot_name);
 	}
-	
+
 	/**
 	 * Add the TelegramID field to profile
 	 */
@@ -135,7 +135,8 @@ class main_listener implements EventSubscriberInterface
 		$this->template->assign_vars(array(
 			'TELEGRAM'		=> $telegram_id,
 		));
-		if ($bot_name) {
+		if ($bot_name)
+		{
 			$this->template->assign_vars(array('TELEGRAM_BOT_NAME' => $bot_name));
 		}
 	}

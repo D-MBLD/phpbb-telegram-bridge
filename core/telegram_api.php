@@ -33,7 +33,8 @@ class telegram_api
 	}
 
 	/** Get the name of the bot */
-	public function get_bot_name() {
+	public function get_bot_name()
+	{
 		$token = $this->config['eb_telegram_bot_token'];
 
 		$opts = array('http' =>
