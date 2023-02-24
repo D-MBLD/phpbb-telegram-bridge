@@ -2,7 +2,11 @@
 
 ## Installation
 
-Create in the extension directory (usually forum/ext) the subdirectories eb/telegram. Download the code as zip (See "code"-button in GitHub) and extract everything below "phpbb-telegram-bridge-master" directly into the eb/telegram subdirectory.
+### From release
+Download the latest [release zip](https://github.com/D-MBLD/phpbb-telegram-bridge/releases) and expand it into the extension folder (\<forums-root\>/ext) of your forum.
+
+### From newest gitHub version.
+Create in the extension directory (usually \<forums-root\>/ext) the subdirectories eb/telegram. Download the code as zip (See "code"-button in GitHub) and extract everything below "phpbb-telegram-bridge-master" directly into the eb/telegram subdirectory.
 
 ## Create a Telegram Bot
 
