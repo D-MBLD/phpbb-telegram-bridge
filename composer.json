@@ -2,8 +2,8 @@
     "name": "eb/telegram",
     "type": "phpbb-extension",
     "description": "",
-    "homepage": "",
-    "version": "1.0.0",
+    "homepage": "https://github.com/D-MBLD/phpbb-telegram-bridge",
+    "version": "1.0.0-dev",
     "time": "2022-12-21",
     "license": "GPL-2.0-only",
     "authors": [
