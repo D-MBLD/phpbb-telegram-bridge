@@ -1,7 +1,7 @@
 {% set bot_name = TELEGRAM_BOT_NAME %}
 {% if bot_name %}
 <dl>
-	<dt><label for="telegram">{L_TELEGRAM_ID}{L_COLON}</label><br /><span>{{ lang('TELEGRAM_ID_DESCR',bot_name)}}</span></dt>
+	<dt><label for="telegram">{{ lang('EBT_TELEGRAM_ID') }}{L_COLON}</label><br /><span>{{ lang('EBT_TELEGRAM_ID_DESCR',bot_name)}}</span></dt>
 	<dd><input type="text" name="telegram" id="telegram" maxlength="255" value="{TELEGRAM}" class="inputbox" /></dd>
 </dl>
 {% endif %}

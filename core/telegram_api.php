@@ -174,7 +174,7 @@ class telegram_api
 		if (strlen($text) >= 4096)
 		{
 			// <b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
-			$pretext = $this->language->lang('TOPIC_SHORTENED') . PHP_EOL . '...' . PHP_EOL;
+			$pretext = $this->language->lang('EBT_TOPIC_SHORTENED') . PHP_EOL . '...' . PHP_EOL;
 			$len = 4095 - strlen($pretext);
 			while (strlen($text) >= 4069)
 			{

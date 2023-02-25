@@ -99,11 +99,11 @@ class acp_controller
 				$this->config->set('eb_telegram_admin_echo', $this->request->variable('eb_telegram_admin_echo', ''));
 
 				// Add option settings change action to the admin log
-				$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_ACP_TELEGRAM_SETTINGS');
+				$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'EBT_SETTINGS_UPDATED');
 
 				// Option settings have been updated and logged
 				// Confirm this to the user and provide link back to previous page
-				trigger_error($this->language->lang('ACP_TELEGRAM_SETTING_SAVED') . adm_back_link($this->u_action));
+				trigger_error($this->language->lang('EBT_SETTINGS_UPDATED') . adm_back_link($this->u_action));
 			}
 		}
 		$s_errors = !empty($errors);
@@ -114,7 +114,7 @@ class acp_controller
 		if ($token && $secret)
 		{
 			$root_url = generate_board_url();
-			$webhook = sprintf($this->user->lang('ACP_TELEGRAM_WEBHOOK_TEMPLATE'), $token, $root_url, $secret);
+			$webhook = sprintf($this->user->lang('EBT_SETTINGS_WEBHOOK_TEMPLATE'), $token, $root_url, $secret);
 		}
 
 		// Set output variables for display in the template
@@ -129,7 +129,7 @@ class acp_controller
 			'ADMIN_USER'	=> $this->config['eb_telegram_admin_user'],
 			'ADMIN_PW'	=> $this->config['eb_telegram_admin_pw'],
 			'FOOTER'	=> $this->config['eb_telegram_footer'],
-			'FOOTER_PLACEHOLDER'	=> $this->user->lang('ACP_TELEGRAM_FOOTER_DEFAULT'),
+			'FOOTER_PLACEHOLDER'	=> $this->user->lang('EBT_SETTINGS_FOOTER_DEFAULT'),
 			'WEBHOOK'   => $webhook,
 			'ADMIN_TELEGRAM_ID'   => $this->config['eb_telegram_admin_telegram_id'],
 			'ADMIN_TELEGRAM_ECHO'   => $this->config['eb_telegram_admin_echo'],

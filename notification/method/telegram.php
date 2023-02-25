@@ -224,15 +224,15 @@ class telegram extends \phpbb\notification\method\messenger_base
 		if (isset($topic_id))
 		{
 			$buttons = array(
-				$this->user->lang('NEW_REPLY') => "newPost~t$topic_id",
-				$this->user->lang('FULL_TOPIC') => "showTopic~t$topic_id",
-				$this->user->lang('BACK') => 'initial',
+				$this->user->lang('EBT_NEW_REPLY') => "newPost~t$topic_id",
+				$this->user->lang('EBT_FULL_TOPIC') => "showTopic~t$topic_id",
+				$this->user->lang('EBT_BACK') => 'initial',
 			);
 		} else
 		{
 			//This was another notification event, no new post or new topic
 			$buttons = array(
-				$this->user->lang('BACK') => 'initial',
+				$this->user->lang('EBT_BACK') => 'initial',
 			);
 		}
 

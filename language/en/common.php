@@ -41,74 +41,74 @@ $lang = array_merge($lang, [
 	'EB_TELEGRAM_NOTIFICATION_METHOD_TELEGRAM'	=> 'Telegram',
 
 	//Notification
-	'FULL_TOPIC'	=> 'Show complete topic',
+	'EBT_FULL_TOPIC'	=> 'Show complete topic',
 
 	//Forum list
-	'FORUM_LIST_TITLE'	=> '<u>%1$s has %2$s forums:</u>',
-	'SELECT_A_FORUM'	=> 'Use one of the buttons to select a forum.',
+	'EBT_FORUM_LIST_TITLE'	=> '<u>%1$s has %2$s forums:</u>',
+	'EBT_SELECT_A_FORUM'	=> 'Use one of the buttons to select a forum.',
 	'EBT_LAST_POST'	=> 'Last post at %1$s by <b>%2$s</b>:',
-	'READ_ONLY' => ' (readonly)',
-	'BACK'	=> 'Back',
-	'ILLEGAL_INPUT' => " \xE2\x9A\xA0 Input <b>%s</b> is invalid.",  //"\xE2\x9A\xA0" = ⚠
+	'EBT_READ_ONLY' => ' (readonly)',
+	'EBT_BACK'	=> 'Back',
+	'EBT_ILLEGAL_INPUT' => " \xE2\x9A\xA0 Input <b>%s</b> is invalid.",  //"\xE2\x9A\xA0" = ⚠
 
 	//Topic list
-	'TOPIC_LIST_TITLE' => 'The forum <b>%1$s</b> has %2$s topics:',
-	'TOPIC_LIST_TITLE_EMPTY' => 'Currently there are no topics in the forum <b>%s</b>',
-	'SELECT_TOPIC' => 'Use one of the buttons to select a topic.',
-	'SELECT_NEXT_PAGE' => 'Send a \'+\'- or \'-\'-sign, to show next/previous page.',
-	'FORUM_NOT_FOUND' => 'Could not read the forum (!?). Please try again',
-	'SHOW_FORUMS' => 'Show other forums',
-	'ADD_TOPIC' => 'Add topic',
+	'EBT_TOPIC_LIST_TITLE' => 'The forum <b>%1$s</b> has %2$s topics:',
+	'EBT_TOPIC_LIST_TITLE_EMPTY' => 'Currently there are no topics in the forum <b>%s</b>',
+	'EBT_SELECT_TOPIC' => 'Use one of the buttons to select a topic.',
+	'EBT_SELECT_NEXT_PAGE' => 'Send a \'+\'- or \'-\'-sign, to show next/previous page.',
+	'EBT_FORUM_NOT_FOUND' => 'Could not read the forum (!?). Please try again',
+	'EBT_SHOW_FORUMS' => 'Show other forums',
+	'EBT_ADD_TOPIC' => 'Add topic',
 
 	//Post list
-	'TOPIC_AT_BY' => '<b>%1$s:</b> Topic created by <b>%2$s</b>', //time, user
-	'TOPIC_TITLE' => 'Title: <b>%s</b>',
-	'REPLY_AT_BY' => '<b>%1$s:</b> Reply from <b>%2$s</b>', //time, user
-	'TOPIC_SHORTENED' => '<b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
-	'NEW_REPLY' => 'Send a reply',
-	'ILLEGAL_TOPIC_ID' => 'Illegal attempt to read topic with ID %s',
+	'EBT_TOPIC_AT_BY' => '<b>%1$s:</b> Topic created by <b>%2$s</b>', //time, user
+	'EBT_TOPIC_TITLE' => 'Title: <b>%s</b>',
+	'EBT_REPLY_AT_BY' => '<b>%1$s:</b> Reply from <b>%2$s</b>', //time, user
+	'EBT_TOPIC_SHORTENED' => '<b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
+	'EBT_NEW_REPLY' => 'Send a reply',
+	'EBT_ILLEGAL_TOPIC_ID' => 'Illegal attempt to read topic with ID %s',
 
 	//Helpscreen unregistered user
 	//Placeholders: Sitename, Site-URL, telegram-id
-	'HELP_SCREEN_NON_MEMBER' => 'This service can be used by registered members of ' .
+	'EBT_HELP_SCREEN_NON_MEMBER' => 'This service can be used by registered members of ' .
 	'<a href="%2$s">%1$s</a> only.' .
 	'<br>If you are a member, you must enter your telegram id (<code>%3$s</code>) into your forums profile ' .
 	'in order to use the service.',
 
 	//Registration screens
-	'HELP_SCREEN_REGISTERED' => '<b>Your telegram id has been sucessfully verified.</b>' .
+	'EBT_HELP_SCREEN_REGISTERED' => '<b>Your telegram id has been sucessfully verified.</b>' .
 								'<br>Don\'t forget to select the events for which you want to receive notifications.' .
 								'Therfore select and edit your profile in the forum, go to ' .
 								'"Settings->Edit notification options" and select the events in the telegram column.',
-	'ILLEGAL_CODE' => " \xE2\x9A\xA0 The entered Code was wrong. Please request a new one.", //"\xE2\x9A\xA0" = ⚠
-	'HELP_SCREEN_REGISTRATION_FAILED' => '<b>Your telegram id is not yet verified.</b>' .
+	'EBT_ILLEGAL_CODE' => " \xE2\x9A\xA0 The entered Code was wrong. Please request a new one.", //"\xE2\x9A\xA0" = ⚠
+	'EBT_HELP_SCREEN_REGISTRATION_FAILED' => '<b>Your telegram id is not yet verified.</b>' .
 								'<br>Use the button to request an email to the address stored with your forums profile. ' .
 								'The email will contain a code, which you need to send once via telegram to the forum ' .
 								'in order to verify your telegram id.',
 
-	'HELP_SCREEN_EMAILED' => 	'<b>Email was sent.</b>' .
+	'EBT_HELP_SCREEN_EMAILED' => 	'<b>Email was sent.</b>' .
 								'<br>Check your inbox and if necessary also your spam folders. ' .
 								'<br>Then send the code as message.' .
 								'<br>Don\'t send other messages in between. Otherwise you have to request a new code.',
 
-	'REQUEST_EMAIL'	=> 'Send email',
+	'EBT_REQUEST_EMAIL'	=> 'Send email',
 
 	//Button outdated
-	'BUTTON_OUTDATED' => 'Please use only buttons of the last message.',
-	'OK' => 'OK',
+	'EBT_BUTTON_OUTDATED' => 'Please use only buttons of the last message.',
+	'EBT_OK' => 'EBT_OK',
 
 	//Illegal Forum was somehow set
-	'ILLEGAL_FORUM' => 'You don\'t have access to the selected forum.',
+	'EBT_ILLEGAL_FORUM' => 'You don\'t have access to the selected forum.',
 
 	//Send new posts and topics
-	'REQUEST_POST' => 'Send your reply or use the cancel button.',
-	'REQUEST_TITLE' => 'Send the title for your new post or use the cancel button.',
-	'REQUEST_TEXT_FOR_TITLE' => 'Send the text for your new post with title <b>%s</b> or use the cancel button.',
-	'CANCEL' => 'Cancel',
-	'TOPIC_SAVED' => 'The following topic was saved:',
-	'TOPIC_SAVE_FAILED' => 'The new post could not be saved. (!?)',
+	'EBT_REQUEST_POST' => 'Send your reply or use the cancel button.',
+	'EBT_REQUEST_TITLE' => 'Send the title for your new post or use the cancel button.',
+	'EBT_REQUEST_TEXT_FOR_TITLE' => 'Send the text for your new post with title <b>%s</b> or use the cancel button.',
+	'EBT_CANCEL' => 'Cancel',
+	'EBT_TOPIC_SAVED' => 'The following topic was saved:',
+	'EBT_TOPIC_SAVE_FAILED' => 'The new post could not be saved. (!?)',
 
 	//Illegal call
-	'GROUP_OR_CHANNEL_CALL' => 'The forum cannot be called via groups or channels.',
+	'EBT_GROUP_OR_CHANNEL_CALL' => 'The forum cannot be called via groups or channels.',
 
 ]);

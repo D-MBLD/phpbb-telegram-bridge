@@ -180,7 +180,7 @@ class main_listener implements EventSubscriberInterface
 		{
 			if (!is_numeric($new_telegram_id))
 			{
-				$error[] = 'TELEGRAM_ID_NOT_NUMERIC';
+				$error[] = 'EBT_TELEGRAM_ID_NOT_NUMERIC';
 				$event['error'] = array_merge($errors, $error);
 			}
 			$users = $this->forum_api->find_telegram_user($new_telegram_id);
@@ -190,7 +190,7 @@ class main_listener implements EventSubscriberInterface
 										});
 			if (count($users) > 0)
 			{
-				$error[] = 'TELEGRAM_ID_ALREADY_USED';
+				$error[] = 'EBT_TELEGRAM_ID_ALREADY_USED';
 				$event['error'] = array_merge($errors, $error);
 			}
 		}
