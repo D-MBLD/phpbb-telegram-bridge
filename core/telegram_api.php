@@ -233,7 +233,8 @@ class telegram_api
 		//Now remove all tags, which we do not allow. (Exception list contains all allowed tags.)
 		//This would not be necessary for "normal" text. But when the forum sends notifications,
 		//a lot of additional tags are surrounding the text, BB-Codes, links etc.
-		//$text = strip_tags($text, $allowed_tags);
+		//$text = strip_tags($text, $allowed_tags); //Needs php version >= 7.4
+		$text = strip_tags($text, '<' . implode('><',$allowed_tags) . '>');
 
 		//Escape all html entities (including the allowed tags, which are still contained)
 		$text = \htmlspecialchars($text, $ent, null, false);

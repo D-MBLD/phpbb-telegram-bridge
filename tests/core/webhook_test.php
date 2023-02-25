@@ -106,9 +106,10 @@ class webhook_test extends \phpbb_test_case
 		$this->config->expects($this->any())
 			->method('offsetGet')
 			->willReturnMap([ //Map param(s) to return value
-				['eb_telegram_secret', ''],
+				['eb_telegram_secret', 'sec_token'],
 				['sitename', 'configured sitename'],
 			]);
+		$this->webhook->secret_token = 'sec_token';
 
 		$this->user->expects($this->any())
 			->method('lang')
