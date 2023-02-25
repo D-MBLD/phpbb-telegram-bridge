@@ -113,7 +113,6 @@ services:
         class: eb\telegram\core\webhook
         arguments:
             - '@config'
-            - '@dbal.conn'
             - '@user'
             - '@auth'
             - '@controller.helper'

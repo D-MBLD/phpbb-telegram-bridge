@@ -17,8 +17,6 @@ class webhook {
 
 	/* @var \phpbb\config\config */
 	protected $config;
-	/* @var \phpbb\db\driver\driver_interface */
-	protected $db;
 	/* @var \phpbb\user */
 	protected $user;
 	/* @var \phpbb\controller\helper $helper */
@@ -42,7 +40,6 @@ class webhook {
 	* Constructor
 	*
 	* @param \phpbb\config\config	$config
-	* @param \phpbb\db\driver\driver_interface		$db
 	* @param \phpbb\user				$user
 	* @param \phpbb\controller\helper $helper
 	* @param \phpbb\request\request $request,
@@ -50,7 +47,6 @@ class webhook {
 	* @param \eb\telegram\core\forum_api $forum_api,
 	*/
 	public function __construct(\phpbb\config\config $config,
-								\phpbb\db\driver\driver_interface $db,
 								\phpbb\user $user,
 								\phpbb\auth\auth $auth,
 								\phpbb\controller\helper $helper,
@@ -60,7 +56,6 @@ class webhook {
 								)
 	{
 		$this->config = $config;
-		$this->db = $db;
 		$this->user = $user;
 		$this->auth = $auth;
 		$this->helper = $helper;
@@ -81,7 +76,6 @@ class webhook {
 		//header('HTTP/1.1 200 EBT_OK');
 		//header('Content-Type: text/plain; charset=utf-8');
 		try {
-
 			$payload = $this->parse_request();
 			$this->debug_output[] = 'Request:';
 			$this->log_obj($payload);
@@ -104,6 +98,7 @@ class webhook {
 		return $obj;
 	}
 
+	/** public, because also used from test-page. */
 	public function process_input($payload, $test_call = false)
 	{
 		$this->test_call = $test_call;
@@ -212,7 +207,7 @@ class webhook {
 		if (isset($admin_info))
 		{
 			$command['admin_info'] = $admin_info;
-			//Admin-Info will be send to the admin. No response to caller, if not yet set.
+			//Admin-Info will be send to the admin. No response to caller, if chat_id not yet set.
 			return $command;
 		}
 		$command['chat_id'] = $caller;
@@ -223,8 +218,7 @@ class webhook {
 			$command['admin_info'] = '<b>Request from unregistered user:</b><br>'.json_encode($input, JSON_PRETTY_PRINT);
 			return $command;
 		}
-		$user = $users[0];
-		$command['user'] = $user;
+		$command['user'] = $users[0];
 		$telegram_data = $this->forum_api->select_telegram_chat_state($caller);
 		if ($telegram_data)
 		{
@@ -309,6 +303,7 @@ class webhook {
 		{
 			$command['action'] = 'allForumTopics';
 			$forum_id = $this->parse_id_from_button($buttonCallback, false);
+			//Back from a topic, the page can be included in the back-command
 			$page = $this->parse_id_from_button($buttonCallback, null, true);
 			if ($forum_id)
 			{
@@ -356,52 +351,54 @@ class webhook {
 		the text, that means no message_id (from previous message) must be provided,
 		such that sendMessage instead of editMessage will be called. */
 		unset($command['message_id']);
-		if ($chat_state == 'V') //Chat-ID not yet verified
+		switch ($chat_state)
 		{
-			if (isset($command['title']) && $text == $command['title'])
-			{
-				$command['action'] = 'registrationOk';
-			} else
-			{
-				$command['action'] = 'registrationFailed';
-			}
-		} else if ($chat_state == '0')
-		{
-			$command['action'] = 'initial';
-		} else if ($chat_state == '1')
-		{
-			//Entered text is a new post for an existing topic
-			$command['action'] = 'saveNewPost';
-		} else if ($chat_state == '2')
-		{
-			//Entered text is the titel for a new topic
-			$command['action'] = 'newTopicText';
-		} else if ($chat_state == '3')
-		{
-			//Entered text is the text for a new topic
-			$command['action'] = 'saveNewTopic';
-		} else if ($chat_state == 'T' || $chat_state = 'F')
-		{
-			//Entered text should be a paging command for a list of topics or forums
-			//Last page number is stored in the title-field.
-			$command['action'] = $chat_state == 'T' ? 'allForumTopics' : 'allForums';
-			if (strlen(trim(str_replace('+', '', $text, $count))) == 0)
-			{
-				//String contains only plus-signs and blanks
-				$command['page'] = $command['title'] + $count;
-			} else if (strlen(trim(str_replace('-', '', $text, $count))) == 0)
-			{
-				$command['page'] = $command['title'] - $count;
-			} else
-			{
-				//Stay at the same page
-				$command['page'] = $command['title'];
-				$command['warning'] = $this->user->lang('EBT_ILLEGAL_INPUT', $text);
-			}
-		} else
-		{
-			$command['action'] = 'initial';
-			$command['admin_info'] = "Unexpected chat state on text-input: $chat_state\n/";
+			case 'V': //Chat-ID not yet verified		
+				if (isset($command['title']) && $text == $command['title'])
+				{
+					$command['action'] = 'registrationOk';
+				} else
+				{
+					$command['action'] = 'registrationFailed';
+				}
+				break;
+			case '0':
+				$command['action'] = 'initial';
+				break;
+			case '1':
+				//Entered text is a new post for an existing topic
+				$command['action'] = 'saveNewPost';
+				break;
+			case '2':
+				//Entered text is the titel for a new topic
+				$command['action'] = 'newTopicText';
+				break;
+			case '3':
+				//Entered text is the text for a new topic
+				$command['action'] = 'saveNewTopic';
+				break;
+			case 'T':
+			case 'F':
+				//Entered text should be a paging command for a list of topics or forums
+				//Last page number is stored in the title-field.
+				$command['action'] = $chat_state == 'T' ? 'allForumTopics' : 'allForums';
+				if (strlen(trim(str_replace('+', '', $text, $count))) == 0)
+				{
+					//String contains only plus-signs and blanks
+					$command['page'] = $command['title'] + $count;
+				} else if (strlen(trim(str_replace('-', '', $text, $count))) == 0)
+				{
+					$command['page'] = $command['title'] - $count;
+				} else
+				{
+					//Stay at the same page
+					$command['page'] = $command['title'];
+					$command['warning'] = $this->user->lang('EBT_ILLEGAL_INPUT', $text);
+				}
+				break;
+			default:
+				$command['action'] = 'initial';
+				$command['admin_info'] = "Unexpected chat state on text-input: $chat_state\n/";
 		}
 		return $command;
 	}
@@ -410,89 +407,92 @@ class webhook {
 	private function execute_command(&$command)
 	{
 		$action = $command['action'];
-		if ($action == 'adminInfo')
+		switch ($action)
 		{
-			//Response will be send to admin only
-			return false;
-		} else if ($action == 'howToRegister')
-		{
-			$postdata = $this->onHowToRegister($command['chat_id']);
-			unset($command['message_id']);
-		} else if ($action == 'registrationEmailed')
-		{
-			$postdata = $this->onRegistration($command['user'], $command['chat_id'], true, true);
-		} else if ($action == 'registrationOk')
-		{
-			$postdata = $this->onRegistration($command['user'], $command['chat_id'], true, false);
-		} else if ($action == 'registrationFailed')
-		{
-			//If an email was sent before, the title contains a code.
-			$postdata = $this->onRegistration($command['user'], $command['chat_id'], false, $command['title']);
-		} else if ($action == 'buttonOutdated')
-		{
-			$postdata = $this->onButtonOutdated();
-		} else if ($action == 'invalidForum')
-		{
-			$postdata = $this->onInvalidForum();
-		} else if ($action == 'initial' && isset($command['forum_id']) && $command['forum_id'])
-		{
-			/* The initial screen depends on whether a forum was
-			 * already selected or not.
-			 */
-			$postdata = $this->onAllForumTopics($command['user']['user_id'], $command['chat_id'], $command['forum_id']);
-		} else if ($action == 'allForums' || $action == 'initial')
-		{
-			$postdata = $this->onAllForums($command['user']['user_id'], $command['chat_id'], $command['forum_id'] ?? 0, $command['page'] ?? 0, $command['warning'] ?? false);
-		} else if ($action == 'allForumTopics')
-		{
-			$postdata = $this->onAllForumTopics($command['user']['user_id'], $command['chat_id'], $command['forum_id'], $command['page'] ?? 0, $command['warning'] ?? false);
-		} else if ($action == 'showTopic')
-		{
-			//If we are called from a paged topic display, we add the page into the
-			//back button.
-			$page = 0;
-			if ($command['chatState'] == 'T')
-			{
-				$page = $command['title'] ?? 0;
-			}
-			$postdata = $this->onShowTopic($command['user']['user_id'], $command['topic_id'], $page);
-		} else if ($action == 'newPost')
-		{
-			$postdata = $this->onNewPost($command['topic_id']);
-			//Save topic id and status "Waiting for Post-Text" in chat table
-			$this->forum_api->store_telegram_chat_state($command['chat_id'], $command['topic_id'], 1);
-		} else if ($action == 'saveNewPost')
-		{
-			$saved = $this->forum_api->insertNewPost(false, $command['forum_id'], $command['topic_id'], $command['text'], $command['user']);
-			if ($saved === true)
-			{
-				$postdata = $this->onShowTopic($command['user']['user_id'], $command['topic_id']);
-			} else
-			{
-				$postdata = $this->onSaveFailed();
-				$command['admin_info'] = $saved;
-			}
-		} else if ($action == 'newTopicTitle')
-		{
-			$postdata = $this->onNewTopicTitle();
-			//Save topic id and status "Waiting for Titel" in chat table
-			$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 2);
-		} else if ($action == 'newTopicText')
-		{
-			$postdata = $this->onNewTopicText($command['text']);
-			//Save topic id and status "Waiting for new Text" in chat table
-			$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 3, $command['text']);
-		} else if ($action == 'saveNewTopic')
-		{
-			$postdata = $this->onNewTopicSaved($command['title'],$command['text'],$command['user'], $command['forum_id']);
-		} else if ($action == 'callFromGroupOrChannel')
-		{
-			$postdata = $this->onCallFromGroupOrChannel();
-		} else
-		{
-			$command_info = print_r($command, true);
-			$command['admin_info'] = "Internal error, no action set. Command: \n$command_info";
-			return false;
+			case 'adminInfo':
+				//Response will be send to admin only
+				return false;
+			case 'howToRegister':
+				$postdata = $this->onHowToRegister($command['chat_id']);
+				unset($command['message_id']);
+				break;
+			case 'registrationEmailed':
+				$postdata = $this->onRegistration($command['user'], $command['chat_id'], true, true);
+				break;
+			case 'registrationOk':
+				$postdata = $this->onRegistration($command['user'], $command['chat_id'], true, false);
+				break;
+			case 'registrationFailed':
+				//If an email was sent before, the title contains a code.
+				$postdata = $this->onRegistration($command['user'], $command['chat_id'], false, $command['title']);
+				break;
+			case 'buttonOutdated':
+				$postdata = $this->onButtonOutdated();
+				break;
+			case 'invalidForum':
+				$postdata = $this->onInvalidForum();
+				break;
+			case 'initial':
+				if (($command['forum_id'] ?? 0) != 0)
+				{
+					/* The initial screen depends on whether a forum was
+					* already selected or not.
+					*/
+					$postdata = $this->onAllForumTopics($command['user']['user_id'], $command['chat_id'], $command['forum_id']);
+					break; //break only here, else continue with same as 'allForums'
+				}
+			case 'allForums':
+				$postdata = $this->onAllForums($command['user']['user_id'], $command['chat_id'], $command['forum_id'] ?? 0, $command['page'] ?? 0, $command['warning'] ?? false);
+				break;
+			case 'allForumTopics':
+				$postdata = $this->onAllForumTopics($command['user']['user_id'], $command['chat_id'], $command['forum_id'], $command['page'] ?? 0, $command['warning'] ?? false);
+				break;
+			case 'showTopic':
+				//If we are called from a paged topic display, we add the page into the
+				//back button.
+				$page = 0;
+				if ($command['chatState'] == 'T')
+				{
+					$page = $command['title'] ?? 0;
+				}
+				$postdata = $this->onShowTopic($command['user']['user_id'], $command['topic_id'], $page);
+				break;
+			case 'newPost':
+				$postdata = $this->onNewPost($command['topic_id']);
+				//Save topic id and status "Waiting for Post-Text" in chat table
+				$this->forum_api->store_telegram_chat_state($command['chat_id'], $command['topic_id'], 1);
+				break;
+			case 'saveNewPost':
+				$saved = $this->forum_api->insertNewPost(false, $command['forum_id'], $command['topic_id'], $command['text'], $command['user']);
+				if ($saved === true)
+				{
+					$postdata = $this->onShowTopic($command['user']['user_id'], $command['topic_id']);
+				} else
+				{
+					$postdata = $this->onSaveFailed();
+					$command['admin_info'] = $saved;
+				}
+				break;
+			case 'newTopicTitle':
+				$postdata = $this->onNewTopicTitle();
+				//Save topic id and status "Waiting for Titel" in chat table
+				$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 2);
+				break;
+			case 'newTopicText':
+				$postdata = $this->onNewTopicText($command['text']);
+				//Save topic id and status "Waiting for new Text" in chat table
+				$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 3, $command['text']);
+				break;
+			case 'saveNewTopic':
+				$postdata = $this->onNewTopicSaved($command['title'],$command['text'],$command['user'], $command['forum_id']);
+				break;
+			case 'callFromGroupOrChannel':
+				$postdata = $this->onCallFromGroupOrChannel();
+				break;
+			default:
+				$command_info = print_r($command, true);
+				$command['admin_info'] = "Internal error, no action set. Command: \n$command_info";
+				return false;
 		}
 		$postdata['chat_id'] = $command['chat_id'];
 		if (isset($command['message_id']))
@@ -617,7 +617,7 @@ class webhook {
 	}
 
 	/** Various registration situations.
-	 * $ok = true and $email = true: Request Email
+	 * $ok = true and $email = true: Email was sent
 	 * $ok = true and $email = false: Registration ok
 	 * $ok = false and $email = true: Registration failed after email was sent
 	 * $ok = false and $email = false: Registration failed, no email was sent immediately before
