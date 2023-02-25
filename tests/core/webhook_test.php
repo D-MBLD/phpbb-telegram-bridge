@@ -115,10 +115,11 @@ class webhook_test extends \phpbb_test_case
 			->method('lang')
 			->willReturnArgument(0);
 
+		$users[] = array('user_id' => 123, 'username' => 'Test User', 'user_telegram_id' => 12345);
 		$this->forum_api->expects($this->once())
 			->method('find_telegram_user')
 			->with('123')
-			->willReturn(array('user_id' => 123, 'username' => 'Test User', 'user_telegram_id' => 12345));
+			->willReturn($users);
 
 		$chat_state = array( 'chat_id' => 123,
 				'message_id' => 345,

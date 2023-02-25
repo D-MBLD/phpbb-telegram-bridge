@@ -353,7 +353,8 @@ class webhook {
 		unset($command['message_id']);
 		switch ($chat_state)
 		{
-			case 'V': //Chat-ID not yet verified		
+			case 'V':
+				//Chat-ID not yet verified
 				if (isset($command['title']) && $text == $command['title'])
 				{
 					$command['action'] = 'registrationOk';
