@@ -18,7 +18,7 @@ if (!isset($phpEx))
 {
 	global $phpEx;
 }
-include($phpbb_root_path . 'includes\functions_acp.' . $phpEx);
+include($phpbb_root_path . 'includes/functions_acp.' . $phpEx);
 
 class acp_controller_test extends \phpbb_test_case
 {
@@ -66,7 +66,7 @@ class acp_controller_test extends \phpbb_test_case
 	}
 
 	/** Switch off temporarily and try in develop branch. */
-	public function xxtest_display_options_submit()
+	public function test_display_options_submit()
 	{
 		$config = array();
 
