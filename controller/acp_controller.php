@@ -58,7 +58,7 @@ class acp_controller
 
 	/**
 	 * Display the options a user can configure for this extension.
-	 * 
+	 *
 	 * $testcall can be set to avoid difficult mocking of the form_key handling
 	 * in the tests.
 	 *
@@ -74,7 +74,7 @@ class acp_controller
 			'eb_telegram_admin_telegram_id',
 			'eb_telegram_admin_echo',
 		];
-		
+
 		// Add our common language file
 		$this->language->add_lang('common', 'eb/telegram');
 
