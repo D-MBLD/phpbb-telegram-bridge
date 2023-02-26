@@ -104,7 +104,7 @@ class acp_controller
 			// If no errors, process the form data
 			if (empty($errors))
 			{
-				foreach ( $configparams as $name)
+				foreach ($configparams as $name)
 				{
 					$this->config->set($name, $this->request->variable($name, ''));
 				}
