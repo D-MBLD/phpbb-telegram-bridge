@@ -68,23 +68,33 @@ class acp_controller_test extends \phpbb_test_case
 	/** Switch off temporarily and try in develop branch. */
 	public function test_display_options_submit()
 	{
-		$config = array();
+		global $user, $config;
+
+		$config_values = array();
 
 		$this->config->expects($this->any())
 			->method('offsetGet')
-			->willReturnCallback(function ($v) use (&$config)
+			->willReturnCallback(function ($v) use (&$config_values)
 			{
-				return $config[$v];
+				return $config_values[$v] ?? $v;
 			});
 		$this->config->expects($this->any())
 			->method('set')
-			->willReturnCallback(function ($k,$v) use (&$config)
+			->willReturnCallback(function ($k,$v) use (&$config_values)
 			{
-				$config[$k] = $v;
+				$config_values[$k] = $v;
 				return null;
 			});
 
+		//A bit of tweaking needed to make some calls to functions.php work
+		$this->config->set('force_server_vars',true);
+		$this->config->set('server_protocol','http://');
+		$this->config->set('server_name','server');
+		$this->config->set('script_path','/phpbb');
 		$this->user->data['user_id'] = 0;
+		$this->user->host = 'host';
+		$user = $this->user; //global used in functions.php
+		$config = $this->config; //global used in functions.php
 
 		$this->request->expects($this->any())
 			->method('is_set_post')
@@ -116,7 +126,7 @@ class acp_controller_test extends \phpbb_test_case
 			'ERROR_MSG' => '',
 			'U_ACTION' => null,
 			'FOOTER_PLACEHOLDER' => 'EBT_SETTINGS_FOOTER_DEFAULT',
-			'WEBHOOK' => 'EBT_SETTINGS_WEBHOOK_TEMPLATE~eb_telegram_bot_token_value~~http:/~~eb_telegram_secret_value~',
+			'WEBHOOK' => 'EBT_SETTINGS_WEBHOOK_TEMPLATE~eb_telegram_bot_token_value~~http://server/phpbb~~eb_telegram_secret_value~',
 			'eb_telegram_bot_token' => 'eb_telegram_bot_token_value',
 			'eb_telegram_secret' => 'eb_telegram_secret_value',
 			'eb_telegram_footer' => 'eb_telegram_footer_value',
