@@ -104,7 +104,7 @@ class acp_controller
 			// If no errors, process the form data
 			if (empty($errors))
 			{
-				foreach ( $configparams as $i => $name)
+				foreach ( $configparams as $name)
 				{
 					$this->config->set($name, $this->request->variable($name, ''));
 				}
@@ -138,7 +138,7 @@ class acp_controller
 		$assignment['FOOTER_PLACEHOLDER'] = $this->language->lang('EBT_SETTINGS_FOOTER_DEFAULT');
 		$assignment['WEBHOOK'] = $webhook;
 
-		foreach ( $configparams as $i => $name)
+		foreach ($configparams as $name)
 		{
 			$assignment[$name] = $this->config[$name];
 		}
