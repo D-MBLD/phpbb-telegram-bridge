@@ -58,7 +58,7 @@ class acp_controller
 
 	/**
 	 * Display the options a user can configure for this extension.
-	 * 
+	 *
 	 * $testcall can be set to avoid difficult mocking of the form_key handling
 	 * in the tests.
 	 *
@@ -74,7 +74,7 @@ class acp_controller
 			'eb_telegram_admin_telegram_id',
 			'eb_telegram_admin_echo',
 		];
-		
+
 		// Add our common language file
 		$this->language->add_lang('common', 'eb/telegram');
 
@@ -104,7 +104,7 @@ class acp_controller
 			// If no errors, process the form data
 			if (empty($errors))
 			{
-				foreach ( $configparams as $i => $name)
+				foreach ($configparams as $i => $name)
 				{
 					$this->config->set($name, $this->request->variable($name, ''));
 				}
@@ -138,7 +138,7 @@ class acp_controller
 		$assignment['FOOTER_PLACEHOLDER'] = $this->language->lang('EBT_SETTINGS_FOOTER_DEFAULT');
 		$assignment['WEBHOOK'] = $webhook;
 
-		foreach ( $configparams as $i => $name)
+		foreach ($configparams as $i => $name)
 		{
 			$assignment[$name] = $this->config[$name];
 		}

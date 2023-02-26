@@ -83,7 +83,9 @@ class acp_controller_test extends \phpbb_test_case
 				$config[$k] = $v;
 				return null;
 			});
-		
+
+		$this->user->data['user_id'] = 0;
+
 		$this->request->expects($this->any())
 			->method('is_set_post')
 			->willReturnMap([ //Map param(s) to return value

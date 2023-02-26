@@ -50,6 +50,8 @@ class install_acp_module extends \phpbb\db\migration\migration
 	public function revert_data()
 	{
 		return [
+			['config.remove', ['eb_telegram_admin_user']], //Could exist from older version
+			['config.remove', ['eb_telegram_admin_pw']], //Could exist from older version
 			['config.remove', ['eb_telegram_bot_token']],
 			['config.remove', ['eb_telegram_secret']],
 			['config.remove', ['eb_telegram_footer']],
