@@ -58,16 +58,33 @@ class acp_controller
 
 	/**
 	 * Display the options a user can configure for this extension.
+	 * 
+	 * $testcall can be set to avoid difficult mocking of the form_key handling
+	 * in the tests.
 	 *
 	 * @return void
 	 */
-	public function display_options()
+	public function display_options($testcall = false)
 	{
+		 /* List of configuration parameters */
+		 $configparams = [
+			'eb_telegram_bot_token',
+			'eb_telegram_secret',
+			'eb_telegram_admin_user',
+			'eb_telegram_admin_pw',
+			'eb_telegram_footer',
+			'eb_telegram_admin_telegram_id',
+			'eb_telegram_admin_echo',
+		];
+		
 		// Add our common language file
 		$this->language->add_lang('common', 'eb/telegram');
 
 		// Create a form key for preventing CSRF attacks
-		add_form_key('eb_telegram_acp');
+		if (!$testcall)
+		{
+			add_form_key('eb_telegram_acp');
+		}
 
 		// Create an array to collect errors that will be output to the user
 		$errors = [];
@@ -81,7 +98,7 @@ class acp_controller
 		if ($this->request->is_set_post('submit'))
 		{
 			// Test if the submitted form is valid
-			if (!check_form_key('eb_telegram_acp'))
+			if (!$testcall && !check_form_key('eb_telegram_acp'))
 			{
 				$errors[] = $this->language->lang('FORM_INVALID');
 			}
@@ -89,51 +106,44 @@ class acp_controller
 			// If no errors, process the form data
 			if (empty($errors))
 			{
-				// Set the options the user configured
-				$this->config->set('eb_telegram_bot_token', $this->request->variable('eb_telegram_bot_token', ''));
-				$this->config->set('eb_telegram_secret', $this->request->variable('eb_telegram_secret', ''));
-				$this->config->set('eb_telegram_admin_user', $this->request->variable('eb_telegram_admin_user', ''));
-				$this->config->set('eb_telegram_admin_pw', $this->request->variable('eb_telegram_admin_pw', ''));
-				$this->config->set('eb_telegram_footer', $this->request->variable('eb_telegram_footer', ''));
-				$this->config->set('eb_telegram_admin_telegram_id', $this->request->variable('eb_telegram_admin_telegram_id', ''));
-				$this->config->set('eb_telegram_admin_echo', $this->request->variable('eb_telegram_admin_echo', ''));
+				foreach( $configparams as $i => $name) {
+					$this->config->set($name, $this->request->variable($name, ''));
+				}
 
 				// Add option settings change action to the admin log
 				$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'EBT_SETTINGS_UPDATED');
 
 				// Option settings have been updated and logged
 				// Confirm this to the user and provide link back to previous page
-				trigger_error($this->language->lang('EBT_SETTINGS_UPDATED') . adm_back_link($this->u_action));
+				if (!$testcall) //Would throw a test error
+				{
+					trigger_error($this->language->lang('EBT_SETTINGS_UPDATED') . adm_back_link($this->u_action));
+				}
 			}
 		}
 		$s_errors = !empty($errors);
 
-		$token = $this->config['eb_telegram_bot_token'] ?? '';
-		$secret = $this->config['eb_telegram_secret'] ?? '';
+		$token = $this->config['eb_telegram_bot_token'];
+		$secret = $this->config['eb_telegram_secret'];
 		$webhook = false;
 		if ($token && $secret)
 		{
 			$root_url = generate_board_url();
-			$webhook = sprintf($this->user->lang('EBT_SETTINGS_WEBHOOK_TEMPLATE'), $token, $root_url, $secret);
+			$webhook = $this->language->lang('EBT_SETTINGS_WEBHOOK_TEMPLATE', $token, $root_url, $secret);
 		}
 
 		// Set output variables for display in the template
-		$this->template->assign_vars([
-			'S_ERROR'		=> $s_errors,
-			'ERROR_MSG'		=> $s_errors ? implode('<br />', $errors) : '',
+		$assignment['S_ERROR'] = $s_errors;
+		$assignment['ERROR_MSG'] = $s_errors ? implode('<br />', $errors) : '';
+		$assignment['U_ACTION'] = $this->u_action;
+		$assignment['FOOTER_PLACEHOLDER'] = $this->language->lang('EBT_SETTINGS_FOOTER_DEFAULT');
+		$assignment['WEBHOOK'] = $webhook;
+		
+		foreach( $configparams as $i => $name) {
+			$assignment[$name] = $this->config[$name];
+		}
 
-			'U_ACTION'		=> $this->u_action,
-
-			'BOT_TOKEN'	=> $token,
-			'SECRET'	=> $secret,
-			'ADMIN_USER'	=> $this->config['eb_telegram_admin_user'],
-			'ADMIN_PW'	=> $this->config['eb_telegram_admin_pw'],
-			'FOOTER'	=> $this->config['eb_telegram_footer'],
-			'FOOTER_PLACEHOLDER'	=> $this->user->lang('EBT_SETTINGS_FOOTER_DEFAULT'),
-			'WEBHOOK'   => $webhook,
-			'ADMIN_TELEGRAM_ID'   => $this->config['eb_telegram_admin_telegram_id'],
-			'ADMIN_TELEGRAM_ECHO'   => $this->config['eb_telegram_admin_echo'],
-		]);
+		$this->template->assign_vars($assignment);
 	}
 
 	/**

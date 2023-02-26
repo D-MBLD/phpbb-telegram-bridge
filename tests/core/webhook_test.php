@@ -1,8 +1,18 @@
 <?php
+/**
+ *
+ * Telegram Bridge. An extension for the phpBB Forum Software package.
+ *
+ * @copyright (c) 2022, Edgar Bolender
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ */
 
 namespace eb\telegram\core;
 
 //See https://area51.phpbb.com/docs/dev/master/extensions/tutorial_testing.html
+//phpunit docu:
+//https://phpunit.de/manual/6.5/en/test-doubles.html#test-doubles.stubs.examples.StubTest3.php
 
 class webhook_test extends \phpbb_test_case
 {

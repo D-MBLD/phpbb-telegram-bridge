@@ -17,19 +17,19 @@
 			 See: https://stackoverflow.com/a/37153976/2808624 -->
 		<dl>
 			<dt><label for="<eb_telegram_admin_user>">{{ lang('EBT_SETTINGS_ADMIN_USER') ~ lang('COLON') }}</label><br /><span>{{ lang('EBT_SETTINGS_ADMIN_USER_DESCR') }}</span></dt>
-			<dd><input readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','');" type="text" id="eb_telegram_admin_user" name="eb_telegram_admin_user" size="64" maxlength="255" value="{ADMIN_USER}" /></dd>
+			<dd><input readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','');" type="text" id="eb_telegram_admin_user" name="eb_telegram_admin_user" size="64" maxlength="255" value="{eb_telegram_admin_user}" /></dd>
 		</dl>
 		<dl>
 			<dt><label for="<eb_telegram_admin_pw>">{{ lang('EBT_SETTINGS_ADMIN_PW') ~ lang('COLON') }}</label></dt>
-			<dd><input readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','');" type="password" id="eb_telegram_admin_pw" name="eb_telegram_admin_pw" size="64" maxlength="255" value="{ADMIN_PW}" /></dd>
+			<dd><input readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','');" type="password" id="eb_telegram_admin_pw" name="eb_telegram_admin_pw" size="64" maxlength="255" value="{eb_telegram_admin_pw}" /></dd>
 		</dl>
 		<dl>
 			<dt><label for="<eb_telegram_bot_token>">{{ lang('EBT_SETTINGS_BOT_TOKEN') ~ lang('COLON') }}</label><br /><span>{{ lang('EBT_SETTINGS_BOT_TOKEN_DESCR') }}</span></dt>
-			<dd><input type="text" id="eb_telegram_bot_token" name="eb_telegram_bot_token" size="64" maxlength="255" value="{BOT_TOKEN}" /></dd>
+			<dd><input type="text" id="eb_telegram_bot_token" name="eb_telegram_bot_token" size="64" maxlength="255" value="{eb_telegram_bot_token}" /></dd>
 		</dl>
 		<dl>
 			<dt><label for="eb_telegram_secret">{{ lang('EBT_SETTINGS_SECRET') ~ lang('COLON') }}</label><br /><span>{{ lang('EBT_SETTINGS_SECRET_DESCR')}}</span></dt>
-			<dd><input type="text" id="eb_telegram_secret" placeholder="(A-Z, a-z and 0-9)" name="eb_telegram_secret" size="64" maxlength="255" value="{SECRET}" /></dd>
+			<dd><input type="text" id="eb_telegram_secret" placeholder="(A-Z, a-z and 0-9)" name="eb_telegram_secret" size="64" maxlength="255" value="{eb_telegram_secret}" /></dd>
 		</dl>
 		{% if WEBHOOK %}
 		<dl>
@@ -42,16 +42,16 @@
 		{% endif %}
 		<dl>
 			<dt><label for="eb_telegram_footer">{{ lang('EBT_SETTINGS_FOOTER') ~ lang('COLON') }}</label><br /><span>{{ lang('EBT_SETTINGS_FOOTER_DESCR')}}</span></dt>
-			<dd><input type="text" id="eb_telegram_footer" name="eb_telegram_footer" size="64" maxlength="255" value="{FOOTER}"
+			<dd><input type="text" id="eb_telegram_footer" name="eb_telegram_footer" size="64" maxlength="255" value="{eb_telegram_footer}"
 				list="footer_proposal" /></dd>
 		</dl>
 		<dl>
 			<dt><label for="eb_telegram_admin_telegram_id">{{ lang('EBT_SETTINGS_ADMIN_ID') ~ lang('COLON') }}</label><br /><span>{{ lang('EBT_SETTINGS_ADMIN_ID_DESCR')}}</span></dt>
-			<dd><input type="text" id="eb_telegram_admin_telegram_id" name="eb_telegram_admin_telegram_id" size="64" maxlength="255" value="{ADMIN_TELEGRAM_ID}"/></dd>
+			<dd><input type="text" id="eb_telegram_admin_telegram_id" name="eb_telegram_admin_telegram_id" size="64" maxlength="255" value="{eb_telegram_admin_telegram_id}"/></dd>
 		</dl>
 		<dl>
 			<dt><label for="eb_telegram_admin_echo">{{ lang('EBT_SETTINGS_ADMIN_ECHO') ~ lang('COLON') }}</label><br /><span>{{ lang('EBT_SETTINGS_ADMIN_ECHO_DESCR')}}</span></dt>
-			<dd><input type="checkbox" class="radio" id="eb_telegram_admin_echo" name="eb_telegram_admin_echo" value="1"<!-- IF ADMIN_TELEGRAM_ECHO --> checked="checked"<!-- ENDIF --> /></dd>
+			<dd><input type="checkbox" class="radio" id="eb_telegram_admin_echo" name="eb_telegram_admin_echo" value="1"<!-- IF eb_telegram_admin_echo --> checked="checked"<!-- ENDIF --> /></dd>
 		</dl>
 	</fieldset>
 
