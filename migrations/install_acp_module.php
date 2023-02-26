@@ -25,8 +25,6 @@ class install_acp_module extends \phpbb\db\migration\migration
 	public function update_data()
 	{
 		return [
-			['config.add', ['eb_telegram_admin_user', '']],
-			['config.add', ['eb_telegram_admin_pw', '']],
 			['config.add', ['eb_telegram_bot_token', '']],
 			['config.add', ['eb_telegram_secret', '']],
 			['config.add', ['eb_telegram_footer', '']],
@@ -52,8 +50,6 @@ class install_acp_module extends \phpbb\db\migration\migration
 	public function revert_data()
 	{
 		return [
-			['config.remove', ['eb_telegram_admin_user']],
-			['config.remove', ['eb_telegram_admin_pw']],
 			['config.remove', ['eb_telegram_bot_token']],
 			['config.remove', ['eb_telegram_secret']],
 			['config.remove', ['eb_telegram_footer']],

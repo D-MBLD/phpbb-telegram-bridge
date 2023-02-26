@@ -402,22 +402,6 @@ class forum_api {
 			return false;
 		}
 
-		// Login is needed, when a new post is sent.
-		$userName = $this->config['eb_telegram_admin_user'];
-		$pw = $this->config['eb_telegram_admin_pw'];
-
-		$login_result = $auth->login($userName, $pw, false);
-
-		//Check for successful login
-		if ($login_result['status'] != LOGIN_SUCCESS)
-		{
-			$author = $author['username'];
-			$error = $login_result['error_msg'];
-			return "Check configuration of telegram bridge." .
-					" Login of admin user failed, when $author tried to send a new post or topic." .
-					" Error-Message: $error";
-		}
-
 		// Now submit the post
 		if (!function_exists('submit_post'))
 		{

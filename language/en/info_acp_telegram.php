@@ -60,10 +60,6 @@ $lang = array_merge($lang, [
 
 	'EBT_SETTINGS_UPDATED'		=> '<strong>Telegram Bridge settings updated</strong>',
 
-	'EBT_SETTINGS_ADMIN_USER'		=> '<strong>Forum User</strong>',
-	'EBT_SETTINGS_ADMIN_USER_DESCR'	=> 'An (admin) user with permissions to post into any forum, where telegram posts should be allowed.',
-	'EBT_SETTINGS_ADMIN_PW'			=> '<strong>Passwort of the above user</strong>',
-
 	'EBT_SETTINGS_BOT_TOKEN'		=> '<strong>Telegram Bot-Token</strong>',
 	'EBT_SETTINGS_BOT_TOKEN_DESCR'	=> 'The API token as provided by @BotFather in a format like 123456789:AaZz0...AaZz9.',
 	'EBT_SETTINGS_SECRET'			=> '<strong>Secret string for webhook requests</strong>',

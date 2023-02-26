@@ -16,14 +16,6 @@
 		<!-- Note: The readonly stuff below, avoids the browser to autofill the user and PW-fields.
 			 See: https://stackoverflow.com/a/37153976/2808624 -->
 		<dl>
-			<dt><label for="<eb_telegram_admin_user>">{{ lang('EBT_SETTINGS_ADMIN_USER') ~ lang('COLON') }}</label><br /><span>{{ lang('EBT_SETTINGS_ADMIN_USER_DESCR') }}</span></dt>
-			<dd><input readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','');" type="text" id="eb_telegram_admin_user" name="eb_telegram_admin_user" size="64" maxlength="255" value="{eb_telegram_admin_user}" /></dd>
-		</dl>
-		<dl>
-			<dt><label for="<eb_telegram_admin_pw>">{{ lang('EBT_SETTINGS_ADMIN_PW') ~ lang('COLON') }}</label></dt>
-			<dd><input readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','');" type="password" id="eb_telegram_admin_pw" name="eb_telegram_admin_pw" size="64" maxlength="255" value="{eb_telegram_admin_pw}" /></dd>
-		</dl>
-		<dl>
 			<dt><label for="<eb_telegram_bot_token>">{{ lang('EBT_SETTINGS_BOT_TOKEN') ~ lang('COLON') }}</label><br /><span>{{ lang('EBT_SETTINGS_BOT_TOKEN_DESCR') }}</span></dt>
 			<dd><input type="text" id="eb_telegram_bot_token" name="eb_telegram_bot_token" size="64" maxlength="255" value="{eb_telegram_bot_token}" /></dd>
 		</dl>

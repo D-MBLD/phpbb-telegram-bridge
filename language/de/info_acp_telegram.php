@@ -60,10 +60,6 @@ $lang = array_merge($lang, [
 
 	'EBT_SETTINGS_UPDATED'			=> '<strong>Einstellungen der Telegram-Anbindung geändert.</strong>',
 
-	'EBT_SETTINGS_ADMIN_USER'		=> '<strong>Forum Benutzer</strong>',
-	'EBT_SETTINGS_ADMIN_USER_DESCR'	=> 'Ein (admin) Benutzer mit Berechtigungen für alle Foren, die per Telegram zugänglich sein sollen.',
-	'EBT_SETTINGS_ADMIN_PW'			=> '<strong>Passwort für den Benutzer</strong>',
-
 	'EBT_SETTINGS_BOT_TOKEN'		=> '<strong>Telegram Bot-Token</strong>',
 	'EBT_SETTINGS_BOT_TOKEN_DESCR'	=> 'API-token. Wird von @BotFather beim Einrichten des Bots vergeben. Format 123456789:AaZz0...AaZz9.',
 	'EBT_SETTINGS_SECRET'			=> '<strong>Geheimer Text für WebHook-Aufrufe</strong>',

@@ -70,8 +70,6 @@ class acp_controller
 		 $configparams = [
 			'eb_telegram_bot_token',
 			'eb_telegram_secret',
-			'eb_telegram_admin_user',
-			'eb_telegram_admin_pw',
 			'eb_telegram_footer',
 			'eb_telegram_admin_telegram_id',
 			'eb_telegram_admin_echo',
@@ -106,7 +104,8 @@ class acp_controller
 			// If no errors, process the form data
 			if (empty($errors))
 			{
-				foreach( $configparams as $i => $name) {
+				foreach ( $configparams as $i => $name)
+				{
 					$this->config->set($name, $this->request->variable($name, ''));
 				}
 
@@ -138,8 +137,9 @@ class acp_controller
 		$assignment['U_ACTION'] = $this->u_action;
 		$assignment['FOOTER_PLACEHOLDER'] = $this->language->lang('EBT_SETTINGS_FOOTER_DEFAULT');
 		$assignment['WEBHOOK'] = $webhook;
-		
-		foreach( $configparams as $i => $name) {
+
+		foreach ( $configparams as $i => $name)
+		{
 			$assignment[$name] = $this->config[$name];
 		}
 
