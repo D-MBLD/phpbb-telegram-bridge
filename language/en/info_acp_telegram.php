@@ -43,7 +43,7 @@ $lang = array_merge($lang, [
 
 	//Used in the event ucp_profile_profile_info_after.html
 	'EBT_TELEGRAM_ID'					=> 'Your Telegram ID',
-	'EBT_TELEGRAM_ID_DESCR'				=> 'Enter your telegram id (numeric id, not name) and add the forums bot (@%s) to your telegram contacts. ' .
+	'EBT_TELEGRAM_ID_DESCR'				=> 'Enter your telegram id (numeric id, not name) and add the forums bot (<a href="https://t.me/%s">@%s</a>) to your telegram contacts. ' .
 									   'If you don\'t know your id, send an arbitrary message to the bot.',
 
 	//Used in the event acp_users_profile_after.html
