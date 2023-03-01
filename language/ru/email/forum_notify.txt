@@ -1,0 +1,5 @@
+Subject: (ignored in Telegram)
+
+Новое <a href="{U_NEWEST_POST}">сообщение</a> от <b>{AUTHOR_NAME}</b> в теме <b>{TOPIC_TITLE}</b> раздела <b>{FORUM_NAME}</b>:
+
+{TELEGRAM_MESSAGE}
