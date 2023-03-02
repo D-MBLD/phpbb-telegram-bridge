@@ -87,7 +87,7 @@
 			  outputProperty='package-version' />
 
 		<phingcall target="wrap-package">
-			<property name="destination-filename" value="${build-directory}/upload/${vendor-name}_${extension-name}_${package-version}" />
+			<property name="destination-filename" value="${build-directory}/upload/${vendor-name}_${extension-name}_language_pack_ru_${package-version}" />
 		</phingcall>
 	</target>
 
