@@ -900,8 +900,9 @@ class webhook {
 		{
 			// The following post was saved.
 			$text = $this->user->lang('EBT_TOPIC_SAVED') . PHP_EOL;
-			// Title. <b>%s</b>
-			$text .= $this->user->lang('EBT_TOPIC_TITLE', $title) . PHP_EOL;
+			// Title: <a href="%2$s"><b>%1$s</b></a>
+			// Empty link here (2nd Parameter).
+			$text .= $this->user->lang('EBT_TOPIC_TITLE', $title, '') . PHP_EOL;
 			$text .= $content;
 			$buttons = array($this->user->lang('EBT_BACK') => 'initial');
 			return $this->telegram_api->prepareMessage($text, $buttons);
