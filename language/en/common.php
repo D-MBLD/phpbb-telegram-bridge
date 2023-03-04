@@ -52,8 +52,8 @@ $lang = array_merge($lang, [
 	'EBT_ILLEGAL_INPUT' => " \xE2\x9A\xA0 Input <b>%s</b> is invalid.",  //"\xE2\x9A\xA0" = ⚠
 
 	//Topic list
-	'EBT_TOPIC_LIST_TITLE' => 'The forum <b>%1$s</b> has %2$s topics:',
-	'EBT_TOPIC_LIST_TITLE_EMPTY' => 'Currently there are no topics in the forum <b>%s</b>',
+	'EBT_TOPIC_LIST_TITLE' => 'The forum <a href="%3$s"><b>%1$s</b></a> has %2$s topics:',
+	'EBT_TOPIC_LIST_TITLE_EMPTY' => 'Currently there are no topics in the forum <a href="%3$s"><b>%s</b></a>',
 	'EBT_SELECT_TOPIC' => 'Use one of the buttons to select a topic.',
 	'EBT_SELECT_NEXT_PAGE' => 'Send a \'+\'- or \'-\'-sign, to show next/previous page.',
 	'EBT_FORUM_NOT_FOUND' => 'Could not read the forum (!?). Please try again',
@@ -62,7 +62,7 @@ $lang = array_merge($lang, [
 
 	//Post list
 	'EBT_TOPIC_AT_BY' => '<b>%1$s:</b> Topic created by <b>%2$s</b>', //time, user
-	'EBT_TOPIC_TITLE' => 'Title: <b>%s</b>',
+	'EBT_TOPIC_TITLE' => 'Title: <a href="%2$s"><b>%1$s</b></a>',
 	'EBT_REPLY_AT_BY' => '<b>%1$s:</b> Reply from <b>%2$s</b>', //time, user
 	'EBT_TOPIC_SHORTENED' => '<b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
 	'EBT_NEW_REPLY' => 'Send a reply',

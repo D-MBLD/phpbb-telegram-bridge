@@ -676,14 +676,15 @@ class webhook {
 
 			$buttons = array();
 			$count = count($topics);
+			$viewforum_url = generate_board_url() . '/viewforum.php?f=' . $forum_id;
 			if ($count > 0)
 			{
 				// There are %2$s topics in the forum %1$s.
-				$text = $this->user->lang('EBT_TOPIC_LIST_TITLE', $forumName, $total_count) . PHP_EOL . PHP_EOL;
+				$text = $this->user->lang('EBT_TOPIC_LIST_TITLE', $forumName, $total_count, $viewforum_url) . PHP_EOL . PHP_EOL;
 			} else
 			{
 				// 'Currently there are no topics in the forum <b>%s</b>'
-				$text = $this->user->lang('EBT_TOPIC_LIST_TITLE_EMPTY', $forumName) . PHP_EOL;
+				$text = $this->user->lang('EBT_TOPIC_LIST_TITLE_EMPTY', $forumName, $viewforum_url) . PHP_EOL;
 			}
 			$i = 1;
 			foreach ($topics as $id => $topic)
@@ -822,6 +823,7 @@ class webhook {
 		$posts = $this->forum_api->selectTopicPosts($user_id, $topic);
 		$first = true;
 		$readonly = true;
+		$viewtopic_url = generate_board_url() . '/viewtopic.php?t=';
 		foreach ($posts as $post)
 		{
 			$time = date('d.m.y H:i', $post['time']);
@@ -838,7 +840,7 @@ class webhook {
 				// "<b>$time:</b> Topic created by <b>$user</b>\n";
 				$text .= $this->user->lang('EBT_TOPIC_AT_BY', $time, $user) . PHP_EOL;
 				// "Titel: <b>$title</b>\n";
-				$text .= $this->user->lang('EBT_TOPIC_TITLE', $title) . PHP_EOL;
+				$text .= $this->user->lang('EBT_TOPIC_TITLE', $title, $viewtopic_url . $topic) . PHP_EOL;
 				$text .= $not_approved;
 				$text .= $post['text'];
 				$readonly = !$post['reply'];
