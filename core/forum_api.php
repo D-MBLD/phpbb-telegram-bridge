@@ -45,22 +45,30 @@ class forum_api {
 	}
 
 	/** Returns an array of forum_ids (key) and assigned arrays with values
-	 * for readonly and moderated.
+	 * for read, post, reply and moderated.
 	 * Only forums with at least read-permission are returned.
 	 * If a parent-forum has no read or list permission, the children forums are
 	 * not listed (even if they would have more permissions).
+	 * 
+	 * Not yet implemented:
+	 * Permissions for browsing and posting into the forum via telegram may in general
+	 * be prohibited/allowed by special telegram-permissions.
+	 * If the user has in general no browsing-permission, a special entry
+	 * [0] => ['read' => false] could be returned here.
 	 *
 	 * Example:
 	 * Array
 	 * (
-	 *	[43] => ['readonly' => true],	//Moderated does not matter
-	 *	[11] => ['readonly' => false, 'moderated' => true],
+	 *	[43] => ['post' = 'false', 'reply' = true, 'moderated' = false],
+	 *	[11] => ['post' => false], 'reply' = false ] //moderated does not matter for this forum
 	 *	... all forums with at least read permission
 	 * )
 	 */
 	private function getForumsPermissions($user_id)
 	{
-		$acls = $this->auth->acl_get_list($user_id, ['f_read', 'f_post', 'f_noapprove'], false);
+		//Note: There are 2 permissions: f_post (for new topics)
+		//and f_reply for posts to existing topics !!!
+		$acls = $this->auth->acl_get_list($user_id, ['f_read', 'f_post', 'f_reply', 'f_noapprove'], false);
 		$acls_read_or_list = $this->auth->acl_get_list($user_id, ['f_read', 'f_list'], false);
 		/* The acl-arrays have the following structure: forum-id -> array of permissions -> array of users
 		 * See http://www.lithotalk.de/docs/auth_api.html for details
@@ -92,11 +100,12 @@ class forum_api {
 		$permissions = array();
 		foreach ($acls as $forum_id => $rights)
 		{
-			if (!isset($rights['f_post']) && !isset($rights['f_read']))
+			if (!isset($rights['f_read']))
 			{
 				continue;
 			}
-			$permissions[$forum_id]['readonly'] = !isset($rights['f_post']);
+			$permissions[$forum_id]['post'] = isset($rights['f_post']);
+			$permissions[$forum_id]['reply'] = isset($rights['f_reply']);
 			$permissions[$forum_id]['moderated'] = !isset($rights['f_noapprove']);
 		}
 		return $permissions;
@@ -144,7 +153,7 @@ class forum_api {
 								'lastTopicTitle' => $row['forum_last_post_subject'],
 								'lastTopicDate' => $row['forum_last_post_time'],
 								'lastTopicAuthor' => $row['forum_last_poster_name'],
-								'readonly' => $forum_permissions[$forum_id]['readonly'],
+								'post' => $forum_permissions[$forum_id]['post'],
 								'moderated' => $forum_permissions[$forum_id]['moderated']
 				);
 			}
@@ -186,7 +195,7 @@ class forum_api {
 
 	/** Read all posts of a given topic.
 	 * Result is an array which maps the post_id to an array with text, username and time.
-	 * Only the first entry contains in addition the title and the readonly-flag.
+	 * Only the first entry contains in addition the title and the reply(permission)-flag.
 	 */
 	public function selectTopicPosts($user_id, $topic_id)
 	{
@@ -223,7 +232,7 @@ class forum_api {
 			return array();
 		}
 		$posts[0]['title'] = $title;
-		$posts[0]['readonly'] = $permissions[$forum_id]['readonly'] || $locked;
+		$posts[0]['reply'] = $permissions[$forum_id]['reply'] && !$locked;
 		return $posts;
 	}
 
@@ -383,9 +392,11 @@ class forum_api {
 		//In case of adding to an existing topic, the topic must exist
 		if ($new_topic)
 		{
+			$required_permission = 'post';
 			$topic_title = $topic_id_or_title;
 		} else
 		{
+			$required_permission = 'reply';
 			$topic_id  = $topic_id_or_title;
 			$existingPosts = $this->selectTopicPosts($author['user_id'], $topic_id);
 			if (count($existingPosts) == 0)
@@ -397,8 +408,10 @@ class forum_api {
 		}
 		$forums = $this->selectAllForums($author['user_id'], $forum_id);
 		$forum = reset($forums);
-		if (!$forum || $forum['readonly'])
+		if (!$forum || !$forum[$required_permission])
 		{
+			//Usually this should not happen, because the corresponding
+			//buttons are not offered, if no permission exists.
 			return false;
 		}
 

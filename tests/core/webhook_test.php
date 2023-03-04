@@ -148,7 +148,7 @@ class webhook_test extends \phpbb_test_case
 							'lastTopicTitle' => 'last topic',
 							'lastTopicDate' => '443134213',
 							'lastTopicAuthor' => 'Last Poster',
-							'readonly' => false,
+							'post' => true,
 							'moderated' => false
 		);
 

@@ -732,7 +732,7 @@ class webhook {
 				// Send '+' or '-' to show next or previous page of topics;
 				$text .= $this->user->lang('EBT_SELECT_NEXT_PAGE') . PHP_EOL;
 			}
-			if (!$forum['readonly'])
+			if ($forum['post']) //User has post permission
 			{
 				$buttons['NEW_LINE1'] = 'NEXT_LINE';
 				$buttons[$this->user->lang('EBT_ADD_TOPIC')] = 'newTopicTitle';
@@ -777,7 +777,7 @@ class webhook {
 			$lastTopicTitle = $forum['lastTopicTitle'];
 			$lastTopicAuthor = $forum['lastTopicAuthor'];
 			$num = $i + $page * 6;
-			$readonly = $forum['readonly'] ? $this->user->lang('EBT_READ_ONLY') : '';
+			$readonly = ($forum['post'] || $forum['reply']) ? '' : $this->user->lang('EBT_READ_ONLY');
 			$text .= " $num: <b>$title</b>$readonly" . PHP_EOL;
 			//Last post at %s by <b>%s</b>
 			$text .= $this->user->lang('EBT_LAST_POST', $lastTopicDate, $lastTopicAuthor) . PHP_EOL;
@@ -841,7 +841,7 @@ class webhook {
 				$text .= $this->user->lang('EBT_TOPIC_TITLE', $title) . PHP_EOL;
 				$text .= $not_approved;
 				$text .= $post['text'];
-				$readonly = $post['readonly'];
+				$readonly = !$post['reply'];
 				$first = false;
 			} else
 			{
