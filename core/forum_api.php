@@ -49,7 +49,7 @@ class forum_api {
 	 * Only forums with at least read-permission are returned.
 	 * If a parent-forum has no read or list permission, the children forums are
 	 * not listed (even if they would have more permissions).
-	 * 
+	 *
 	 * Not yet implemented:
 	 * Permissions for browsing and posting into the forum via telegram may in general
 	 * be prohibited/allowed by special telegram-permissions.
