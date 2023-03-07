@@ -95,7 +95,7 @@ $lang = array_merge($lang, [
 
 	//Button outdated
 	'EBT_BUTTON_OUTDATED' => 'Please use only buttons of the last message.',
-	'EBT_OK' => 'EBT_OK',
+	'EBT_OK' => 'OK',
 
 	//Illegal Forum was somehow set
 	'EBT_ILLEGAL_FORUM' => 'You don\'t have access to the selected forum.',

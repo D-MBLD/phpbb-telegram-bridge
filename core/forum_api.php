@@ -343,7 +343,7 @@ class forum_api {
 		$db = $this->db;
 		$users = array();
 
-		$sql = 'SELECT user_id, username, user_colour, user_email, user_telegram_id FROM '. USERS_TABLE ;
+		$sql = 'SELECT user_id, username, user_colour, user_email, user_lang, user_telegram_id FROM '. USERS_TABLE ;
 		$sql .= ' WHERE ( user_type = 0 OR user_type = 3)';
 		$sql .= " AND user_telegram_id = '$telegram_id'";
 		$result = $db->sql_query($sql);

@@ -114,7 +114,7 @@ services:
         arguments:
             - '@config'
             - '@user'
-            - '@auth'
+            - '@language'
             - '@controller.helper'
             - '@request'
             - '@eb.telegram.core.telegram_api'

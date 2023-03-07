@@ -96,7 +96,7 @@ $lang = array_merge($lang, [
 
 	//Button outdated
 	'EBT_BUTTON_OUTDATED' => 'Bitte nutze nur die Tasten der letzten Telegram-Nachricht.',
-	'EBT_OK' => 'EBT_OK',
+	'EBT_OK' => 'OK',
 
 	//Illegal Forum was somehow set
 	'EBT_ILLEGAL_FORUM' => 'Du hast auf das ausgewählte Forum keinen Zugriff (mehr?).',
