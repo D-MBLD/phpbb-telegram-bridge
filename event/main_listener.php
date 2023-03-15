@@ -241,20 +241,21 @@ class main_listener implements EventSubscriberInterface
 		$categories['telegram'] = 'EBT_PERM_CAT_TG';
 		$event['categories'] = $categories;
 	}
-	
+
 	/**
 	 * Modify the display of selected notification events, if the user does not have
 	 * permission for notification.
 	 * The column-header contains a hint, and the checkboxes are invalidated.
-	 * 
+	 *
 	 * $event: method_data, subscriptions, tpl_ary, type_data
 	 */
 	public function ucp_notifications_output($event)
 	{
 		$permissions = $this->forum_api->read_telegram_permissions($this->user->data['user_id']);
-		if ($permissions['u_ebt_notify']) {
+		if ($permissions['u_ebt_notify'])
+		{
 			return;
-		}		
+		}
 		//We change the column header.
 		//See template ucp_notifications.html and controller ucp_notifications.php
 		$telegram_header = $this->user->lang['EB_TELEGRAM_NOTIFICATION_METHOD_TELEGRAM_NP'];
@@ -262,10 +263,11 @@ class main_listener implements EventSubscriberInterface
 			'METHOD'			=> 'eb.telegram.notification.method.telegram',
 			'NAME'				=> $telegram_header,
 		), array('METHOD' => 'eb.telegram.notification.method.telegram'), 'change');
-		
-		//And we deactivate the checkboxes. 
+
+		//And we deactivate the checkboxes.
 		$tpl_ary = $event['tpl_ary'];
-		if ($tpl_ary['METHOD'] == 'eb.telegram.notification.method.telegram') {
+		if ($tpl_ary['METHOD'] == 'eb.telegram.notification.method.telegram')
+		{
 			$tpl_ary['AVAILABLE'] = false;
 			$tpl_ary['SUBSCRIBED'] = false;
 			$event['tpl_ary'] = $tpl_ary;

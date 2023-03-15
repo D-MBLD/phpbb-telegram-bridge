@@ -72,10 +72,10 @@ class forum_api_test extends \phpbb_test_case
 	{		
 		$this->auth->expects($this->once())
 			->method('acl_get_list')
-			->with($user_id)
+			->with($this->user_id)
 			->willReturn($acls);
 		
-		$permissions = $this->forum_api->read_telegram_permissions($user_id);
+		$permissions = $this->forum_api->read_telegram_permissions($this->user_id);
 		$this->assertEquals($expected_permissions, $permissions);
 	}
 }

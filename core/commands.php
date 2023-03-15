@@ -10,7 +10,7 @@
 
 namespace eb\telegram\core;
 
-/** Create the text and buttons response depending on the state and the users 
+/** Create the text and buttons response depending on the state and the users
  * input.
  * If an action like saving a post or saving the state is involved, this is
  * also done here.*/
@@ -332,7 +332,7 @@ class commands
 	{
 		if (!$command['permissions']['u_ebt_post'])
 		{
-			return $this->onShowPermissions($command);			
+			return $this->onShowPermissions($command);
 		}
 		$topic_id = $command['topic_id'];
 		$chat_id = $command['chat_id'];
@@ -341,7 +341,7 @@ class commands
 		// Send your reply or use the cancel button
 		$text = $this->language->lang('EBT_REQUEST_POST');
 		$buttons = array($this->language->lang('EBT_CANCEL') => 'back');
-		
+
 		return [$text, $buttons];
 	}
 
@@ -349,7 +349,7 @@ class commands
 	{
 		if (!$command['permissions']['u_ebt_post'])
 		{
-			return $this->onShowPermissions($command);			
+			return $this->onShowPermissions($command);
 		}
 		//Set state "Waiting for Titel" (without changing forum_id)
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 2);
@@ -380,7 +380,7 @@ class commands
 	{
 		if (!$command['permissions']['u_ebt_post'])
 		{
-			return $this->onShowPermissions($command);			
+			return $this->onShowPermissions($command);
 		}
 		$title = $command['title'];
 		$content = $command['text'];
@@ -407,7 +407,7 @@ class commands
 	{
 		if (!$command['permissions']['u_ebt_post'])
 		{
-			return $this->onShowPermissions($command);			
+			return $this->onShowPermissions($command);
 		}
 		$saved = $this->forum_api->insertNewPost(false, $command['forum_id'], $command['topic_id'], $command['text'], $command['user']);
 		if ($saved === true)
@@ -431,7 +431,8 @@ class commands
 	public function onShowPermissions($command)
 	{
 		$text = '';
-		if ($command['text'] ?? false) {
+		if ($command['text'] ?? false)
+		{
 			$text = $this->language->lang('EBT_ILLEGAL_INPUT', $command['text']) . PHP_EOL;
 		}
 		$text .= $this->language->lang('EBT_PERMISSION_TITEL');

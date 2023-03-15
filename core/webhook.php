@@ -332,7 +332,7 @@ class webhook {
 					break;
 				case 'T': $command['action'] = 'allForumTopics';
 					break;
-				case '1': 
+				case '1':
 					//New reply for a topic was cancelled
 				case 'P':
 					$command['action'] = 'showTopic';
@@ -400,11 +400,11 @@ class webhook {
 				{
 					$command['page'] -= $count;
 					break;
-				} 
+				}
 				//No break in case of other text input
 			default:
 				$command['action'] = 'showPermissions';
-				if (strstr('0TFP', $chat_state) == false) 
+				if (strstr('0TFP', $chat_state) == false)
 				{
 					$command['admin_info'] = "Unexpected chat state on text-input: $chat_state\n";
 				}

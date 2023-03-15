@@ -45,7 +45,8 @@ class forum_api {
 	}
 
 	/** Simplified permission reader, used to check if notification should show reply button. */
-	public function has_reply_permission($user_id, $forum_id) {
+	public function has_reply_permission($user_id, $forum_id)
+	{
 		$acls = $this->auth->acl_get_list($user_id, 'f_reply', $forum_id);
 		return isset($acls[$forum_id]['f_reply']);
 	}
@@ -376,7 +377,7 @@ class forum_api {
 	{
 		$permissions = array('u_ebt_notify' => false, 'u_ebt_browse' => false, 'u_ebt_post' => false);
 		$acls = $this->auth->acl_get_list($user_id, array_keys($permissions), false);
-		foreach($permissions as $key => $has_permission)
+		foreach ($permissions as $key => $has_permission)
 		{
 			$permissions[$key] = isset($acls[0][$key]);
 		}

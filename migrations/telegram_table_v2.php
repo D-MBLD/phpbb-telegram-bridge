@@ -40,7 +40,8 @@ class telegram_table_v2 extends \phpbb\db\migration\migration
 	 */
 	public function update_schema()
 	{
-		if ($this->db_tools->sql_table_exists($this->table_prefix . 'eb_telegram_chat')) {
+		if ($this->db_tools->sql_table_exists($this->table_prefix . 'eb_telegram_chat'))
+		{
 			return [
 				'add_columns' => [
 					$this->table_prefix . 'eb_telegram_chat' => [

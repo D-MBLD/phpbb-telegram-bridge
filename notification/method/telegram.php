@@ -153,7 +153,7 @@ class telegram extends \phpbb\notification\method\messenger_base
 			{
 				continue;
 			}
-			
+
 			if ($user['user_type'] == USER_IGNORE || in_array($notification->user_id, $banned_users))
 			{
 				continue;
@@ -176,7 +176,8 @@ class telegram extends \phpbb\notification\method\messenger_base
 			$template_variables = $notification->get_email_template_variables();
 
 			$forum_id = $template_variables['FORUM_ID'] ?? false;
-			if ($forum_id) {
+			if ($forum_id)
+			{
 				// Overwrite the post permissions, if the user has no reply permission.
 				$permissions['u_ebt_post'] = $permissions['u_ebt_post'] && $this->forum_api->has_reply_permission($notification->user_id, $forum_id);
 				// Store the corresponding forum as currently selected forum for the users telegram communication
@@ -217,7 +218,7 @@ class telegram extends \phpbb\notification\method\messenger_base
 
 			// Lets send to Telegram
 			$this->send($telegram_id, $this->msg, $topic_id, $permissions);
-			
+
 		}
 		$this->empty_queue();
 	}
