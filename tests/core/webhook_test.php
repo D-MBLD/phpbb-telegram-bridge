@@ -147,7 +147,8 @@ class webhook_test extends \phpbb_test_case
 				'state' => '0',
 				'forum_id' => 17,
 				'topic_id' => 0,
-				'title' => '' 
+				'title' => '',
+				'page' => 0,
 			);
 		$this->forum_api->expects($this->once())
 			->method('select_telegram_chat_state')
