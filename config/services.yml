@@ -113,11 +113,18 @@ services:
         class: eb\telegram\core\webhook
         arguments:
             - '@config'
-            - '@user'
             - '@language'
             - '@controller.helper'
             - '@request'
             - '@eb.telegram.core.telegram_api'
+            - '@eb.telegram.core.forum_api'
+            - '@eb.telegram.core.commands'
+
+    eb.telegram.core.commands:
+        class: eb\telegram\core\commands
+        arguments:
+            - '@config'
+            - '@language'
             - '@eb.telegram.core.forum_api'
 
     eb.telegram.core.test:

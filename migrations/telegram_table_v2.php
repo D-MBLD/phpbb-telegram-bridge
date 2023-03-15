@@ -10,11 +10,11 @@
 
 namespace eb\telegram\migrations;
 
-class telegram_table extends \phpbb\db\migration\migration
+class telegram_table_v2 extends \phpbb\db\migration\migration
 {
 	public function effectively_installed()
 	{
-		return $this->db_tools->sql_table_exists($this->table_prefix . 'eb_telegram_chat');
+		return $this->db_tools->sql_column_exists($this->table_prefix . 'eb_telegram_chat', 'page');
 	}
 
 	public static function depends_on()
@@ -40,21 +40,38 @@ class telegram_table extends \phpbb\db\migration\migration
 	 */
 	public function update_schema()
 	{
-		return [
-			'add_tables'		=> [
-				$this->table_prefix . 'eb_telegram_chat'	=> [
-					'COLUMNS'=> [
-						'chat_id'    => ['VCHAR:50', ''],
-						'message_id' => ['VCHAR:50', ''],
-						'forum_id'   => ['VCHAR:50', ''],
-						'topic_id'   => ['VCHAR:50', ''],
-						'state'      => ['CHAR:1', ''],
-						'title'      => ['VCHAR:50', ''],
+		if ($this->db_tools->sql_table_exists($this->table_prefix . 'eb_telegram_chat')) {
+			return [
+				'add_columns' => [
+					$this->table_prefix . 'eb_telegram_chat' => [
+						'page'    => ['UINT', 0, 'after' => 'title'],
 					],
-					'PRIMARY_KEY' => 'chat_id',
 				],
-			],
-		];
+				'change_columns' => [
+					$this->table_prefix . 'eb_telegram_chat' => [
+						'title'        => ['VCHAR:120', ''],
+					],
+				],
+			];
+		} else
+		{
+			return [
+				'add_tables' => [
+					$this->table_prefix . 'eb_telegram_chat' => [
+						'COLUMNS'=> [
+							'chat_id'    => ['VCHAR:50', ''],
+							'message_id' => ['VCHAR:50', ''],
+							'forum_id'   => ['VCHAR:50', ''],
+							'topic_id'   => ['VCHAR:50', ''],
+							'state'      => ['CHAR:1', ''],
+							'title'      => ['VCHAR:120', ''],
+							'page'       => ['UINT', 0],
+						],
+						'PRIMARY_KEY' => 'chat_id',
+					],
+				],
+			];
+		}
 	}
 
 	/**

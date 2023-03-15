@@ -22,7 +22,7 @@ class webhook_test extends \phpbb_test_case
 		$this->config = $this->getMockBuilder('\phpbb\config\config')
 			->disableOriginalConstructor()
 			->getMock();
-		$this->user = $this->getMockBuilder('\phpbb\user')
+		$this->language = $this->getMockBuilder('\phpbb\language\language')
 			->disableOriginalConstructor()
 			->getMock();
 		$this->auth = $this->getMockBuilder('\phpbb\auth\auth')
@@ -41,15 +41,20 @@ class webhook_test extends \phpbb_test_case
 		$this->forum_api = $this->getMockBuilder('\eb\telegram\core\forum_api')
 			->disableOriginalConstructor()
 			->getMock();
-		//Now create a non-mocked webhook class
+		//Now create a non-mocked commands and webhook class
+		$this->commands = new \eb\telegram\core\commands(
+			$this->config,
+			$this->language,
+			$this->forum_api
+		);
 		$this->webhook = new \eb\telegram\core\webhook(
 			$this->config,
-			$this->user,
-			$this->auth,
+			$this->language,
 			$this->helper,
 			$this->request,
 			$this->telegram_api,
-			$this->forum_api
+			$this->forum_api,
+			$this->commands
 		);
 	}
 
@@ -59,20 +64,26 @@ class webhook_test extends \phpbb_test_case
 		$dataPairs = array();
 		//Create an array of parameters passed to the test function
 		$command_in = ['buttonCallback'=>'does not matter'];
-		$command_out = ['buttonCallback'=>'does not matter','action' => 'registrationFailed'];
+		$command_out = ['buttonCallback'=>'does not matter','action' => 'registrationRequired'];
+		$dataPairs[] = [$command_in, $command_out];
+
+		$command_in = ['buttonCallback'=>'does not matter', 'title' => 'expected code'];
+		$command_out = $command_in;
+		$command_out['action'] = 'registrationRequired';
 		$dataPairs[] = [$command_in, $command_out];
 
 		$command_in = ['buttonCallback'=>'requestEmail'];
 		$command_out = ['buttonCallback'=>'requestEmail','action' => 'registrationEmailed'];
 		$dataPairs[] = [$command_in, $command_out];
 
-		$command_in = $command_out = ['buttonCallback'=>'allForumsXXX', 'chatState' => 'anythingDifferentFromVOrEmpty'];
+		$command_in = $command_out = ['buttonCallback'=>'allForumsXXX', 'chatState' => 'anythingDifferentFromVOrEmpty', 'page' => 1];
 		$command_out['action'] = 'allForums';
 		$dataPairs[] = [$command_in, $command_out];
 
-		$command_in = $command_out = ['buttonCallback'=>'allForumTopics~f123', 'chatState' => 'X'];
+		$command_in = $command_out = ['buttonCallback'=>'allForumTopics~f123', 'chatState' => 'X', 'page' => 1];
 		$command_out['action'] = 'allForumTopics';
 		$command_out['forum_id'] = 123;
+		$command_out['page'] = 0; //Because new forum was defined
 		$dataPairs[] = [$command_in, $command_out];
 
 		$command_in = $command_out = ['buttonCallback'=>'allForumTopics~p123', 'chatState' => 'X'];
@@ -121,11 +132,11 @@ class webhook_test extends \phpbb_test_case
 			]);
 		$this->webhook->secret_token = 'sec_token';
 
-		$this->user->expects($this->any())
+		$this->language->expects($this->any())
 			->method('lang')
 			->willReturnArgument(0);
 
-		$users[] = array('user_id' => 123, 'username' => 'Test User', 'user_telegram_id' => 12345);
+		$users[] = array('user_id' => 123, 'username' => 'Test User', 'user_lang' => 'en', 'user_telegram_id' => 12345);
 		$this->forum_api->expects($this->once())
 			->method('find_telegram_user')
 			->with('123')
@@ -156,6 +167,10 @@ class webhook_test extends \phpbb_test_case
 			->method('selectAllForums')
 			->willReturn($forums);
 
+		$this->forum_api->expects($this->any())
+			->method('read_telegram_permissions')
+			->willReturn(array('u_ebt_browse' => true));
+
 		$eol = PHP_EOL;
 		$expected = array(
 			'disable_web_page_preview' => 'true',
@@ -165,11 +180,8 @@ class webhook_test extends \phpbb_test_case
 			'reply_markup' => array (
 				'inline_keyboard' => array (array(
 					array(
-					'text' => '1: forum1',
-					'callback_data' => 'allForumTopics~f111'),
-					array(
-						'text' => 'EBT_BACK',
-						'callback_data' => 'allForumTopics~f17'),
+						'text' => '1: forum1',
+						'callback_data' => 'allForumTopics~f111'),
 					))
 			),
 			'chat_id' => '123',

@@ -15,19 +15,17 @@
  */
 class webhook {
 
-	/* @var \phpbb\config\config */
+	/** @var \phpbb\config\config */
 	protected $config;
-	/* @var \phpbb\user */
-	protected $user;
-	/* @var \phpbb\controller\helper $helper */
+	/** @var \phpbb\controller\helper $helper */
 	protected $helper;
-	/* @var \phpbb\language\language  */
+	/** @var \phpbb\language\language  */
 	protected $language;
-	/* @var \phpbb\request\request   */
+	/** @var \phpbb\request\request   */
 	protected $request;
-	/* @var \eb\telegram\core\telegram_api  */
+	/** @var \eb\telegram\core\telegram_api  */
 	protected $telegram_api;
-	/* @var \eb\telegram\core\forum_api  */
+	/** @var \eb\telegram\core\forum_api  */
 	protected $forum_api;
 
 	/** Telegram-ID of the administrator, where all unidentfied calls are returned to. */
@@ -40,29 +38,29 @@ class webhook {
 	* Constructor
 	*
 	* @param \phpbb\config\config $config
-	* @param \phpbb\user $user
 	* @param \language\language $language
 	* @param \phpbb\controller\helper $helper
 	* @param \phpbb\request\request $request,
 	* @param \eb\telegram\core\telegram_api $telegram_api,
 	* @param \eb\telegram\core\forum_api $forum_api,
+	* @param \eb\telegram\core\commands $commands,
 	*/
 	public function __construct(\phpbb\config\config $config,
-								\phpbb\user $user,
 								\phpbb\language\language $language,
 								\phpbb\controller\helper $helper,
 								\phpbb\request\request $request,
 								\eb\telegram\core\telegram_api $telegram_api,
-								\eb\telegram\core\forum_api $forum_api
+								\eb\telegram\core\forum_api $forum_api,
+								\eb\telegram\core\commands $commands
 								)
 	{
 		$this->config = $config;
-		$this->user = $user;
 		$this->language = $language;
 		$this->helper = $helper;
 		$this->request = $request;
 		$this->telegram_api = $telegram_api;
 		$this->forum_api = $forum_api;
+		$this->commands = $commands;
 		$this->admin_telegram_id = $this->config['eb_telegram_admin_telegram_id'];
 		$this->echo_to_admin =  $this->config['eb_telegram_admin_echo'];
 	}
@@ -220,16 +218,19 @@ class webhook {
 			return $command;
 		}
 		$command['user'] = $users[0];
+		$command['permissions'] = $this->forum_api->read_telegram_permissions($users[0]['user_id']);
 		$this->language->set_user_language($users[0]['user_lang'], true);
 		$telegram_data = $this->forum_api->select_telegram_chat_state($caller);
 		if ($telegram_data)
 		{
-			//Always clear the previous chat state. If a new state is needed,
-			//it will be set below.
-			$this->forum_api->store_telegram_chat_state($caller);
+			$command['message_id'] = $telegram_data['message_id'];
+			$command['forum_id'] = $telegram_data['forum_id'];
+			$command['topic_id'] = $telegram_data['topic_id'];
+			$command['chatState'] = $telegram_data['state'];
+			$command['title'] = $telegram_data['title'];
+			$command['page'] = $telegram_data['page'];
 
-			$message_id = $telegram_data['message_id']; //Message to be updated
-			if (isset($buttonData) && $message_id && $message_id != $reply_to_msgid)
+			if (isset($buttonData) && $command['message_id'] && $command['message_id'] != $reply_to_msgid)
 			{
 				if (!$this->test_call)
 				{
@@ -237,17 +238,6 @@ class webhook {
 					return $command;
 				}
 			}
-			$command['message_id'] = $message_id;
-			if (isset($telegram_data['forum_id']) && $telegram_data['forum_id'] != 0)
-			{
-				$command['forum_id'] = $telegram_data['forum_id'];
-			}
-			if (isset($telegram_data['topic_id']))
-			{
-				$command['topic_id'] = $telegram_data['topic_id'];
-			}
-			$command['chatState'] = $telegram_data['state'];
-			$command['title'] = $telegram_data['title'];
 		} else
 		{
 			$command['chatState'] = 'V'; //Verification pending
@@ -275,7 +265,7 @@ class webhook {
 		}
 		//In all cases where a forum is preselected, check that the user
 		//has access to that forum.
-		if (isset($command['forum_id']))
+		if (isset($command['forum_id']) && $command['permissions']['u_ebt_browse'])
 		{
 			if (!$this->has_permission($command['user']['user_id'], $command['forum_id']))
 			{
@@ -296,11 +286,13 @@ class webhook {
 				$command['action'] = 'registrationEmailed';
 			} else
 			{
-				$command['action'] = 'registrationFailed';
+				$command['action'] = 'registrationRequired';
 			}
 		} else if (stripos($buttonCallback, 'allForums') === 0 )
 		{
 			$command['action'] = 'allForums';
+			$page = $this->parse_id_from_button($buttonCallback, null, true);
+			$command['page'] = $page !== false ? $page : $command['page'];
 		} else if (stripos($buttonCallback, 'allForumTopics') === 0 )
 		{
 			$command['action'] = 'allForumTopics';
@@ -311,6 +303,8 @@ class webhook {
 			{
 				//Change forum only if coded in the button
 				$command['forum_id'] = $forum_id;
+				//In that case, start with page 0
+				$command['page'] = 0;
 			} else if ($page)
 			{
 				$command['page'] = $page;
@@ -330,13 +324,26 @@ class webhook {
 			$command['action'] = 'newTopicTitle';
 			//No update of telegram message, but request title below of display with forum content
 			unset($command['message_id']);
-		} else if ($buttonCallback == 'initial')
+		} else if ($buttonCallback == 'back')
 		{
-			$command['action'] = 'initial';
+			switch ($command['chatState'])
+			{
+				case 'F': $command['action'] = 'allForums';
+					break;
+				case 'T': $command['action'] = 'allForumTopics';
+					break;
+				case '1': 
+					//New reply for a topic was cancelled
+				case 'P':
+					$command['action'] = 'showTopic';
+					break;
+				default:
+					$command['action'] = 'allForums';
+			}
 		} else
 		{
-			//The user herself should just receive the initial screen again.
-			$command['action'] = 'initial';
+			//Unexpected callback. Show the permissions screen and inform the admin.
+			$command['action'] = 'showPermissions';
 			$command['admin_info'] = 'Unexpected input via button callback: '. $command['buttonCallback'];
 		}
 		return $command;
@@ -349,9 +356,9 @@ class webhook {
 		*/
 		$chat_state = $command['chatState'] ?? false;
 		$text = $command['text'];
-		/* When a text was sent by the user, the answer should always appear below
+		/* When a text was sent by the user, the answer in telegram should always appear below
 		the text, that means no message_id (from previous message) must be provided,
-		such that sendMessage instead of editMessage will be called. */
+		such that sendMessage instead of editMessage of the telegram API will be called. */
 		unset($command['message_id']);
 		switch ($chat_state)
 		{
@@ -360,13 +367,13 @@ class webhook {
 				if (isset($command['title']) && $text == $command['title'])
 				{
 					$command['action'] = 'registrationOk';
-				} else
+				} else if (isset($command['title']) && $command['title'])
 				{
 					$command['action'] = 'registrationFailed';
+				} else
+				{
+					$command['action'] = 'registrationRequired';
 				}
-				break;
-			case '0':
-				$command['action'] = 'initial';
 				break;
 			case '1':
 				//Entered text is a new post for an existing topic
@@ -383,120 +390,48 @@ class webhook {
 			case 'T':
 			case 'F':
 				//Entered text should be a paging command for a list of topics or forums
-				//Last page number is stored in the title-field.
 				$command['action'] = $chat_state == 'T' ? 'allForumTopics' : 'allForums';
 				if (strlen(trim(str_replace('+', '', $text, $count))) == 0)
 				{
 					//String contains only plus-signs and blanks
-					$command['page'] = $command['title'] + $count;
+					$command['page'] += $count;
+					break;
 				} else if (strlen(trim(str_replace('-', '', $text, $count))) == 0)
 				{
-					$command['page'] = $command['title'] - $count;
-				} else
-				{
-					//Stay at the same page
-					$command['page'] = $command['title'];
-					$command['warning'] = $this->language->lang('EBT_ILLEGAL_INPUT', $text);
-				}
-				break;
+					$command['page'] -= $count;
+					break;
+				} 
+				//No break in case of other text input
 			default:
-				$command['action'] = 'initial';
-				$command['admin_info'] = "Unexpected chat state on text-input: $chat_state\n/";
+				$command['action'] = 'showPermissions';
+				if (strstr('0TFP', $chat_state) == false) 
+				{
+					$command['admin_info'] = "Unexpected chat state on text-input: $chat_state\n";
+				}
 		}
 		return $command;
 	}
 
-	/** Note: Command is passed by reference because admin_info may be added. */
+	/** Note: Command is passed by reference because some methods may add something, e.g. an admin_info. */
 	private function execute_command(&$command)
 	{
 		$action = $command['action'];
-		switch ($action)
+
+		//Execute the function, which is named like the action, starting uppercase and prefixed with on.
+		$function = 'on' . ucfirst($action);
+		if (method_exists($this->commands, $function))
 		{
-			case 'adminInfo':
-				//Response will be send to admin only
-				return false;
-			case 'howToRegister':
-				$postdata = $this->onHowToRegister($command['chat_id']);
-				unset($command['message_id']);
-				break;
-			case 'registrationEmailed':
-				$postdata = $this->onRegistration($command['user'], $command['chat_id'], true, true);
-				break;
-			case 'registrationOk':
-				$postdata = $this->onRegistration($command['user'], $command['chat_id'], true, false);
-				break;
-			case 'registrationFailed':
-				//If an email was sent before, the title contains a code.
-				$postdata = $this->onRegistration($command['user'], $command['chat_id'], false, $command['title']);
-				break;
-			case 'buttonOutdated':
-				$postdata = $this->onButtonOutdated();
-				break;
-			case 'invalidForum':
-				$postdata = $this->onInvalidForum();
-				break;
-			case 'initial':
-				if (($command['forum_id'] ?? 0) != 0)
-				{
-					/* The initial screen depends on whether a forum was
-					* already selected or not.
-					*/
-					$postdata = $this->onAllForumTopics($command['user']['user_id'], $command['chat_id'], $command['forum_id']);
-					break; //break only here, else continue with same as 'allForums'
-				}
-			case 'allForums':
-				$postdata = $this->onAllForums($command['user']['user_id'], $command['chat_id'], $command['forum_id'] ?? 0, $command['page'] ?? 0, $command['warning'] ?? false);
-				break;
-			case 'allForumTopics':
-				$postdata = $this->onAllForumTopics($command['user']['user_id'], $command['chat_id'], $command['forum_id'], $command['page'] ?? 0, $command['warning'] ?? false);
-				break;
-			case 'showTopic':
-				//If we are called from a paged topic display, we add the page into the
-				//back button.
-				$page = 0;
-				if ($command['chatState'] == 'T')
-				{
-					$page = $command['title'] ?? 0;
-				}
-				$postdata = $this->onShowTopic($command['user']['user_id'], $command['topic_id'], $page);
-				break;
-			case 'newPost':
-				$postdata = $this->onNewPost($command['topic_id']);
-				//Save topic id and status "Waiting for Post-Text" in chat table
-				$this->forum_api->store_telegram_chat_state($command['chat_id'], $command['topic_id'], 1);
-				break;
-			case 'saveNewPost':
-				$saved = $this->forum_api->insertNewPost(false, $command['forum_id'], $command['topic_id'], $command['text'], $command['user']);
-				if ($saved === true)
-				{
-					$postdata = $this->onShowTopic($command['user']['user_id'], $command['topic_id']);
-				} else
-				{
-					$postdata = $this->onSaveFailed();
-					$command['admin_info'] = $saved;
-				}
-				break;
-			case 'newTopicTitle':
-				$postdata = $this->onNewTopicTitle();
-				//Save topic id and status "Waiting for Titel" in chat table
-				$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 2);
-				break;
-			case 'newTopicText':
-				$postdata = $this->onNewTopicText($command['text']);
-				//Save topic id and status "Waiting for new Text" in chat table
-				$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 3, $command['text']);
-				break;
-			case 'saveNewTopic':
-				$postdata = $this->onNewTopicSaved($command['title'],$command['text'],$command['user'], $command['forum_id']);
-				break;
-			case 'callFromGroupOrChannel':
-				$postdata = $this->onCallFromGroupOrChannel();
-				break;
-			default:
-				$command_info = print_r($command, true);
-				$command['admin_info'] = "Internal error, no action set. Command: \n$command_info";
-				return false;
+			$text_and_buttons = $this->commands->{$function}($command);
+		} else
+		{
+			$command_info = print_r($command, true);
+			$command['admin_info'] = "Internal error, illegal action set. Command: \n$command_info";
 		}
+		if (!$text_and_buttons)
+		{
+			return false; //Nothing to send to the user, but maybe to the admin
+		}
+		$postdata = $this->telegram_api->prepareMessage($text_and_buttons[0], $text_and_buttons[1] ?? array());
 		$postdata['chat_id'] = $command['chat_id'];
 		if (isset($command['message_id']))
 		{
@@ -509,14 +444,16 @@ class webhook {
 	{
 		if ($this->echo_to_admin && !isset($command['admin_info']))
 		{
-			$prop_text = &$this->find_obj_with_prop($input, 'text');
+			//Modify the input by shortening the text-property and the
+			//entities-property if necessary.
+			$prop_text = &$this->get_ref_to_prop($input, 'text');
 			if ($prop_text && strlen($prop_text) > 50)
 			{
 				$prop_text = \substr($prop_text, 0, 50) . ' ...(shortened)...';
 			}
 			//Warning: Don't assign prop_text again. It's a reference and would overwrite
 			//the content of the text-property.
-			$prop_entities = &$this->find_obj_with_prop($input, 'entities');
+			$prop_entities = &$this->get_ref_to_prop($input, 'entities');
 			if ($prop_entities && count($prop_entities) > 2)
 			{
 				$prop_entities = 'array too long (' . count($prop_entities) . ') for display';
@@ -539,7 +476,7 @@ class webhook {
 	}
 
 	/** Return a reference to the given property (even if deep nested) */
-	private function &find_obj_with_prop(&$obj, $property)
+	private function &get_ref_to_prop(&$obj, $property)
 	{
 		if (is_object($obj))
 		{
@@ -551,7 +488,7 @@ class webhook {
 			{
 				foreach ($obvar as $name => $var)
 				{
-					$result = &$this->find_obj_with_prop($obj->{$name},$property);
+					$result = &$this->get_ref_to_prop($obj->{$name},$property);
 					if ($result)
 					{
 						return $result;
@@ -590,343 +527,6 @@ class webhook {
 		$forums = $this->forum_api->selectAllForums($user_id, $forum_id);
 		$first = reset($forums);
 		return $first ? true : false;
-	}
-
-	private function onInvalidForum()
-	{
-		// "You don\'t have access to the selected forum."
-		$text = $this->language->lang('EBT_ILLEGAL_FORUM');
-		return $this->telegram_api->prepareMessage($text, [$this->language->lang('EBT_OK') => 'allForums']);
-	}
-
-	private function onButtonOutdated()
-	{
-		// "Please use only buttons of the last message"
-		$text = $this->language->lang('EBT_BUTTON_OUTDATED');
-		return $this->telegram_api->prepareMessage($text, [$this->language->lang('EBT_OK') => 'initial']);
-	}
-
-	private function onHowToRegister($chat_id)
-	{
-		// "This service can be used only by members of (%s for link and %s for sitename)
-		// Register your telegram id %s "
-		$home_url = $this->config['site_home_url'];
-		if (!$home_url)
-		{
-			$home_url = generate_board_url();
-		}
-		$text = $this->language->lang('EBT_HELP_SCREEN_NON_MEMBER', $this->config['sitename'], $home_url, $chat_id);
-		return $this->telegram_api->prepareMessage($text);
-	}
-
-	/** Various registration situations.
-	 * $ok = true and $email = true: Email was sent
-	 * $ok = true and $email = false: Registration ok
-	 * $ok = false and $email = true: Registration failed after email was sent
-	 * $ok = false and $email = false: Registration failed, no email was sent immediately before
-	 */
-	private function onRegistration($user, $chat_id, $ok, $email)
-	{
-		$buttons = array();
-		if ($ok && $email)
-		{
-			$code = $this->forum_api->send_email($user);
-			$this->forum_api->store_telegram_chat_state($chat_id, 0, 'V', $code);
-			$text = $this->language->lang('EBT_HELP_SCREEN_EMAILED');
-		} else if ($ok)
-		{
-			$this->forum_api->store_telegram_chat_state($chat_id);
-			$text = $this->language->lang('EBT_HELP_SCREEN_REGISTERED');
-			$buttons[$this->language->lang('EBT_OK')] = 'initial';
-		} else
-		{
-			$this->forum_api->store_telegram_chat_state($chat_id, 0, 'V');
-			$text = $this->language->lang('EBT_HELP_SCREEN_REGISTRATION_FAILED');
-			if ($email)
-			{
-				$text = $this->language->lang('EBT_ILLEGAL_CODE') . '<br>' . $text;
-			}
-			$buttons[$this->language->lang('EBT_REQUEST_EMAIL')] = 'requestEmail';
-		}
-		return $this->telegram_api->prepareMessage($text, $buttons);
-	}
-
-	/** Show all topics in the forum given by its ID.
-	 */
-	private function onAllForumTopics($user_id, $chat_id, $forum_id, $page = 0, $warning = false)
-	{
-		$forums = $this->forum_api->selectAllForums($user_id, $forum_id);
-		$forum = reset($forums);
-		$forumName = $forum['title'];
-
-		if ($forum)
-		{
-			//Store the selected forum.
-			$this->forum_api->store_forum_id($chat_id, $forum_id);
-
-			$topics = $this->forum_api->selectForumTopics($user_id, $forum_id );
-			$total_count = count($topics);
-			while ($page * 6 >= $total_count)
-			{
-				$page--;
-			}
-			if ($page < 0)
-			{
-				$page = 0;
-			}
-			$topics = array_slice($topics, $page * 6, null, true);
-
-			$buttons = array();
-			$count = count($topics);
-			$viewforum_url = generate_board_url() . '/viewforum.php?f=' . $forum_id;
-			if ($count > 0)
-			{
-				// There are %2$s topics in the forum %1$s.
-				$text = $this->language->lang('EBT_TOPIC_LIST_TITLE', $forumName, $total_count, $viewforum_url) . PHP_EOL . PHP_EOL;
-			} else
-			{
-				// 'Currently there are no topics in the forum <b>%s</b>'
-				$text = $this->language->lang('EBT_TOPIC_LIST_TITLE_EMPTY', $forumName, $viewforum_url) . PHP_EOL;
-			}
-			$i = 1;
-			foreach ($topics as $id => $topic)
-			{
-				$not_approved = '';
-				if (!$topic['approved'])
-				{
-					$not_approved = $this->language->lang('TOPIC_UNAPPROVED');
-					$not_approved = "(<i><b>$not_approved</b></i>)" . PHP_EOL;
-				}
-				$title = $topic['title'];
-				$date = date('d.m.y', $topic['date']);
-				$num = $i + $page * 6;
-				if ($topic['type'] == 2)
-				{
-					//announcement
-					$text .= " $num: <i><u>$title ($date)</u></i>\n";
-				} else if ($topic['type'] == 1)
-				{
-					//important topic
-					$text .= " $num: <i>$title ($date)</i>\n";
-				} else
-				{
-					$text .= " $num: $title ($date)\n";
-				}
-				$text .= $not_approved;
-				$buttonText = "$num: $title";
-				$buttons[$buttonText] = "showTopic~t$id";
-				$i++;
-				if ($i > 6)
-				{
-					break; //Not more than 8 buttons allowed.
-				}
-			}
-			if ($warning)
-			{
-				$text .= PHP_EOL . $warning;
-			}
-			if ($count > 0)
-			{
-				// Use one of the buttons to select a topic;
-				$text .= PHP_EOL . $this->language->lang('EBT_SELECT_TOPIC') . PHP_EOL;
-			}
-			if ($total_count > 6)
-			{
-				// Send '+' or '-' to show next or previous page of topics;
-				$text .= $this->language->lang('EBT_SELECT_NEXT_PAGE') . PHP_EOL;
-			}
-			if ($forum['post']) //User has post permission
-			{
-				$buttons['NEW_LINE1'] = 'NEXT_LINE';
-				$buttons[$this->language->lang('EBT_ADD_TOPIC')] = 'newTopicTitle';
-			}
-			$buttons['NEW_LINE2'] = 'NEXT_LINE';
-			$buttons[$this->language->lang('EBT_SHOW_FORUMS')] = 'allForums';
-		} else
-		{
-			// Could not read the forum. Please try again;
-			$text .= $this->language->lang('EBT_FORUM_NOT_FOUND') . PHP_EOL;
-			$buttons[$this->language->lang('EBT_BACK')] = 'initial';
-		}
-		//Save a chat state, that allows to page through the entries
-		$this->forum_api->store_telegram_chat_state($chat_id, 0, 'T', $page);
-		return $this->telegram_api->prepareMessage($text, $buttons);
-	}
-
-	/** Show the given page of all forums.  */
-	private function onAllForums($user_id, $chat_id, $back_to_forum_id, $page = 0, $warning = false)
-	{
-		$forums = $this->forum_api->selectAllForums( $user_id );
-		$total_count = count($forums);
-		while ($page * 6 >= $total_count)
-		{
-			$page--;
-		}
-		if ($page < 0)
-		{
-			$page = 0;
-		}
-		$forums = array_slice($forums, $page * 6, null, true);
-
-		$buttons = array();
-		//List of forums:\n\n
-		$text = $this->language->lang('EBT_FORUM_LIST_TITLE', $this->config['sitename'], $total_count) . PHP_EOL . PHP_EOL;
-		$i = 1;
-		foreach ($forums as $forum)
-		{
-			$id = $forum['id'];
-			$title = $forum['title'];
-			$lastTopicDate = date('d.m.y', $forum['lastTopicDate']);
-			$lastTopicTitle = $forum['lastTopicTitle'];
-			$lastTopicAuthor = $forum['lastTopicAuthor'];
-			$num = $i + $page * 6;
-			$readonly = ($forum['post'] || $forum['reply']) ? '' : $this->language->lang('EBT_READ_ONLY');
-			$text .= " $num: <b>$title</b>$readonly" . PHP_EOL;
-			//Last post at %s by <b>%s</b>
-			$text .= $this->language->lang('EBT_LAST_POST', $lastTopicDate, $lastTopicAuthor) . PHP_EOL;
-			$text .= $lastTopicTitle . PHP_EOL;
-			$text .= '<u>___________________________________</u>' . PHP_EOL;
-
-			$buttonText = "$num: $title";
-			$buttons[$buttonText] = "allForumTopics~f$id";
-			$i++;
-			if ($i > 6)
-			{
-				break; //6 per page, such that the button list stays short.
-			}
-		}
-		if ($warning)
-		{
-			$text .=  $warning . PHP_EOL;
-		}
-		// "Use one of the buttons to select a forum";
-		$text .= $this->language->lang('EBT_SELECT_A_FORUM');
-		if ($total_count > 6)
-		{
-			// Send '+' or '-' to show next or previous page;
-			$text .= PHP_EOL . $this->language->lang('EBT_SELECT_NEXT_PAGE') . PHP_EOL;
-		}
-		if ($back_to_forum_id)
-		{
-			$buttons[$this->language->lang('EBT_BACK')] = "allForumTopics~f$back_to_forum_id";
-		}
-		//Save a chat state, that allows to page through the entries
-		$this->forum_api->store_telegram_chat_state($chat_id, 0, 'F', $page);
-
-		return $this->telegram_api->prepareMessage($text, $buttons);
-	}
-
-	/** Display the topic with the given topic_id. Page refers to the page, of
-	 * the topics-list, such that the return-button can go back to the same page.
-	 */
-	private function onShowTopic($user_id, $topic, $page = 0)
-	{
-		$text = '';
-		$posts = $this->forum_api->selectTopicPosts($user_id, $topic);
-		$first = true;
-		$readonly = true;
-		$viewtopic_url = generate_board_url() . '/viewtopic.php?t=';
-		foreach ($posts as $post)
-		{
-			$time = date('d.m.y H:i', $post['time']);
-			$user = $post['username'];
-			$not_approved = '';
-			if (!$post['approved'])
-			{
-				$not_approved = $this->language->lang('POST_UNAPPROVED_EXPLAIN');
-				$not_approved = "<i><b>$not_approved</b></i>" . PHP_EOL;
-			}
-			if ($first)
-			{
-				$title = $post['title'];
-				// "<b>$time:</b> Topic created by <b>$user</b>\n";
-				$text .= $this->language->lang('EBT_TOPIC_AT_BY', $time, $user) . PHP_EOL;
-				// "Titel: <b>$title</b>\n";
-				$text .= $this->language->lang('EBT_TOPIC_TITLE', $title, $viewtopic_url . $topic) . PHP_EOL;
-				$text .= $not_approved;
-				$text .= $post['text'];
-				$readonly = !$post['reply'];
-				$first = false;
-			} else
-			{
-				// "<b>$time:</b> Reply from <b>$user</b>\n";
-				$text .= $this->language->lang('EBT_REPLY_AT_BY', $time, $user) . PHP_EOL;
-				$text .= $not_approved;
-				$text .= $post['text'];
-			}
-			$text .= PHP_EOL . '<u>___________________________________</u>' . PHP_EOL;
-		}
-		if (count($posts) == 0)
-		{
-			// "Illegal attempt to read topic with ID $topic";
-			$text = $this->language->lang('EBT_ILLEGAL_TOPIC_ID', $topic);
-		}
-
-		$buttons = array();
-		if (!$readonly)
-		{
-			$buttons[$this->language->lang('EBT_NEW_REPLY')] = "newPost~t$topic";
-		}
-		$buttons[$this->language->lang('EBT_BACK')] = "allForumTopics~p$page";
-		return $this->telegram_api->prepareMessage($text, $buttons);
-	}
-
-	private function onNewPost($topic)
-	{
-		// Send your reply or use the cancel button
-		$text = $this->language->lang('EBT_REQUEST_POST');
-		$buttons = array($this->language->lang('EBT_CANCEL') => 'initial');
-		return $this->telegram_api->prepareMessage($text, $buttons);
-	}
-
-	private function onNewTopicTitle()
-	{
-		// Send the title for your new post or use the cancel button
-		$text = $this->language->lang('EBT_REQUEST_TITLE');
-		$buttons = array($this->language->lang('EBT_CANCEL') => 'initial');
-		return $this->telegram_api->prepareMessage($text, $buttons);
-	}
-
-	private function onNewTopicText($title)
-	{
-		// Send the text for your new post with title <b>$title</b> or use the cancel button.
-		$text = $this->language->lang('EBT_REQUEST_TEXT_FOR_TITLE', $title);
-		$buttons = array($this->language->lang('EBT_CANCEL') => 'initial');
-		return $this->telegram_api->prepareMessage($text, $buttons);
-	}
-
-	private function onNewTopicSaved($title, $content, $user, $forum_id)
-	{
-		$saved = $this->forum_api->insertNewPost(true, $forum_id, $title, $content, $user);
-		if ($saved)
-		{
-			// The following post was saved.
-			$text = $this->language->lang('EBT_TOPIC_SAVED') . PHP_EOL;
-			// Title: <a href="%2$s"><b>%1$s</b></a>
-			// Empty link here (2nd Parameter).
-			$text .= $this->language->lang('EBT_TOPIC_TITLE', $title, '') . PHP_EOL;
-			$text .= $content;
-			$buttons = array($this->language->lang('EBT_BACK') => 'initial');
-			return $this->telegram_api->prepareMessage($text, $buttons);
-		} else
-		{
-			return $this->onSaveFailed();
-		}
-	}
-
-	private function onSaveFailed()
-	{
-		// For some unknown reason, saving your new entry failed.
-		$text = $this->language->lang('EBT_TOPIC_SAVE_FAILED');
-		$buttons = array($this->language->lang('EBT_BACK') => 'initial');
-		return $this->telegram_api->prepareMessage($text, $buttons);
-	}
-
-	private function onCallFromGroupOrChannel()
-	{
-		// The forum cannot be called via groups or channels.
-		$text = $this->language->lang('EBT_GROUP_OR_CHANNEL_CALL') . PHP_EOL;
-		return $this->telegram_api->prepareMessage($text);
 	}
 
 	private function log_obj($obj)

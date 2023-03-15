@@ -1,5 +1,10 @@
 # Telegram Bridge
 
+## Update
+
+**Important**: If you update from a previous version, de-activate the extension, before installing the new version.
+
+Note: Unfortunately, as a side effect, the notification settings of the users get lost, when the extension is deactivated.
 ## Installation
 
 ### From release

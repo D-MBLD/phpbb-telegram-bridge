@@ -39,9 +39,11 @@ $lang = array_merge($lang, [
 	'EB_TELEGRAM_NOTIFICATION'	=> 'Telegram Bridge notification',
 	//Automatically compiled as column title in notification method selection
 	'EB_TELEGRAM_NOTIFICATION_METHOD_TELEGRAM'	=> 'Telegram',
+	'EB_TELEGRAM_NOTIFICATION_METHOD_TELEGRAM_NP'	=> 'Telegram<br>(No Permission)',
 
 	//Notification
 	'EBT_FULL_TOPIC'	=> 'Show complete topic',
+	'EBT_SHOW_FORUM'	=> 'Show forum',
 
 	//Forum list
 	'EBT_FORUM_LIST_TITLE'	=> '<u>%1$s has %2$s forums:</u>',
@@ -92,6 +94,15 @@ $lang = array_merge($lang, [
 								'<br>Don\'t send other messages in between. Otherwise you have to request a new code.',
 
 	'EBT_REQUEST_EMAIL'	=> 'Send email',
+
+	//Permissions
+	'EBT_PERMISSION_TITEL' => '<b>You have the following permissions:</b>',
+	'EBT_PERMISSION_NOTIFY_YES' => 'You can receive notifications via telegram.',
+	'EBT_PERMISSION_NOTIFY_NO' => 'You <b>cannot</b> receive notifications via telegram.',
+	'EBT_PERMISSION_BROWSE_YES' => 'You can browse and read the forum via telegram.',
+	'EBT_PERMISSION_BROWSE_NO' => 'You <b>cannot</b> browse and read the forum via telegram.',
+	'EBT_PERMISSION_POST_YES' => 'You can post new topics and replies via telegram.',
+	'EBT_PERMISSION_POST_NO' => 'You <b>cannot</b> post new topics and replies via telegram.',
 
 	//Button outdated
 	'EBT_BUTTON_OUTDATED' => 'Please use only buttons of the last message.',

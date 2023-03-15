@@ -44,17 +44,17 @@ class forum_api {
 		$this->php_ext = $php_ext;
 	}
 
+	/** Simplified permission reader, used to check if notification should show reply button. */
+	public function has_reply_permission($user_id, $forum_id) {
+		$acls = $this->auth->acl_get_list($user_id, 'f_reply', $forum_id);
+		return isset($acls[$forum_id]['f_reply']);
+	}
+
 	/** Returns an array of forum_ids (key) and assigned arrays with values
 	 * for read, post, reply and moderated.
 	 * Only forums with at least read-permission are returned.
 	 * If a parent-forum has no read or list permission, the children forums are
 	 * not listed (even if they would have more permissions).
-	 *
-	 * Not yet implemented:
-	 * Permissions for browsing and posting into the forum via telegram may in general
-	 * be prohibited/allowed by special telegram-permissions.
-	 * If the user has in general no browsing-permission, a special entry
-	 * [0] => ['read' => false] could be returned here.
 	 *
 	 * Example:
 	 * Array
@@ -97,7 +97,6 @@ class forum_api {
 			}
 		}
 		//Convert into an easier to use array
-		$permissions = array();
 		foreach ($acls as $forum_id => $rights)
 		{
 			if (!isset($rights['f_read']))
@@ -119,13 +118,18 @@ class forum_api {
 		return $forumName;
 	}
 
-	/** Read all forums the user has permission for.
+	/** Read all forums the user has at least reading permission for.
 	 *  The result array has the fields
 	 *	- id
 	 *	- title
 	 *	- lastTopicTitle
 	 *	- lastTopicDate
 	 *	- lastTopicAuthor
+	 *	- post (true/false for post permission)
+	 *	- moderated (true/false whether posts must be approved)
+	 *
+	 * @param int $user_id
+	 * @param int $forum_id
 	 */
 	public function selectAllForums($user_id, $forum_id = 0)
 	{
@@ -154,6 +158,7 @@ class forum_api {
 								'lastTopicDate' => $row['forum_last_post_time'],
 								'lastTopicAuthor' => $row['forum_last_poster_name'],
 								'post' => $forum_permissions[$forum_id]['post'],
+								'reply' => $forum_permissions[$forum_id]['reply'],
 								'moderated' => $forum_permissions[$forum_id]['moderated']
 				);
 			}
@@ -258,10 +263,20 @@ class forum_api {
 		$sql .= " (chat_id, forum_id) VALUES('$chat_id', '$forum_id')";
 		$sql .= ' ON DUPLICATE KEY UPDATE ';
 		$sql .= " forum_id = '$forum_id'";
+		$sql .= ', page = 0'; //New forum starts with first page
 		$this->db->sql_query($sql);
 	}
 
-	public function store_telegram_chat_state($chat_id, $topic_id = 0, $state = 0, $title = '')
+	/** Following states are used:
+	 * V: User is not yet verified. Expected Code is stored in title-field.
+	 * F: List of forums is displayed.
+	 * T: List of topics is displayed.
+	 * P: Display the topic (or post) given by topic_id
+	 * 1: Wait for new reply for given topic_id
+	 * 2: Wait for title of new topic in current forum
+	 * 3: Wait for text of new topic. Previously sent title is stored in title field
+	 */
+	public function store_telegram_chat_state($chat_id, $topic_id = 0, $state = 0, $title = '', $page = -1)
 	{
 		if (!$chat_id)
 		{
@@ -270,12 +285,16 @@ class forum_api {
 		$title_escaped = $this->db->sql_escape($title);
 
 		$sql = 'INSERT INTO phpbb_eb_telegram_chat';
-		$sql .= ' (chat_id, message_id, forum_id, topic_id, state, title)';
-		$sql .= " VALUES('$chat_id', 0, 0, '$topic_id', '$state', '$title')";
+		$sql .= ' (chat_id, message_id, forum_id, topic_id, state, title, page)';
+		$sql .= " VALUES('$chat_id', 0, 0, '$topic_id', '$state', '$title', 0)";
 		$sql .= ' ON DUPLICATE KEY UPDATE';
 		$sql .= " topic_id = '$topic_id'";
 		$sql .= ", state = '$state'";
 		$sql .= ", title = '$title_escaped'";
+		if ($page >= 0)
+		{
+			$sql .= ", page = '$page'";
+		}
 		$this->db->sql_query($sql);
 	}
 
@@ -290,7 +309,7 @@ class forum_api {
 	{
 		$telegram_data = array();
 		$db = $this->db;
-		$sql = 'SELECT chat_id, message_id, forum_id, topic_id, state, title FROM phpbb_eb_telegram_chat';
+		$sql = 'SELECT chat_id, message_id, forum_id, topic_id, state, title, page FROM phpbb_eb_telegram_chat';
 		if ($chat_id)
 		{
 			$sql .= " WHERE chat_id = $chat_id";
@@ -298,12 +317,7 @@ class forum_api {
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
-			$telegram_data[] = array( 'chat_id' => $row['chat_id'],
-							 'message_id' => $row['message_id'],
-							 'state' => $row['state'],
-							 'forum_id' => $row['forum_id'],
-							 'topic_id' => $row['topic_id'],
-							 'title' => $row['title'] );
+			$telegram_data[] = $row;
 		}
 		$db->sql_freeresult($result);
 		if (isset($telegram_data))
@@ -354,6 +368,21 @@ class forum_api {
 		$db->sql_freeresult($result);
 		return $users;
 	}
+
+	/** Get the telegram specific permissions for the user.
+	 * Returns an array containing all telegram specific permissions assigned to true or false.
+	 */
+	public function read_telegram_permissions($user_id)
+	{
+		$permissions = array('u_ebt_notify' => false, 'u_ebt_browse' => false, 'u_ebt_post' => false);
+		$acls = $this->auth->acl_get_list($user_id, array_keys($permissions), false);
+		foreach($permissions as $key => $has_permission)
+		{
+			$permissions[$key] = isset($acls[0][$key]);
+		}
+		return $permissions;
+	}
+
 
 	public function send_email($user)
 	{

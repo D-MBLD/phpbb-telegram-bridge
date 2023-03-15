@@ -3,8 +3,8 @@
     "type": "phpbb-extension",
     "description": "",
     "homepage": "https://github.com/D-MBLD/phpbb-telegram-bridge",
-    "version": "1.0.1-dev",
-    "time": "2022-12-21",
+    "version": "1.0.2-dev",
+    "time": "2023-03-14",
     "license": "GPL-2.0-only",
     "authors": [
         {

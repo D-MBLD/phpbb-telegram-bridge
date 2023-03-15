@@ -19,7 +19,7 @@ namespace eb\telegram;
 class ext extends \phpbb\extension\base
 {
 
-	//TODO: Add a disable_step() which deletes all entries
+	//Add a disable_step() which deletes all entries
 	//for telegram-method in the users_notification table.
 	//Otherwise the forum will try to load this notification method
 	//and fail.
@@ -36,20 +36,5 @@ class ext extends \phpbb\extension\base
 		$migration = $this->migrator->get_migration('\eb\telegram\migrations\delete_method');
 		$migration->delete_notification_method();
 		return false;
-		// Only have the finder search in this extension path directory
-		$migrations = $this->extension_finder
-		->extension_directory('/migrations')
-		->find_from_extension($this->extension_name, $this->extension_path);
-
-		$migrations = $this->extension_finder->get_classes_from_files($migrations);
-
-		foreach ($migrations as $migration)
-		{
-			if (method_exists($migration, 'delete_notification_method'))
-			{
-				//echo "<br>Found matching $migration in disable_step<br>";
-				$migration->delete_notification_method();
-			}
-		}
 	}
 }

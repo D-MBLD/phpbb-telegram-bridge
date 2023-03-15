@@ -39,9 +39,11 @@ $lang = array_merge($lang, [
 	'EB_TELEGRAM_NOTIFICATION'	=> 'Telegram Nachrichten',
 	//Automatically compiled as column title in notification method selection
 	'EB_TELEGRAM_NOTIFICATION_METHOD_TELEGRAM'	=> 'Telegram',
+	'EB_TELEGRAM_NOTIFICATION_METHOD_TELEGRAM_NP'	=> 'Telegram<br>(Keine Berechtigung)',
 
 	//Notification
 	'EBT_FULL_TOPIC'	=> 'Beitrag vollst. anzeigen',
+	'EBT_SHOW_FORUM'	=> 'Forum anzeigen',
 
 	//Forum list
 	'EBT_FORUM_LIST_TITLE'	=> '<u>In %1$s gibt es %2$s Foren:</u>',
@@ -93,6 +95,15 @@ $lang = array_merge($lang, [
 								'<br>Sende dazwischen keine anderen Nachrichten, sonst musst du erneut einen Code anfordern.' ,
 
 	'EBT_REQUEST_EMAIL'	=> 'E-Mail anfordern',
+
+	//Permissions
+	'EBT_PERMISSION_TITEL' => '<b>Du hast folgende Berechtigungen:</b>',
+	'EBT_PERMISSION_NOTIFY_YES' => 'Du kannst Benachrichtigungen per Telegram erhalten.',
+	'EBT_PERMISSION_NOTIFY_NO' => 'Du kannst <b>keine</b> Benachrichtigungen per Telegram erhalten.',
+	'EBT_PERMISSION_BROWSE_YES' => 'Du kannst das Forum per Telegram durchblättern und lesen.',
+	'EBT_PERMISSION_BROWSE_NO' => 'Du kannst das Forum per Telegram <b>nicht</b> lesen.',
+	'EBT_PERMISSION_POST_YES' => 'Du kannst neue Beiträge und Antworten per Telegram schreiben.',
+	'EBT_PERMISSION_POST_NO' => 'Du kannst <b>keine</b> neuen Beiträge per Telegram schreiben.',
 
 	//Button outdated
 	'EBT_BUTTON_OUTDATED' => 'Bitte nutze nur die Tasten der letzten Telegram-Nachricht.',

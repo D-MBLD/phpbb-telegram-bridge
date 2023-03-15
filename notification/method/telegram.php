@@ -17,31 +17,36 @@
 class telegram extends \phpbb\notification\method\messenger_base
 {
 
-		protected $user;
-		protected $config;
-		protected $language;
-		protected $telegram_api;
-		protected $forum_api;
+	/** @var \phpbb\user */
+	protected $user;
+	/** @var \phpbb\config\config */
+	protected $config;
+	/** @var \phpbb\language\language */
+	protected $language;
+	/** @var \eb\telegram\core\telegram_api */
+	protected $telegram_api;
+	/** @var \eb\telegram\core\forum_api */
+	protected $forum_api;
 
-		public function __construct(
-			\phpbb\user_loader $user_loader,
-			\phpbb\user $user,
-			\phpbb\language\language $language,
-			\phpbb\config\config $config,
-			$phpbb_root_path,
-			$php_ext,
-			\eb\telegram\core\telegram_api $telegram_api,
-			\eb\telegram\core\forum_api $forum_api
-			)
-		{
-			parent::__construct($user_loader, $phpbb_root_path, $php_ext);
-			$this->user 	= $user;
-			$this->config 	= $config;
-			$this->language = $language;
-			$this->telegram_api = $telegram_api;
-			$this->forum_api = $forum_api;
-			$this->language->add_lang('common', 'eb/telegram');
-		}
+	public function __construct(
+		\phpbb\user_loader $user_loader,
+		\phpbb\user $user,
+		\phpbb\language\language $language,
+		\phpbb\config\config $config,
+		$phpbb_root_path,
+		$php_ext,
+		\eb\telegram\core\telegram_api $telegram_api,
+		\eb\telegram\core\forum_api $forum_api
+		)
+	{
+		parent::__construct($user_loader, $phpbb_root_path, $php_ext);
+		$this->user 	= $user;
+		$this->config 	= $config;
+		$this->language = $language;
+		$this->telegram_api = $telegram_api;
+		$this->forum_api = $forum_api;
+		$this->language->add_lang('common', 'eb/telegram');
+	}
 
 	/**
 	* Get notification method name
@@ -127,8 +132,6 @@ class telegram extends \phpbb\notification\method\messenger_base
 		//Make chat_id the index of the array
 		$verified_chat_ids = array_column($verified_telegram_users, null, 'chat_id');
 
-		// global $config, $phpbb_container; //not sure if necessary. May be needed by functions_messenger
-
 		if (!class_exists('messenger'))
 		{
 			include($this->phpbb_root_path . 'includes/functions_messenger.' . $this->php_ext);
@@ -150,8 +153,14 @@ class telegram extends \phpbb\notification\method\messenger_base
 			{
 				continue;
 			}
-
+			
 			if ($user['user_type'] == USER_IGNORE || in_array($notification->user_id, $banned_users))
+			{
+				continue;
+			}
+
+			$permissions = $this->forum_api->read_telegram_permissions($notification->user_id);
+			if (!$permissions['u_ebt_notify'])
 			{
 				continue;
 			}
@@ -165,6 +174,22 @@ class telegram extends \phpbb\notification\method\messenger_base
 			}
 
 			$template_variables = $notification->get_email_template_variables();
+
+			$forum_id = $template_variables['FORUM_ID'] ?? false;
+			if ($forum_id) {
+				// Overwrite the post permissions, if the user has no reply permission.
+				$permissions['u_ebt_post'] = $permissions['u_ebt_post'] && $this->forum_api->has_reply_permission($notification->user_id, $forum_id);
+				// Store the corresponding forum as currently selected forum for the users telegram communication
+				$this->forum_api->store_forum_id($telegram_id, $forum_id);
+			}
+			//Also store the topic display as chat-state, such that the back buttons of the further
+			//communication works correctly.
+			$topic_id = $template_variables['TOPIC_ID'] ?? false;
+			if ($topic_id)
+			{
+				$this->forum_api->store_telegram_chat_state($telegram_id, $topic_id, 'P');
+			}
+
 			if (isset($template_variables['POSTER_ID']))
 			{
 				if ($template_variables['POSTER_ID'] == $notification->user_id)
@@ -180,9 +205,9 @@ class telegram extends \phpbb\notification\method\messenger_base
 			$messenger->set_addresses($user);
 
 			$messenger->assign_vars(array_merge(array(
-				'NOTIFICATION_TYPE'             => $notification->get_type(),
-				'USERNAME'						=> $user['username'],
-				'U_NOTIFICATION_SETTINGS'		=> generate_board_url() . '/ucp.' . $this->php_ext . '?i=ucp_notifications&mode=notification_options',
+				'NOTIFICATION_TYPE'       => $notification->get_type(),
+				'USERNAME'                => $user['username'],
+				'U_NOTIFICATION_SETTINGS' => generate_board_url() . '/ucp.' . $this->php_ext . '?i=ucp_notifications&mode=notification_options',
 			), $template_variables));
 
 			/* Send with break=true only prepares the text, but does not send the message */
@@ -191,13 +216,8 @@ class telegram extends \phpbb\notification\method\messenger_base
 			$this->msg = $messenger->msg;
 
 			// Lets send to Telegram
-			$this->send($telegram_id, $this->msg, $template_variables['TOPIC_ID'] ?? null);
-
-			// Store the corresponding forum as currently selected forum for the users telegram communication
-			if (isset($template_variables['FORUM_ID']))
-			{
-				$this->forum_api->store_forum_id($telegram_id,$template_variables['FORUM_ID']);
-			}
+			$this->send($telegram_id, $this->msg, $topic_id, $permissions);
+			
 		}
 		$this->empty_queue();
 	}
@@ -207,8 +227,10 @@ class telegram extends \phpbb\notification\method\messenger_base
 	 *
 	 * @param	string	$telegram_id
 	 * @param	string	$msg
+	 * @param	string|false	$topic_id
+	 * @param	array	$permissions
 	 */
-	public function send($telegram_id, $msg, $topic_id)
+	public function send($telegram_id, $msg, $topic_id, $permissions)
 	{
 		if (!$telegram_id)
 		{
@@ -221,25 +243,30 @@ class telegram extends \phpbb\notification\method\messenger_base
 		   error_log('Error, No message to send',0);
 		   return;
 		}
-		if (isset($topic_id))
+		if ($topic_id)
 		{
-			$buttons = array(
-				$this->language->lang('EBT_NEW_REPLY') => "newPost~t$topic_id",
-				$this->language->lang('EBT_FULL_TOPIC') => "showTopic~t$topic_id",
-				$this->language->lang('EBT_BACK') => 'initial',
-			);
+			//The full topic itself can always be viewed.
+			$buttons[$this->language->lang('EBT_FULL_TOPIC')] = "showTopic~t$topic_id";
+			if ($permissions['u_ebt_post'])
+			{
+				$buttons[$this->language->lang('EBT_NEW_REPLY')] = "newPost~t$topic_id";
+			}
+			if ($permissions['u_ebt_browse'])
+			{
+				$buttons[$this->language->lang('EBT_SHOW_FORUM')] = "allForumTopics";
+			};
 		} else
 		{
 			//This was another notification event, no new post or new topic
 			$buttons = array(
-				$this->language->lang('EBT_BACK') => 'initial',
+				$this->language->lang('EBT_BACK') => 'back',
 			);
 		}
 
 		$messageObject = $this->telegram_api->prepareMessage($msg, $buttons);
 		$messageObject['chat_id'] = $telegram_id;
 		$this->telegram_api->sendOrEditMessage($messageObject);
-		//Clear the message-id, such that using the button, results in
+		//Clear the message-id, such that using a button, results in
 		//a new answer rather than overwriting this notification.
 		$this->forum_api->update_message_id($telegram_id);
 	}

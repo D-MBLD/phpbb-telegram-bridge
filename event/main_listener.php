@@ -23,23 +23,26 @@ class main_listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
-			'core.user_setup'						 => 'load_language_on_setup',
-			'core.ucp_profile_modify_profile_info'	 => 'ucp_profile_modify_profile_info',
-			'core.ucp_profile_info_modify_sql_ary'	 => 'ucp_profile_info_modify_sql_ary',
-			'core.ucp_profile_validate_profile_info' => 'ucp_profile_validate_profile_info',
-			'core.acp_users_modify_profile'			 => 'acp_users_modify_profile',
-			'core.acp_users_profile_modify_sql_ary'	 => 'acp_users_profile_modify_sql_ary',
-			'core.acp_users_profile_validate' 		 => 'acp_users_profile_validate',
+			'core.user_setup'						=> 'load_language_on_setup',
+			'core.ucp_profile_modify_profile_info'	=> 'ucp_profile_modify_profile_info',
+			'core.ucp_profile_info_modify_sql_ary'	=> 'ucp_profile_info_modify_sql_ary',
+			'core.ucp_profile_validate_profile_info'=> 'ucp_profile_validate_profile_info',
+			'core.acp_users_modify_profile'			=> 'acp_users_modify_profile',
+			'core.acp_users_profile_modify_sql_ary'	=> 'acp_users_profile_modify_sql_ary',
+			'core.acp_users_profile_validate'		=> 'acp_users_profile_validate',
+			'core.permissions'						=> 'permissions',
+			'core.ucp_notifications_output_notification_types_modify_template_vars'
+													=> 'ucp_notifications_output',
 		];
 	}
 
-	/* @var \phpbb\request\request  */
+	/** @var \phpbb\request\request  */
 	protected $request;
 
-	/* @var \phpbb\user  */
+	/** @var \phpbb\user  */
 	protected $user;
 
-	/* @var \phpbb\template\template */
+	/** @var \phpbb\template\template */
 	protected $template;
 
 	/** @var string eb\telegram\core\forum_api */
@@ -219,11 +222,54 @@ class main_listener implements EventSubscriberInterface
 		$this->add_telegram_id_to_sql_ary($event, $event['user_row']['user_telegram_id']);
 	}
 
-	public function add_telegram_id_to_sql_ary($event, $telegram_id)
+	private function add_telegram_id_to_sql_ary($event, $telegram_id)
 	{
 		$event['sql_ary'] = array_merge($event['sql_ary'], array(
 			'user_telegram_id' => $telegram_id,
 		));
+	}
+
+	public function permissions($event)
+	{
+		$permissions = $event['permissions'];
+		$permissions['u_ebt_notify'] = ['lang' => 'EBT_PERM_U_NOTIFY', 'cat' => 'telegram'];
+		$permissions['u_ebt_browse'] = ['lang' => 'EBT_PERM_U_BROWSE', 'cat' => 'telegram'];
+		$permissions['u_ebt_post'] = ['lang' => 'EBT_PERM_U_POST', 'cat' => 'telegram'];
+		$event['permissions'] = $permissions;
+
+		$categories = $event['categories'];
+		$categories['telegram'] = 'EBT_PERM_CAT_TG';
+		$event['categories'] = $categories;
+	}
+	
+	/**
+	 * Modify the display of selected notification events, if the user does not have
+	 * permission for notification.
+	 * The column-header contains a hint, and the checkboxes are invalidated.
+	 * 
+	 * $event: method_data, subscriptions, tpl_ary, type_data
+	 */
+	public function ucp_notifications_output($event)
+	{
+		$permissions = $this->forum_api->read_telegram_permissions($this->user->data['user_id']);
+		if ($permissions['u_ebt_notify']) {
+			return;
+		}		
+		//We change the column header.
+		//See template ucp_notifications.html and controller ucp_notifications.php
+		$telegram_header = $this->user->lang['EB_TELEGRAM_NOTIFICATION_METHOD_TELEGRAM_NP'];
+		$this->template->alter_block_array('notification_methods', array(
+			'METHOD'			=> 'eb.telegram.notification.method.telegram',
+			'NAME'				=> $telegram_header,
+		), array('METHOD' => 'eb.telegram.notification.method.telegram'), 'change');
+		
+		//And we deactivate the checkboxes. 
+		$tpl_ary = $event['tpl_ary'];
+		if ($tpl_ary['METHOD'] == 'eb.telegram.notification.method.telegram') {
+			$tpl_ary['AVAILABLE'] = false;
+			$tpl_ary['SUBSCRIBED'] = false;
+			$event['tpl_ary'] = $tpl_ary;
+		}
 	}
 
 }
