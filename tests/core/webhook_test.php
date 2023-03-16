@@ -201,6 +201,75 @@ class webhook_test extends \phpbb_test_case
 		$this->webhook->process_input($payload);
 	}
 
+	/** Test a full call of unregistered user */
+	public function test_how_to_register()
+	{
+		$this->config->expects($this->any())
+			->method('offsetGet')
+			->willReturnMap([ //Map param(s) to return value
+				['eb_telegram_secret', 'sec_token'],
+				['sitename', 'configured sitename'],
+			]);
+		$this->webhook->secret_token = 'sec_token';
+
+		$this->language->expects($this->any())
+			->method('lang')
+			->willReturnArgument(0);
+
+		//No user with that telegram_id
+		$this->forum_api->expects($this->any())
+			->method('find_telegram_user')
+			->with('123')
+			->willReturn(array());
+
+		$eol = PHP_EOL;
+		$expected = array(
+			'disable_web_page_preview' => 'true',
+			'parse_mode' => 'HTML',
+			'text' => 'EBT_HELP_SCREEN_NON_MEMBER',
+			'chat_id' => '123',
+		);
+		/* We are calling 2 times, and expecting 4 messages,
+		 * 2 send to the user, and 2 to the admin.
+		 */
+		$admin_info = "<b>Request from unregistered user:</b>";
+		$this->telegram_api->expects($this->exactly(4))
+			->method('sendOrEditMessage')
+			->withConsecutive(
+							[$this->equalTo($expected)], 
+							[$this->callback(function($input) use ($admin_info)
+							{
+								return (bool)strstr($input['text'], $admin_info);
+							})],
+							[$this->equalTo($expected)], 
+							[$this->callback(function($input) use ($admin_info)
+							{
+								return (bool)strstr($input['text'], $admin_info);
+							})]
+						);
+
+		//Calling with text
+		$json = '{"message": {' .
+			'"from": {' .
+			'	"id": "123"' .
+			'},' .
+			'"chat": {' .
+			'	"id": "123"' .
+			'},' .
+			'"text": "Some Text" }}';
+		$payload = json_decode($json);
+		$this->webhook->process_input($payload);
+		
+		//Calling from a button, could happen after user was deregistered
+		$json = '{"callback_query":' .
+			'{"from": {"id":"123"},' .
+			' "message":{"chat":{"id":"123"},' .
+				'           "message_id":"345"},' .
+				'"data":"allForums"}}';
+		$payload = json_decode($json);
+		$this->webhook->process_input($payload);
+	}
+
 	/**
  	 * getPrivateMethod
  	 *

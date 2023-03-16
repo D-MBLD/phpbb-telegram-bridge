@@ -49,8 +49,6 @@ class commands
 	{
 		// "Please use only buttons of the last message"
 		$text = $this->language->lang('EBT_BUTTON_OUTDATED');
-		//Save previous state, such that it is possible to go back to it.
-		$this->forum_api->store_telegram_chat_state($command['chat_id'], $command['topic_id'] ?? 0, $command['chatState'] ?? 0, $command['title'] ?? '');
 		return [$text, [$this->language->lang('EBT_OK') => 'back']];
 	}
 
@@ -359,7 +357,7 @@ class commands
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 2);
 		// Send the title for your new post or use the cancel button
 		$text = $this->language->lang('EBT_REQUEST_TITLE');
-		$buttons = array($this->language->lang('EBT_CANCEL') => 'back');
+		$buttons = array($this->language->lang('EBT_CANCEL') => 'allForumTopics');
 		return [$text, $buttons];
 	}
 
@@ -376,7 +374,7 @@ class commands
 
 		// Send the text for your new post with title <b>$title</b> or use the cancel button.
 		$text = $this->language->lang('EBT_REQUEST_TEXT_FOR_TITLE', $title);
-		$buttons = array($this->language->lang('EBT_CANCEL') => 'back');
+		$buttons = array($this->language->lang('EBT_CANCEL') => 'allForumTopics');
 		return [$text, $buttons];
 	}
 
@@ -391,6 +389,9 @@ class commands
 		$user = $command['user'];
 		$forum_id = $command['forum_id'];
 		$saved = $this->forum_api->insertNewPost(true, $forum_id, $title, $content, $user);
+		//Reset chat_state to topic-display (for back commands)
+		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 'T');
+
 		if ($saved)
 		{
 			// The following post was saved.
@@ -409,16 +410,18 @@ class commands
 
 	public function onSaveNewPost(&$command)
 	{
-		//Save button should not be available, if user has no permission, 
+		//Save button should not be available, if user has no permission,
 		//but just to be sure, we check again.
 		if (!$command['permissions']['u_ebt_post'])
 		{
 			return $this->onShowPermissions($command);
 		}
 		$saved = $this->forum_api->insertNewPost(false, $command['forum_id'], $command['topic_id'], $command['text'], $command['user']);
+		//Reset chat_state to topic-display (for back commands)
+		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 'T');
 		if ($saved === true)
 		{
-			$this->onShowTopic($command);
+			return $this->onShowTopic($command);
 		} else
 		{
 			$command['admin_info'] = $saved;
