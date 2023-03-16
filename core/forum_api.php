@@ -284,6 +284,10 @@ class forum_api {
 			return;
 		}
 		$title_escaped = $this->db->sql_escape($title);
+		while (strlen($title_escaped) > 120) {
+			$title = substr($title, 0, -1);
+			$title_escaped = $this->db->sql_escape($title);
+		}
 
 		$sql = 'INSERT INTO phpbb_eb_telegram_chat';
 		$sql .= ' (chat_id, message_id, forum_id, topic_id, state, title, page)';
