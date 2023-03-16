@@ -284,7 +284,8 @@ class forum_api {
 			return;
 		}
 		$title_escaped = $this->db->sql_escape($title);
-		while (strlen($title_escaped) > 120) {
+		while (strlen($title_escaped) > 120)
+		{
 			$title = substr($title, 0, -1);
 			$title_escaped = $this->db->sql_escape($title);
 		}
