@@ -78,18 +78,14 @@ $lang = array_merge($lang, [
 									'Forums-Profil ein.',
 
 	//Registration Screens
-	'EBT_HELP_SCREEN_REGISTERED' => '<b>Deine Telegram-ID wurde erfolgreich verifiziert.</b>' .
-								'<br>Vergiss nicht in deinem Profil die Ereignisse auszuwählen, für die du ' .
-								'Benachrichtigungen erhalten möchtest. ' .
-								'Gehe hierzu in dein Profil, wähle "Profil ändern", dann "Einstellungen->Benachrichtigungen einstellen" und ' .
-								'wähle in der Telegram-Spalte die Ereignisse aus.',
+	'EBT_HELP_SCREEN_REGISTERED' => '<b>Deine Telegram-ID wurde erfolgreich verifiziert.</b>',
 
 	'EBT_ILLEGAL_CODE' => " \xE2\x9A\xA0 Der Code war falsch. Bitte fordere einen neuen Code an.", //"\xE2\x9A\xA0" = ⚠
 	'EBT_HELP_SCREEN_REGISTRATION_FAILED' => '<b>Deine Telegram-ID ist noch nicht verifiziert.</b>' .
 								'<br>Nutze die Taste um eine E-Mail an deine hinterlegte Adresse zu senden. ' .
 								'Die E-Mail enthält einen Code, den du per Telegram senden musst.',
 
-	'EBT_HELP_SCREEN_EMAILED' => 	'<b>E-Mail wurde gesendet.</b>' .
+	'EBT_HELP_SCREEN_EMAILED' => '<b>E-Mail wurde gesendet.</b>' .
 								'<br>Prüfe deine Inbox und evtl. auch die Spam-Ordner. ' .
 								'<br>Sende dann sofort den Code als Nachricht.' .
 								'<br>Sende dazwischen keine anderen Nachrichten, sonst musst du erneut einen Code anfordern.' ,
@@ -98,12 +94,16 @@ $lang = array_merge($lang, [
 
 	//Permissions
 	'EBT_PERMISSION_TITEL' => '<b>Du hast folgende Berechtigungen:</b>',
-	'EBT_PERMISSION_NOTIFY_YES' => 'Du kannst Benachrichtigungen per Telegram erhalten.',
-	'EBT_PERMISSION_NOTIFY_NO' => 'Du kannst <b>keine</b> Benachrichtigungen per Telegram erhalten.',
-	'EBT_PERMISSION_BROWSE_YES' => 'Du kannst das Forum per Telegram durchblättern und lesen.',
-	'EBT_PERMISSION_BROWSE_NO' => 'Du kannst das Forum per Telegram <b>nicht</b> lesen.',
-	'EBT_PERMISSION_POST_YES' => 'Du kannst neue Beiträge und Antworten per Telegram schreiben.',
-	'EBT_PERMISSION_POST_NO' => 'Du kannst <b>keine</b> neuen Beiträge per Telegram schreiben.',
+	'EBT_PERMISSION_NOTIFY_YES' => ' - Du kannst Benachrichtigungen per Telegram erhalten.',
+	'EBT_PERMISSION_NOTIFY_NO' => ' - Du kannst <b>keine</b> Benachrichtigungen per Telegram erhalten.',
+	'EBT_PERMISSION_BROWSE_YES' => ' - Du kannst das Forum per Telegram durchblättern und lesen.',
+	'EBT_PERMISSION_BROWSE_NO' => ' - Du kannst das Forum per Telegram <b>nicht</b> lesen.',
+	'EBT_PERMISSION_POST_YES' => ' - Du kannst neue Beiträge und Antworten per Telegram schreiben.',
+	'EBT_PERMISSION_POST_NO' => ' - Du kannst <b>keine</b> neuen Beiträge per Telegram schreiben.',
+	'EBT_SELECT_NOTIFICATIONS' => 'Vergiss nicht in deinem Profil die Ereignisse auszuwählen, für die du ' .
+								'Benachrichtigungen erhalten möchtest. ' .
+								'Gehe hierzu in dein Profil, wähle "Profil ändern", dann "Einstellungen->Benachrichtigungen einstellen" und ' .
+								'wähle in der Telegram-Spalte die Ereignisse aus.',
 
 	//Button outdated
 	'EBT_BUTTON_OUTDATED' => 'Bitte nutze nur die Tasten der letzten Telegram-Nachricht.',

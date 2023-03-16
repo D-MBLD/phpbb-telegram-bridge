@@ -93,6 +93,10 @@ class commands
 		$chat_id = $command['chat_id'];
 		$this->forum_api->store_telegram_chat_state($chat_id);
 		$text = $this->language->lang('EBT_HELP_SCREEN_REGISTERED');
+		//Add the permissions information, using the output of the onShowPermission command.
+		unset($command['text']);
+		[$permissions_text, $ignored_buttons] = $this->onShowPermissions($command);
+		$text .= PHP_EOL . $permissions_text;
 		$buttons[$this->language->lang('EBT_OK')] = 'allForums';
 		return [$text, $buttons];
 	}
@@ -405,6 +409,8 @@ class commands
 
 	public function onSaveNewPost(&$command)
 	{
+		//Save button should not be available, if user has no permission, 
+		//but just to be sure, we check again.
 		if (!$command['permissions']['u_ebt_post'])
 		{
 			return $this->onShowPermissions($command);
@@ -448,6 +454,11 @@ class commands
 		$text .= $command['permissions']['u_ebt_notify'] ?
 					$this->language->lang('EBT_PERMISSION_NOTIFY_YES') :
 					$this->language->lang('EBT_PERMISSION_NOTIFY_NO');
+		if ($command['permissions']['u_ebt_notify'])
+		{
+			$text .= PHP_EOL;
+			$text .= $this->language->lang('EBT_SELECT_NOTIFICATIONS');
+		}
 		$buttons = array($this->language->lang('EBT_BACK') => 'back');
 		return [$text, $buttons];
 	}

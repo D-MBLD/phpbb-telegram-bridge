@@ -78,10 +78,7 @@ $lang = array_merge($lang, [
 	'in order to use the service.',
 
 	//Registration screens
-	'EBT_HELP_SCREEN_REGISTERED' => '<b>Your telegram id has been sucessfully verified.</b>' .
-								'<br>Don\'t forget to select the events for which you want to receive notifications.' .
-								'Therfore select and edit your profile in the forum, go to ' .
-								'"Settings->Edit notification options" and select the events in the telegram column.',
+	'EBT_HELP_SCREEN_REGISTERED' => '<b>Your telegram id has been sucessfully verified.</b>',
 	'EBT_ILLEGAL_CODE' => " \xE2\x9A\xA0 The entered Code was wrong. Please request a new one.", //"\xE2\x9A\xA0" = ⚠
 	'EBT_HELP_SCREEN_REGISTRATION_FAILED' => '<b>Your telegram id is not yet verified.</b>' .
 								'<br>Use the button to request an email to the address stored with your forums profile. ' .
@@ -97,12 +94,15 @@ $lang = array_merge($lang, [
 
 	//Permissions
 	'EBT_PERMISSION_TITEL' => '<b>You have the following permissions:</b>',
-	'EBT_PERMISSION_NOTIFY_YES' => 'You can receive notifications via telegram.',
-	'EBT_PERMISSION_NOTIFY_NO' => 'You <b>cannot</b> receive notifications via telegram.',
-	'EBT_PERMISSION_BROWSE_YES' => 'You can browse and read the forum via telegram.',
-	'EBT_PERMISSION_BROWSE_NO' => 'You <b>cannot</b> browse and read the forum via telegram.',
-	'EBT_PERMISSION_POST_YES' => 'You can post new topics and replies via telegram.',
-	'EBT_PERMISSION_POST_NO' => 'You <b>cannot</b> post new topics and replies via telegram.',
+	'EBT_PERMISSION_NOTIFY_YES' => ' - You can receive notifications via telegram.',
+	'EBT_PERMISSION_NOTIFY_NO' => ' - You <b>cannot</b> receive notifications via telegram.',
+	'EBT_PERMISSION_BROWSE_YES' => ' - You can browse and read the forum via telegram.',
+	'EBT_PERMISSION_BROWSE_NO' => ' - You <b>cannot</b> browse and read the forum via telegram.',
+	'EBT_PERMISSION_POST_YES' => ' - You can post new topics and replies via telegram.',
+	'EBT_PERMISSION_POST_NO' => ' - You <b>cannot</b> post new topics and replies via telegram.',
+	'EBT_SELECT_NOTIFICATIONS' => 'Don\'t forget to select the events for which you want to receive notifications.' .
+								'Therfore select and edit your profile in the forum, go to ' .
+								'"Settings->Edit notification options" and select the events in the telegram column.',
 
 	//Button outdated
 	'EBT_BUTTON_OUTDATED' => 'Please use only buttons of the last message.',
