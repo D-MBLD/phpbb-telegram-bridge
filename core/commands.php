@@ -380,7 +380,7 @@ class commands
 		return [$text, $buttons];
 	}
 
-	public function onNewTopicSaved($command)
+	public function onSaveNewTopic($command)
 	{
 		if (!$command['permissions']['u_ebt_post'])
 		{
