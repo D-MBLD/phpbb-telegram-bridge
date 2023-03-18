@@ -332,7 +332,7 @@ class webhook {
 					break;
 				case '2':
 					// e.g. back form buttonOutdated while waiting for titel
-				case '3': 
+				case '3':
 					// e.g. back form buttonOutdated while waiting for text
 				case 'T': $command['action'] = 'allForumTopics';
 					break;

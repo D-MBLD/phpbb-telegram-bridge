@@ -209,6 +209,7 @@ class webhook_test extends \phpbb_test_case
 			->willReturnMap([ //Map param(s) to return value
 				['eb_telegram_secret', 'sec_token'],
 				['sitename', 'configured sitename'],
+				['site_home_url', 'home_url'],
 			]);
 		$this->webhook->secret_token = 'sec_token';
 
