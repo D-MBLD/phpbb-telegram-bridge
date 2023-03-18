@@ -14,7 +14,8 @@ class telegram_table_v2 extends \phpbb\db\migration\migration
 {
 	public function effectively_installed()
 	{
-		return $this->db_tools->sql_column_exists($this->table_prefix . 'eb_telegram_chat', 'page');
+		return $this->db_tools->sql_table_exists($this->table_prefix . 'eb_telegram_chat')
+				&& $this->db_tools->sql_column_exists($this->table_prefix . 'eb_telegram_chat', 'page');
 	}
 
 	public static function depends_on()
