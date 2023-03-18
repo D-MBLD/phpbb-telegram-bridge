@@ -61,7 +61,7 @@ class webhook {
 		$this->telegram_api = $telegram_api;
 		$this->forum_api = $forum_api;
 		$this->commands = $commands;
-		$this->admin_telegram_id = $this->config['eb_telegram_admin_telegram_id'];
+		$this->admin_telegram_id = $this->config['eb_telegram_admin_telegram_id'] ?? false;
 		$this->echo_to_admin =  $this->config['eb_telegram_admin_echo'];
 	}
 
@@ -446,6 +446,9 @@ class webhook {
 
 	private function send_admin_info($input, $command)
 	{
+		if (!$this->admin_telegram_id) {
+			return;
+		}
 		if ($this->echo_to_admin && !isset($command['admin_info']))
 		{
 			//Modify the input by shortening the text-property and the
