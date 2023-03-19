@@ -58,7 +58,6 @@ $lang = array_merge($lang, [
 	'EBT_TOPIC_LIST_TITLE_EMPTY' => 'В настоящее время в форуме <a href="%3$s"><b>%s</b></a> нет тем.',
 	'EBT_SELECT_TOPIC' => 'Используйте одну из кнопок, чтобы выбрать тему.',
 	'EBT_SELECT_NEXT_PAGE' => 'Отправьте знак \'+\'- или \'-\', чтобы показать следующую/предыдущую страницу.',
-	'EBT_FORUM_NOT_FOUND' => 'Не удалось прочитать форум (Ошибка!?). Пожалуйста, попробуйте снова',
 	'EBT_SHOW_FORUMS' => 'Показать другие форумы',
 	'EBT_ADD_TOPIC' => 'Добавить тему',
 
@@ -93,7 +92,7 @@ $lang = array_merge($lang, [
 	'EBT_REQUEST_EMAIL'	=> 'Отправить письмо',
 	
 	//Permissions
-	'EBT_PERMISSION_TITEL' => '<b>Права доступа:</b>',
+	'EBT_PERMISSION_TITLE' => '<b>Права доступа:</b>',
 	'EBT_PERMISSION_NOTIFY_YES' => ' - Вы можете получать уведомления через Telegram.',
 	'EBT_PERMISSION_NOTIFY_NO' => ' - Вы <b>не можете</b> получать уведомления через Telegram.',
 	'EBT_PERMISSION_BROWSE_YES' => ' - Вы можете просматривать и читать конференцию через Telegram.',
