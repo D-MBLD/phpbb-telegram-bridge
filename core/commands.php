@@ -119,7 +119,7 @@ class commands
 		//Permission check needed
 		$forums = $this->forum_api->selectAllForums($user_id, $forum_id);
 		$forum = reset($forums);
-		
+
 		if ($forum)
 		{
 			$forumName = $forum['title'];
