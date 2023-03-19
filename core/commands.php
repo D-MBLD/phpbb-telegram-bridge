@@ -119,10 +119,10 @@ class commands
 		//Permission check needed
 		$forums = $this->forum_api->selectAllForums($user_id, $forum_id);
 		$forum = reset($forums);
-		$forumName = $forum['title'];
-
+		
 		if ($forum)
 		{
+			$forumName = $forum['title'];
 			//Store the selected forum.
 			$this->forum_api->store_forum_id($chat_id, $forum_id);
 			//Permission check needed

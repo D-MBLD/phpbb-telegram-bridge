@@ -81,17 +81,27 @@ class command_pattern_test extends \phpbb_test_case
 				->with('123')
 				->willReturn($users);
 		}
+		if (!in_array('forum_api->read_telegram_permissions', $exclude))
+		{
+			$permissions = array('u_ebt_notify' => true, 'u_ebt_browse' => true, 'u_ebt_post' => true);
+			$this->forum_api->expects($this->any())
+				->method('read_telegram_permissions')
+				->with('123')
+				->willReturn($permissions);
+		}
 		$this->webhook->secret_token = '123abc';
 		$this->config->expects($this->any())
 			->method('offsetGet')
 			->willReturnMap([ //Map param(s) to return value
 				['eb_telegram_admin_telegram_id', '12345'],
+				['site_home_url', 'home_url'],
 				['eb_telegram_secret', '123abc']
 			]);
 		$this->config->expects($this->any())
 			->method('offsetExists')
 			->willReturnMap([ //Map param(s) to return value
 				['eb_telegram_admin_telegram_id', true],
+				['site_home_url', true],
 				['eb_telegram_secret', true]
 			]);
 	
@@ -175,10 +185,16 @@ class command_pattern_test extends \phpbb_test_case
 		$command = $this->webhook->process_input($input);
 	}
 
-	/** Test illegal button press with unset message id */
-	public function test07_buttonOutdated()
+	/** Test show forums without permission */
+	public function test07_noBrowsePermission()
 	{
-		$this->defaultSetup();
+		$this->defaultSetup(['forum_api->read_telegram_permissions']);
+		$permissions = array('u_ebt_notify' => true, 'u_ebt_browse' => false, 'u_ebt_post' => true);
+		$this->forum_api->expects($this->any())
+			->method('read_telegram_permissions')
+			->with('123')
+			->willReturn($permissions);
+
 		$this->set_chat_state(array('message_id' => '0'));
 		$this->assert_telegram_output('/^EBT_PERMISSION_TITLE/');
 		
@@ -192,11 +208,6 @@ class command_pattern_test extends \phpbb_test_case
 		$this->defaultSetup();
 		$this->set_chat_state(array('state' => 'F'));
 
-		$permissions = array('u_ebt_notify' => false, 'u_ebt_browse' => true, 'u_ebt_post' => false);
-		$this->forum_api->expects($this->any())
-			->method('read_telegram_permissions')
-			->with('123')
-			->willReturn($permissions);
 		$this->forum_api->expects($this->any())
 			->method('selectAllForums')
 			->willReturn(array());
