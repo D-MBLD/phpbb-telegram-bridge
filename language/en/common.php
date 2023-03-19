@@ -58,7 +58,6 @@ $lang = array_merge($lang, [
 	'EBT_TOPIC_LIST_TITLE_EMPTY' => 'Currently there are no topics in the forum <a href="%3$s"><b>%s</b></a>',
 	'EBT_SELECT_TOPIC' => 'Use one of the buttons to select a topic.',
 	'EBT_SELECT_NEXT_PAGE' => 'Send a \'+\'- or \'-\'-sign, to show next/previous page.',
-	'EBT_FORUM_NOT_FOUND' => 'Could not read the forum (!?). Please try again',
 	'EBT_SHOW_FORUMS' => 'Show other forums',
 	'EBT_ADD_TOPIC' => 'Add topic',
 

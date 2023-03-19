@@ -58,7 +58,6 @@ $lang = array_merge($lang, [
 	'EBT_TOPIC_LIST_TITLE_EMPTY' => 'Im Forum <a href="%3$s"><b>%1$s</b></a> gibt es momentan keine Beiträge.',
 	'EBT_SELECT_TOPIC' => 'Nutze die Tasten um einen Beitrag anzuzeigen.',
 	'EBT_SELECT_NEXT_PAGE' => 'Sende ein \'+\'- oder \'-\'-Zeichen um zur nächsten/vorherigen Seite zu blättern.',
-	'EBT_FORUM_NOT_FOUND' => 'Das Forum konnte nicht gelesen werden (!?). Bitte versuche es erneut.',
 	'EBT_SHOW_FORUMS' => 'Alle Foren anzeigen',
 	'EBT_ADD_TOPIC' => 'Neuen Beitrag senden',
 

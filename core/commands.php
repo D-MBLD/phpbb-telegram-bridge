@@ -38,13 +38,6 @@ class commands
 		$this->forum_api = $forum_api;
 	}
 
-	public function onInvalidForum($command)
-	{
-		// "You don\'t have access to the selected forum."
-		$text = $this->language->lang('EBT_ILLEGAL_FORUM');
-		return [$text, [$this->language->lang('EBT_OK') => 'allForums']];
-	}
-
 	public function onButtonOutdated($command)
 	{
 		// "Please use only buttons of the last message"
@@ -204,9 +197,7 @@ class commands
 			$buttons[$this->language->lang('EBT_SHOW_FORUMS')] = 'allForums~p0';
 		} else
 		{
-			// Could not read the forum. Please try again;
-			$text .= $this->language->lang('EBT_FORUM_NOT_FOUND') . PHP_EOL;
-			$buttons[$this->language->lang('EBT_BACK')] = 'allForums';
+			return $this->errorInvalidForum();
 		}
 		return [$text, $buttons];
 	}
@@ -429,14 +420,6 @@ class commands
 		}
 	}
 
-	private function errorOnSave()
-	{
-		// For some unknown reason, saving your new entry failed.
-		$text = $this->language->lang('EBT_TOPIC_SAVE_FAILED');
-		$buttons = array($this->language->lang('EBT_BACK') => 'back');
-		return [$text, $buttons];
-	}
-
 	public function onShowPermissions($command)
 	{
 		$text = '';
@@ -495,4 +478,20 @@ class commands
 		$this->forum_api->store_telegram_chat_state($chat_id, 0, $state, '', $page);
 		return array_slice($list, $page * 6, null, true);
 	}
+
+	private function errorOnSave()
+	{
+		// For some unknown reason, saving your new entry failed.
+		$text = $this->language->lang('EBT_TOPIC_SAVE_FAILED');
+		$buttons = array($this->language->lang('EBT_BACK') => 'back');
+		return [$text, $buttons];
+	}
+
+	private function errorInvalidForum()
+	{
+		// "You don\'t have access to the selected forum."
+		$text = $this->language->lang('EBT_ILLEGAL_FORUM');
+		return [$text, [$this->language->lang('EBT_OK') => 'allForums']];
+	}
+
 }

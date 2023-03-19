@@ -61,8 +61,6 @@ class webhook {
 		$this->telegram_api = $telegram_api;
 		$this->forum_api = $forum_api;
 		$this->commands = $commands;
-		$this->admin_telegram_id = $this->config['eb_telegram_admin_telegram_id'] ?? false;
-		$this->echo_to_admin =  $this->config['eb_telegram_admin_echo'];
 	}
 
 	private $test_call; //Called via URL rather than via webhook.
@@ -101,6 +99,9 @@ class webhook {
 	public function process_input($payload, $test_call = false)
 	{
 		$this->test_call = $test_call;
+		$this->admin_telegram_id = $this->config['eb_telegram_admin_telegram_id'] ?? false;
+		$this->echo_to_admin =  $this->config['eb_telegram_admin_echo'] ?? false;
+
 		$this->debug_output[] = 'Payload:';
 		$this->log_obj($payload);
 		$command = $this->validate_input($payload);
@@ -262,16 +263,6 @@ class webhook {
 		} else
 		{
 			$command = $this->create_command_for_text_input($command);
-		}
-		//In all cases where a forum is preselected, check that the user
-		//has access to that forum.
-		if (isset($command['forum_id']) && $command['permissions']['u_ebt_browse'])
-		{
-			if (!$this->has_permission($command['user']['user_id'], $command['forum_id']))
-			{
-				$command['action'] = 'invalidForum';
-				$command['admin_info'] = "Illegal attempt to read forum {$command['forum_id']} by {$command['chat_id']}";
-			}
 		}
 		return $command;
 	}
