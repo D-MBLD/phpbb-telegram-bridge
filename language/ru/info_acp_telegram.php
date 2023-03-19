@@ -43,12 +43,12 @@ $lang = array_merge($lang, [
 
 	//Used in the event ucp_profile_profile_info_after.html
 	'EBT_TELEGRAM_ID'					=> 'Ваш Telegram ID',
-	'EBT_TELEGRAM_ID_DESCR'				=> 'введите свой цифровой Telegram ID (не путать с @username!) и добавьте бота (<a href="https://t.me/%s">@%s</a>) в свои контакты в Telegram. ' .
-									   'Если вы не знаете свой цифровой ID - отправьте любое сообщение боту и он вам его сообщит.',
+	'EBT_TELEGRAM_ID_DESCR'				=> 'Введите свой цифровой Telegram ID (не путать с @username!) и добавьте бота (<a href="https://t.me/%1$s">@%1$s</a>) в свои контакты в Telegram. ' .
+										'Если вы не знаете свой цифровой ID - отправьте любое сообщение боту и он вам его сообщит.',
 
 	//Used in the event acp_users_profile_after.html
 	'EBT_ACP_UP_TELEGRAM_ID'			=> 'Telegram ID',
-	'EBT_ACP_UP_TELEGRAM_ID_DESCR'		=> 'Цифровой Telegram ID пользователей.',
+	'EBT_ACP_UP_TELEGRAM_ID_DESCR'		=> 'Цифровой Telegram ID пользователя.',
 
 	//Used in both events acp_users_profile_after.html and ucp_profile_profile_info_after.html
 	'EBT_TELEGRAM_ID_NOT_NUMERIC'		=> 'Telegram ID должен состоять только из цифр.',
