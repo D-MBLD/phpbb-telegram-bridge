@@ -71,28 +71,36 @@ class command_pattern_test extends \phpbb_test_case
 		);
 	}
 
-	private function defaultSetup() {
-		$users[] = array('user_id' => 123, 'username' => 'Test User', 'user_lang' => 'en', 'user_telegram_id' => 12345);
-		$this->forum_api->expects($this->any())
-			->method('find_telegram_user')
-			->with('123')
-			->willReturn($users);
+	/** exclude options can be enhanced as needed. */
+	private function defaultSetup($exclude = array()) {
+		if (!in_array('forum_api->find_telegram_user', $exclude))
+		{
+			$users[] = array('user_id' => 123, 'username' => 'Test User', 'user_lang' => 'en', 'user_telegram_id' => 12345);
+			$this->forum_api->expects($this->any())
+				->method('find_telegram_user')
+				->with('123')
+				->willReturn($users);
+		}
+		$this->webhook->secret_token = '123abc';
+		$this->config->expects($this->any())
+			->method('offsetGet')
+			->willReturnMap([ //Map param(s) to return value
+				['eb_telegram_admin_telegram_id', '12345'],
+				['eb_telegram_secret', '123abc']
+			]);
+		$this->config->expects($this->any())
+			->method('offsetExists')
+			->willReturnMap([ //Map param(s) to return value
+				['eb_telegram_admin_telegram_id', true],
+				['eb_telegram_secret', true]
+			]);
+	
 	}
 
 	public function test01_howToRegister()
 	{
+		$this->defaultSetup(['forum_api->find_telegram_user']);
 		//Test if admin receives the information also
-		$this->config->expects($this->any())
-		->method('offsetGet')
-		->willReturnMap([ //Map param(s) to return value
-			['eb_telegram_admin_telegram_id', '12345'],
-		]);
-		$this->config->expects($this->any())
-		->method('offsetExists')
-		->willReturnMap([ //Map param(s) to return value
-			['eb_telegram_admin_telegram_id', true],
-		]);
-
 		// No default-setup: Don't return a user for this testcase
 		$this->forum_api->expects($this->once())
 			->method('find_telegram_user')
