@@ -92,7 +92,7 @@ $lang = array_merge($lang, [
 	'EBT_REQUEST_EMAIL'	=> 'Send email',
 
 	//Permissions
-	'EBT_PERMISSION_TITEL' => '<b>You have the following permissions:</b>',
+	'EBT_PERMISSION_TITLE' => '<b>You have the following permissions:</b>',
 	'EBT_PERMISSION_NOTIFY_YES' => ' - You can receive notifications via telegram.',
 	'EBT_PERMISSION_NOTIFY_NO' => ' - You <b>cannot</b> receive notifications via telegram.',
 	'EBT_PERMISSION_BROWSE_YES' => ' - You can browse and read the forum via telegram.',

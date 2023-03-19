@@ -291,7 +291,7 @@ class commands
 				$title = $post['title'];
 				// "<b>$time:</b> Topic created by <b>$user</b>\n";
 				$text .= $this->language->lang('EBT_TOPIC_AT_BY', $time, $user) . PHP_EOL;
-				// "Titel: <b>$title</b>\n";
+				// "Title: <b>$title</b>\n";
 				$text .= $this->language->lang('EBT_TOPIC_TITLE', $title, $viewtopic_url . $topic_id) . PHP_EOL;
 				$text .= $not_approved;
 				$text .= $post['text'];
@@ -344,7 +344,7 @@ class commands
 		{
 			return $this->onShowPermissions($command);
 		}
-		//Set state "Waiting for Titel" (without changing forum_id)
+		//Set state "Waiting for Title" (without changing forum_id)
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 2);
 		// Send the title for your new post or use the cancel button
 		$text = $this->language->lang('EBT_REQUEST_TITLE');
@@ -359,8 +359,7 @@ class commands
 			return $this->onShowPermissions($command);
 		}
 		$title = $command['text'];
-		//Save the titel and set state to "Waiting for new Text"
-		//TODO: Shorten title to 120 chars if necessary
+		//Save the title and set state to "Waiting for new Text"
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 3, $title);
 
 		// Send the text for your new post with title <b>$title</b> or use the cancel button.
@@ -427,7 +426,7 @@ class commands
 		{
 			$text = $this->language->lang('EBT_ILLEGAL_INPUT', $command['text']) . PHP_EOL;
 		}
-		$text .= $this->language->lang('EBT_PERMISSION_TITEL');
+		$text .= $this->language->lang('EBT_PERMISSION_TITLE');
 		$text .= PHP_EOL;
 		$text .= $command['permissions']['u_ebt_browse'] ?
 					$this->language->lang('EBT_PERMISSION_BROWSE_YES') :

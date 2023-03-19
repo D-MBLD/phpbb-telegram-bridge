@@ -105,7 +105,7 @@ class command_pattern_test extends \phpbb_test_case
 			->method('sendOrEditMessage')
 			->withConsecutive(
 				[$this->callback(function($input) use ($user_text) { return $this->accept_text_and_buttons($input, $user_text); })],
-				[$this->callback(function($input) use ($admin_text) { return $this->accept_text_and_buttons($input, $admin_text); })],
+				[$this->callback(function($input) use ($admin_text) { return $this->accept_text_and_buttons($input, $admin_text); })]
 			);
 		
 		$input = $this->create_button_input('allForums'); //try with a valid input
@@ -150,7 +150,7 @@ class command_pattern_test extends \phpbb_test_case
 		$this->defaultSetup();
 		$this->set_chat_state(array('state' => 'V', 'title' => 'xyz'));
 		//In the following pattern, * must also match EOL, therefore the s modifier
-		$this->assert_telegram_output('/^EBT_HELP_SCREEN_REGISTERED.*EBT_PERMISSION_TITEL/s');
+		$this->assert_telegram_output('/^EBT_HELP_SCREEN_REGISTERED.*EBT_PERMISSION_TITLE/s');
 		
 		$input = $this->create_text_input('xyz');
 		$command = $this->webhook->process_input($input);
@@ -172,7 +172,7 @@ class command_pattern_test extends \phpbb_test_case
 	{
 		$this->defaultSetup();
 		$this->set_chat_state(array('message_id' => '0'));
-		$this->assert_telegram_output('/^EBT_PERMISSION_TITEL/');
+		$this->assert_telegram_output('/^EBT_PERMISSION_TITLE/');
 		
 		$input = $this->create_button_input('allForums'); //try with a valid input, but no permission
 		$command = $this->webhook->process_input($input);

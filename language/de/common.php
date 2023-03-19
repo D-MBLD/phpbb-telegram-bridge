@@ -92,7 +92,7 @@ $lang = array_merge($lang, [
 	'EBT_REQUEST_EMAIL'	=> 'E-Mail anfordern',
 
 	//Permissions
-	'EBT_PERMISSION_TITEL' => '<b>Du hast folgende Berechtigungen:</b>',
+	'EBT_PERMISSION_TITLE' => '<b>Du hast folgende Berechtigungen:</b>',
 	'EBT_PERMISSION_NOTIFY_YES' => ' - Du kannst Benachrichtigungen per Telegram erhalten.',
 	'EBT_PERMISSION_NOTIFY_NO' => ' - Du kannst <b>keine</b> Benachrichtigungen per Telegram erhalten.',
 	'EBT_PERMISSION_BROWSE_YES' => ' - Du kannst das Forum per Telegram durchblättern und lesen.',

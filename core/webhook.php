@@ -322,7 +322,7 @@ class webhook {
 				case 'F': $command['action'] = 'allForums';
 					break;
 				case '2':
-					// e.g. back form buttonOutdated while waiting for titel
+					// e.g. back form buttonOutdated while waiting for title
 				case '3':
 					// e.g. back form buttonOutdated while waiting for text
 				case 'T': $command['action'] = 'allForumTopics';
@@ -375,7 +375,7 @@ class webhook {
 				$command['action'] = 'saveNewPost';
 				break;
 			case '2':
-				//Entered text is the titel for a new topic
+				//Entered text is the title for a new topic
 				$command['action'] = 'newTopicText';
 				break;
 			case '3':
@@ -437,7 +437,8 @@ class webhook {
 
 	private function send_admin_info($input, $command)
 	{
-		if (!$this->admin_telegram_id) {
+		if (!$this->admin_telegram_id)
+		{
 			return;
 		}
 		if ($this->echo_to_admin && !isset($command['admin_info']))
