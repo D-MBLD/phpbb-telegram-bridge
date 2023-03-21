@@ -406,6 +406,7 @@ class commands
 		{
 			return $this->onShowPermissions($command);
 		}
+		$command['text'] = $this->format_text($command['text'], $command['entities'] ?? array());
 		$saved = $this->forum_api->insertNewPost(false, $command['forum_id'], $command['topic_id'], $command['text'], $command['user']);
 		//Reset chat_state to topic-display (for back commands)
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 'T');
@@ -491,6 +492,70 @@ class commands
 		// "You don\'t have access to the selected forum."
 		$text = $this->language->lang('EBT_ILLEGAL_FORUM');
 		return [$text, [$this->language->lang('EBT_OK') => 'allForums']];
+	}
+
+	public function format_text($text, $entities) {
+		/* Split the text, at every point where a formatting starts or ends into an array.
+		 * Therefore we collect at first all splitpoints, and remove duplicates.
+		 */
+		$split_points[] = 0;
+		foreach ($entities as $entity)
+		{
+			$split_points[] = $entity->offset;
+			$split_points[] = $entity->offset + $entity->length;
+		}
+		$split_points = array_unique($split_points);
+		rsort($split_points);
+		$chunks = array();
+		foreach($split_points as $point) {
+			$chunks[$point] = mb_substr($text, $point);
+			$text = mb_substr($text, 0, $point);
+		}		
+		ksort($chunks);
+		//Sort by end of formatting, such that in case of overlapping formats, the opening tag
+		//for the format, that gets closed last is placed at first.
+		usort($entities, function($a, $b) {return (($a->offset + $a->length) < ($b->offset + $b->length)) ? -1 : 1;});
+		foreach ($entities as $entity)
+		{
+			$bbcode = $this->get_bbcode($entity->type);
+			if (!$bbcode) {
+				continue;
+			}
+			$chunks[$entity->offset] = $bbcode . $chunks[$entity->offset];
+		}
+		for ($i = count($entities) - 1; $i >= 0; $i--)
+		{
+			$entity = $entities[$i];
+			$bbcode = $this->get_bbcode($entity->type, false);
+			if (!$bbcode) {
+				continue;
+			}
+			$bbcode_start = $this->get_bbcode($entity->type);
+			$end = $entity->offset + $entity->length;
+			if (strpos($chunks[$end], $bbcode_start) === 0)
+			{
+				//Remove ending tag immediatly followed by starting tag
+				$chunks[$end] = substr($chunks[$end], strlen($bbcode_start));
+			} else
+			{
+				$chunks[$end] = $bbcode . $chunks[$end];
+			}
+		}
+		//Remove non printable whitespace, which may have been included, when user copies
+		//a part of a post, where the whitespace was added. (See telegrami_api->htmlentitiesForTelegram)
+		$text = implode('', $chunks);
+		$text = str_replace("/\u{200B}", "/", $text);
+		return $text;
+	}
+
+	private function get_bbcode($format_type, $start = true) {
+		switch($format_type)
+		{
+			case 'bold': return $start ? '[b]' : '[/b]';
+			case 'italic': return $start ? '[i]' : '[/i]';
+			case 'underline': return $start ? '[u]' : '[/u]';
+			default: return false;
+		}
 	}
 
 }

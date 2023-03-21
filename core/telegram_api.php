@@ -245,6 +245,9 @@ class telegram_api
 		{
 			$text = preg_replace($pattern, $replacement, $text, 1, $count);
 		} while ($count > 0);
+		//Add a non printable space (ZWSP) to all forward slashes, which do not belong to an HTML-Tag.
+		//By that, telegram does not treat the forward slash as the beginning of a command.
+		$text = preg_replace('~([^<]/)~', "$0\u{200B}", $text);
 		return $text;
 	}
 

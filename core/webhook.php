@@ -165,6 +165,10 @@ class webhook {
 			$chat_id = $input->message->chat->id;
 			$text = $input->message->text;
 			$command['text'] = $text;
+			if (isset($input->message->entities))
+			{
+				$command['entities'] = $input->message->entities;
+			}
 		} else if (isset($input->callback_query))
 		{
 			//This is the message format, sent from an inline button
@@ -446,14 +450,14 @@ class webhook {
 			//Modify the input by shortening the text-property and the
 			//entities-property if necessary.
 			$prop_text = &$this->get_ref_to_prop($input, 'text');
-			if ($prop_text && strlen($prop_text) > 50)
+			if ($prop_text && strlen($prop_text) > 100)
 			{
-				$prop_text = \substr($prop_text, 0, 50) . ' ...(shortened)...';
+				$prop_text = \substr($prop_text, 0, 100) . ' ...(shortened)...';
 			}
 			//Warning: Don't assign prop_text again. It's a reference and would overwrite
 			//the content of the text-property.
 			$prop_entities = &$this->get_ref_to_prop($input, 'entities');
-			if ($prop_entities && count($prop_entities) > 2)
+			if ($prop_entities && count($prop_entities) > 10)
 			{
 				$prop_entities = 'array too long (' . count($prop_entities) . ') for display';
 			}
