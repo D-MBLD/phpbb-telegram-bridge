@@ -402,7 +402,7 @@ class webhook {
 				}
 				//No break in case of other text input
 			default:
-				$command['action'] = 'showPermissions';
+				$command['action'] = $text == '/start' ? 'allForums' : 'showPermissions';
 				if (strstr('0TFP', $chat_state) == false)
 				{
 					$command['admin_info'] = "Unexpected chat state on text-input: $chat_state\n";
