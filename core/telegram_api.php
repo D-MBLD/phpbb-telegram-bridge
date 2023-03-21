@@ -195,7 +195,7 @@ class telegram_api
 	private function prepare_button_text($text)
 	{
 		$text = strip_tags($text);
-		if (strlen($text) > 24)
+		if (mb_strlen($text) > 24)
 		{
 			$text = mb_substr($text, 0, 20) . ' ...'; //Multibyte-safe cut
 		}
