@@ -494,7 +494,11 @@ class commands
 		return [$text, [$this->language->lang('EBT_OK') => 'allForums']];
 	}
 
-	public function format_text($text, $entities) {
+	/** Format the text by adding bbCodes according to the formatting information,
+	 * which telegram sends as so called entities.
+	 */
+	public function format_text($text, $entities)
+	{
 		/* Split the text, at every point where a formatting starts or ends into an array.
 		 * Therefore we collect at first all splitpoints, and remove duplicates.
 		 */
@@ -507,18 +511,23 @@ class commands
 		$split_points = array_unique($split_points);
 		rsort($split_points);
 		$chunks = array();
-		foreach($split_points as $point) {
+		foreach ($split_points as $point)
+		{
 			$chunks[$point] = mb_substr($text, $point);
 			$text = mb_substr($text, 0, $point);
-		}		
+		}
 		ksort($chunks);
 		//Sort by end of formatting, such that in case of overlapping formats, the opening tag
 		//for the format, that gets closed last is placed at first.
-		usort($entities, function($a, $b) {return (($a->offset + $a->length) < ($b->offset + $b->length)) ? -1 : 1;});
+		usort($entities, function($a, $b)
+						{
+							return (($a->offset + $a->length) < ($b->offset + $b->length)) ? -1 : 1;
+						});
 		foreach ($entities as $entity)
 		{
 			$bbcode = $this->get_bbcode($entity->type);
-			if (!$bbcode) {
+			if (!$bbcode)
+			{
 				continue;
 			}
 			$chunks[$entity->offset] = $bbcode . $chunks[$entity->offset];
@@ -527,7 +536,8 @@ class commands
 		{
 			$entity = $entities[$i];
 			$bbcode = $this->get_bbcode($entity->type, false);
-			if (!$bbcode) {
+			if (!$bbcode)
+			{
 				continue;
 			}
 			$bbcode_start = $this->get_bbcode($entity->type);
@@ -548,8 +558,9 @@ class commands
 		return $text;
 	}
 
-	private function get_bbcode($format_type, $start = true) {
-		switch($format_type)
+	private function get_bbcode($format_type, $start = true)
+	{
+		switch ($format_type)
 		{
 			case 'bold': return $start ? '[b]' : '[/b]';
 			case 'italic': return $start ? '[i]' : '[/i]';

@@ -106,7 +106,7 @@ class acp_controller
 			{
 				foreach ($configparams as $name)
 				{
-					$this->config->set($name, $this->request->variable($name, ''));
+					$this->config->set($name, $this->request->variable($name, '', true));
 				}
 
 				// Add option settings change action to the admin log
