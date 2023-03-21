@@ -358,6 +358,8 @@ class commands
 		{
 			return $this->onShowPermissions($command);
 		}
+		//Note: title does not support BBCode.
+		//$title = $this->format_text($command['text'], $command['entities'] ?? array());
 		$title = $command['text'];
 		//Save the title and set state to "Waiting for new Text"
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 3, $title);
@@ -375,7 +377,7 @@ class commands
 			return $this->onShowPermissions($command);
 		}
 		$title = $command['title'];
-		$content = $command['text'];
+		$content = $this->format_text($command['text'], $command['entities'] ?? array());
 		$user = $command['user'];
 		$forum_id = $command['forum_id'];
 		$saved = $this->forum_api->insertNewPost(true, $forum_id, $title, $content, $user);
