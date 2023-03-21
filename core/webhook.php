@@ -399,6 +399,11 @@ class webhook {
 				{
 					$command['page'] -= $count;
 					break;
+				} else if (is_numeric($text))
+				{
+					$command['action'] = $chat_state == 'T' ? 'showTopic' : 'allForumTopics';
+					$command['index'] = 0 + $text;
+					break;
 				}
 				//No break in case of other text input
 			default:

@@ -188,8 +188,9 @@ class forum_api {
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
-			$topics[$row['topic_id']] =
-				array( 'title' => $row['topic_title'],
+			$topics[] =
+				array( 'topic_id' => $row['topic_id'], 
+					   'title' => $row['topic_title'],
 					   'date' => $row['topic_time'],
 					   'type' => $row['topic_type'],
 					   'approved' => $row['topic_visibility'] == ITEM_APPROVED

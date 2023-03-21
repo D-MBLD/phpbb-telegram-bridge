@@ -108,7 +108,8 @@ class commands
 	{
 		$user_id = $command['user']['user_id'];
 		$chat_id =$command['chat_id'];
-		$forum_id = $command['forum_id'];
+		$forum_id = $command['forum_id'] ?? 0;
+		$forum_index = $command['index'] ?? -1;
 		$page = $command['page'];
 		$warning = $command['warning'] ?? false;
 
@@ -116,9 +117,16 @@ class commands
 		{
 			return $this->onShowPermissions($command);
 		}
-		//Permission check needed
-		$forums = $this->forum_api->selectAllForums($user_id, $forum_id);
-		$forum = reset($forums);
+		//Permission check inside API
+		if ($forum_index >= 0)
+		{
+			$forums = $this->forum_api->selectAllForums($user_id);
+			$forum = $forums[$forum_index - 1] ?? false;
+		} else
+		{
+			$forums = $this->forum_api->selectAllForums($user_id, $forum_id);
+			$forum = reset($forums);
+		}
 
 		if ($forum)
 		{
@@ -142,7 +150,7 @@ class commands
 				$text = $this->language->lang('EBT_TOPIC_LIST_TITLE_EMPTY', $forumName, $viewforum_url) . PHP_EOL;
 			}
 			$i = 1;
-			foreach ($topics as $id => $topic)
+			foreach ($topics as $topic)
 			{
 				$not_approved = '';
 				if (!$topic['approved'])
@@ -167,6 +175,7 @@ class commands
 				}
 				$text .= $not_approved;
 				$buttonText = "$num: $title";
+				$id = $topic['topic_id'];
 				$buttons[$buttonText] = "showTopic~t$id";
 				$i++;
 				if ($i > 6)
@@ -267,12 +276,21 @@ class commands
 		$chat_id = $command['chat_id'];
 		$user_id = $command['user']['user_id'];
 		$topic_id = $command['topic_id'];
-		// Page refers to the page, of the topics-list, such that the return-button can go back to the same page.
-		$page = $command['page'];
+		$topic_index = $command['index'] ?? 0;
+		$topic_index--;
 		$text = '';
-		//Permission check needed
+		if ($topic_index >= 0) {
+			$topics = $this->forum_api->selectForumTopics($user_id, $command['forum_id']);
+			$topic_id = $topics[$topic_index]['topic_id'] ?? 0;
+		}
+		//Permission check needed		
 		$posts = $this->forum_api->selectTopicPosts($user_id, $topic_id);
-		$this->forum_api->store_telegram_chat_state($chat_id, $topic_id, 'P');
+		// Page refers to the page, of the topics-list.
+		$page = $command['page'];
+		if (count($posts) > 0 && $topic_index >= 0) {
+			$page = floor($topic_index / 6); //Adapt the page to the selection
+		}
+		$this->forum_api->store_telegram_chat_state($chat_id, $topic_id, 'P', '', $page);
 		$first = true;
 		$readonly = true;
 		$viewtopic_url = generate_board_url() . '/viewtopic.php?t=';
