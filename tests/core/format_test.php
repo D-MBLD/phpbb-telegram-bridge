@@ -23,6 +23,10 @@ class format_test extends \phpbb_test_case
 	public function setUp(): void
 	{
 		parent::setUp();
+		$this->user = $this->getMockBuilder('\phpbb\user')
+			->disableOriginalConstructor()
+			->getMock();
+		$this->user->host = "server.name"; //expected by generate_board_url()
 		$this->config = $this->getMockBuilder('\phpbb\config\config')
 		->disableOriginalConstructor()
 		->getMock();
@@ -169,8 +173,11 @@ class format_test extends \phpbb_test_case
 	 */
 	public function test_format_post_for_telelegram()
 	{
-		global $config;
+		//Function generate_board_url called in formatters->format_post_for_telegram
+		//expects some globals to be set.
+		global $config, $user;
 		$config = $this->config;
+		$user = $this->user;
 		 //This is the typical DB-content for a post.
 		$input = <<<'EOD'
 <r>mention -&gt; <QUOTE><s>[quote]</s>Quote something<e>[/quote]</e></QUOTE>

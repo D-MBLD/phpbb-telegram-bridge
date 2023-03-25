@@ -24,6 +24,7 @@ trait type_interface_decorator //implements \phpbb\notification\type\type_interf
 	public function set_inner(\phpbb\notification\type\base $inner)
 	{
 		$this->inner = $inner;
+		$this->formatters = new \eb\telegram\core\formatters();
 	}
 
 	/**

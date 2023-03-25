@@ -52,7 +52,7 @@ trait type_trait
 		if ($this->is_post_or_topic())
 		{
 			$post_body = utf8_decode_ncr(censor_text($this->inner->get_data('telegram_body')));
-			$template_vars['TELEGRAM_MESSAGE'] = htmlspecialchars_decode($post_body);
+			$template_vars['TELEGRAM_MESSAGE'] = $this->formatters->format_post_for_telegram($post_body);
 			$template_vars['NOTIFICATION_TYPE'] = get_class($this) . ' decorates ' . get_class($this->inner);
 
 			$template_vars['FORUM_NAME'] = $this->inner->get_data('forum_name');

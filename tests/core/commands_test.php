@@ -40,7 +40,7 @@ class command_pattern_test extends \phpbb_test_case
 				});
 		$this->auth = $this->getMockBuilder('\phpbb\auth\auth')
 			->disableOriginalConstructor()
-			->getMock();		
+			->getMock();
 		$this->helper = $this->getMockBuilder('\phpbb\controller\helper')
 			->disableOriginalConstructor()
 			->getMock();
