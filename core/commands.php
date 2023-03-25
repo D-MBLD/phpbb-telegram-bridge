@@ -283,7 +283,8 @@ class commands
 		$topic_index = $command['index'] ?? 0;
 		$topic_index--;
 		$text = '';
-		if ($topic_index >= 0) {
+		if ($topic_index >= 0)
+		{
 			$topics = $this->forum_api->selectForumTopics($user_id, $command['forum_id']);
 			$topic_id = $topics[$topic_index]['topic_id'] ?? 0;
 		}
@@ -291,7 +292,8 @@ class commands
 		$posts = $this->forum_api->selectTopicPosts($user_id, $topic_id);
 		// Page refers to the page, of the topics-list.
 		$page = $command['page'];
-		if (count($posts) > 0 && $topic_index >= 0) {
+		if (count($posts) > 0 && $topic_index >= 0)
+		{
 			$page = floor($topic_index / 6); //Adapt the page to the selection
 		}
 		$this->forum_api->store_telegram_chat_state($chat_id, $topic_id, 'P', '', $page);

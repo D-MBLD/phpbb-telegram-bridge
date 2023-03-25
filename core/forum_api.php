@@ -189,7 +189,7 @@ class forum_api {
 		while ($row = $db->sql_fetchrow($result))
 		{
 			$topics[] =
-				array( 'topic_id' => $row['topic_id'], 
+				array( 'topic_id' => $row['topic_id'],
 					   'title' => $row['topic_title'],
 					   'date' => $row['topic_time'],
 					   'type' => $row['topic_type'],

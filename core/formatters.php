@@ -31,7 +31,8 @@ class formatters
 	/** Format a phpbb-post, such that the formatting information
 	 * is transformed into valid telegram formatting.
 	 */
-	public function format_post_for_telegram($text) {
+	public function format_post_for_telegram($text)
+	{
 		$ent = ENT_SUBSTITUTE | ENT_HTML401; //Don't substitute quotes
 		//The telegram bot only allows a predefined set of HTLM-Tags.
 		//The forum posts however surround each opening BBCode with an <s>-Tag (and each closing with an <e>)
@@ -45,7 +46,7 @@ class formatters
 		} while ($count > 0);
 
 		$allowed_tags = ['url', 'img', 'b', 'strong', 'i', 'em', 'u', 'ins', 'strike', 'del', 'a', 'code', 'pre'];
-		
+
 		//Now remove all tags, which we do not allow. (Exception list contains all allowed tags.)
 		//This would not be necessary for "normal" text. But when the forum sends notifications,
 		//a lot of additional tags are surrounding the text, BB-Codes, links etc.
@@ -85,7 +86,7 @@ class formatters
 		return $text;
 	}
 
-	/** Implements the substring function (without length-param) 
+	/** Implements the substring function (without length-param)
 	 * such that html-tags are still correctly opened and closed.
 	 * Cut the beginning of a text at the given offset.
 	 * If the offset happens to lay inside a tagged area,
@@ -96,9 +97,10 @@ class formatters
 	 * By adding the start-tags before the offset, the text-length is increased.
 	 * To ensure, the text is not longer, than it would be expected by the offset,
 	 * the offset is increased, until the total lenght is less or equal
-	 * than mb_strlen($text) - $offset. 
+	 * than mb_strlen($text) - $offset.
 	 */
-	public function tag_aware_substr($tagged_text, $offset) {
+	public function tag_aware_substr($tagged_text, $offset)
+	{
 		$tags = $this->parse_tags($tagged_text);
 		$prefix = '';
 		$cut_point = $offset - 1;
@@ -106,7 +108,6 @@ class formatters
 		{
 			$cut_point++;
 			$prefix = $this->adapt_cut_point($tags, $cut_point);
-			
 		} while ($cut_point - mb_strlen($prefix) < $offset);
 		return $prefix . mb_substr($tagged_text, $cut_point);
 	}
@@ -116,10 +117,12 @@ class formatters
 	 * return the start-tags, which must be added as prefix, because the
 	 * cut text still contains the corresponding end tags.
 	 */
-	public function adapt_cut_point($tags, &$offset) {
+	public function adapt_cut_point($tags, &$offset)
+	{
 		$print = array();
 		//Move the offset, such that no tag is split
-		foreach ($tags as $tag) {
+		foreach ($tags as $tag)
+		{
 			if ($offset <= $tag['full_s'] || $offset >= $tag['full_e'])
 			{
 				continue; //We are outside the enclosing tags.
@@ -141,9 +144,10 @@ class formatters
 			}
 		}
 		//Collect the start tags, which must be added to the beginning, such that
-		//their is no end-tag with missing start tag	
+		//their is no end-tag with missing start tag
 		$start_tags = array();
-		foreach ($tags as $tag) {
+		foreach ($tags as $tag)
+		{
 			if ($offset > $tag['full_s'] && $offset < $tag['full_e'])
 			{
 				$start_tag = $tag['s_tag'];
@@ -158,7 +162,7 @@ class formatters
 	/** Find the start and end of text enclosed in html tags.
 	 * The result is an array containing all tagged texts (alos if nested)
 	 * in the following form:
-	 * array( 
+	 * array(
 	 *    array('full' => full tag enclosed text,
 	 *          'full_s' => offset, where full text starts
 	 *          'full_e' => offset, where full text ends
@@ -167,16 +171,20 @@ class formatters
 	 *  ))
 	 * In case of self closing tags, e_tag is empty.
 	 */
-	public function parse_tags($tagged_text) {
+	public function parse_tags($tagged_text)
+	{
 		$tag_pattern = "/<([\w]+)([^>]*?)(?:([\s]*\/>)|(?:(>)(?:(?:(?:[^<]*?|<\!\-\-.*?\-\->)|(?R))*)(<\/\\1[\s]*>)))/xsmu";
 		$result[] = array('full' => ' ' . $tagged_text, 'full_s' => -1);
-		for($i = 0; $i < count($result); $i++) {
+		for ($i = 0; $i < count($result); $i++)
+		{
 			$full = $result[$i]['full'];
 			$offset = $result[$i]['full_s'];
 			$t_count = preg_match_all($tag_pattern, mb_substr($full,1), $matches, PREG_OFFSET_CAPTURE);
-			if ($t_count) {
+			if ($t_count)
+			{
 				$j = 0;
-				foreach($matches[0] as $match) {
+				foreach ($matches[0] as $match)
+				{
 					$mb_offset = mb_strlen(substr(mb_substr($full,1), 0, $match[1]));
 					$result[] = array(
 						'full' => $match[0],
