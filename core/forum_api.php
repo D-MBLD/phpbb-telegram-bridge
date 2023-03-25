@@ -520,7 +520,8 @@ class forum_api {
 		{
 			$user->data[$prop] = $userOrigData[$prop];
 		}
-		return $url ? true : false;
+		//For new topics, topic_id was set in submit_post.
+		return $url ? $data['topic_id'] : false;
 	}
 
 	private function print_formatted($obj)

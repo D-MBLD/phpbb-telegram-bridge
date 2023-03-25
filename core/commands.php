@@ -21,6 +21,9 @@ class commands
 	/** @var \eb\telegram\core\forum_api */
 	private $forum_api;
 
+	/** @var \eb\telegram\core\formatters */
+	private $formatters;
+
 	/**
 	* Constructor
 	*
@@ -36,6 +39,7 @@ class commands
 		$this->config = $config;
 		$this->language = $language;
 		$this->forum_api = $forum_api;
+		$this->formatters = new \eb\telegram\core\formatters(/*$config, $language*/);
 	}
 
 	public function onButtonOutdated($command)
@@ -283,7 +287,7 @@ class commands
 			$topics = $this->forum_api->selectForumTopics($user_id, $command['forum_id']);
 			$topic_id = $topics[$topic_index]['topic_id'] ?? 0;
 		}
-		//Permission check needed		
+		//Permission check needed
 		$posts = $this->forum_api->selectTopicPosts($user_id, $topic_id);
 		// Page refers to the page, of the topics-list.
 		$page = $command['page'];
@@ -312,7 +316,10 @@ class commands
 				// "Title: <b>$title</b>\n";
 				$text .= $this->language->lang('EBT_TOPIC_TITLE', $title, $viewtopic_url . $topic_id) . PHP_EOL;
 				$text .= $not_approved;
-				$text .= $post['text'];
+				//Add an invisible marker, where the text could be split, if the
+				//full post is too long, to be displayed.
+				$text .= "\u{200B}\u{200B}";
+				$text .= $this->formatters->format_post_for_telegram($post['text']);
 				$readonly = !$post['reply'];
 				$first = false;
 			} else
@@ -320,7 +327,7 @@ class commands
 				// "<b>$time:</b> Reply from <b>$user</b>\n";
 				$text .= $this->language->lang('EBT_REPLY_AT_BY', $time, $user) . PHP_EOL;
 				$text .= $not_approved;
-				$text .= $post['text'];
+				$text .= $this->formatters->format_post_for_telegram($post['text']);
 			}
 			$text .= PHP_EOL . '<u>___________________________________</u>' . PHP_EOL;
 		}
@@ -395,14 +402,14 @@ class commands
 			return $this->onShowPermissions($command);
 		}
 		$title = $command['title'];
-		$content = $this->format_text($command['text'], $command['entities'] ?? array());
+		$content = $this->formatters->format_input($command['text'], $command['entities'] ?? array());
 		$user = $command['user'];
 		$forum_id = $command['forum_id'];
-		$saved = $this->forum_api->insertNewPost(true, $forum_id, $title, $content, $user);
+		$topic_id = $this->forum_api->insertNewPost(true, $forum_id, $title, $content, $user);
 		//Reset chat_state to topic-display (for back commands)
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 'T');
 
-		if ($saved)
+		if ($topic_id)
 		{
 			// The following post was saved.
 			$text = $this->language->lang('EBT_TOPIC_SAVED') . PHP_EOL;
@@ -411,7 +418,9 @@ class commands
 			$text .= $this->language->lang('EBT_TOPIC_TITLE', $title, '') . PHP_EOL;
 			$text .= $content;
 			$buttons = array($this->language->lang('EBT_BACK') => 'allForumTopics');
-			return [$text, $buttons];
+
+			$command['topic_id'] = $topic_id;
+			return $this->onShowTopic($command);
 		} else
 		{
 			return $this->errorOnSave();
@@ -426,16 +435,18 @@ class commands
 		{
 			return $this->onShowPermissions($command);
 		}
-		$command['text'] = $this->format_text($command['text'], $command['entities'] ?? array());
+		$command['text'] = $this->formatters->format_input($command['text'], $command['entities'] ?? array());
 		$saved = $this->forum_api->insertNewPost(false, $command['forum_id'], $command['topic_id'], $command['text'], $command['user']);
 		//Reset chat_state to topic-display (for back commands)
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 'T');
-		if ($saved === true)
+		if ($saved)
 		{
 			return $this->onShowTopic($command);
 		} else
 		{
-			$command['admin_info'] = $saved;
+			$topic_id = $command['topic_id'];
+			$username = $command['user']['username'];
+			$command['admin_info'] = "New post for topic $topic_id could not be saved, by user $username";
 			return $this->errorOnSave();
 		}
 	}

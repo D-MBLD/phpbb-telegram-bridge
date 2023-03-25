@@ -30,6 +30,7 @@ class telegram_api
 	{
 		$this->config = $config;
 		$this->language = $language;
+		$this->formatters = new \eb\telegram\core\formatters();
 	}
 
 	/** Get the name of the bot */
@@ -167,23 +168,27 @@ class telegram_api
 		return $message;
 	}
 
-	private function prepareText($org_text)
+	/** Shorten the text if necessary. Keep the html-tags intact. */
+	private function prepareText($text)
 	{
-		$text = $this->htmlentitiesForTelegram($org_text);
-		// Return the text from its XML form to its original plain text form
-		if (strlen($text) >= 4096)
+		$maxlen = 4096;
+		if (mb_strlen($text) > $maxlen)
 		{
+			//Split the text a two consecutive ZWSPs, if found
+			$splitmarker = "\u{200B}\u{200B}";
+			$pos = strpos($text, $splitmarker);
+			$title = '';
+			if ($pos !== false)
+			{
+				$title = substr($text, 0, $pos);
+				$text = substr($text,$pos + strlen($splitmarker));
+			}
 			// <b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
 			$pretext = $this->language->lang('EBT_TOPIC_SHORTENED') . PHP_EOL . '...' . PHP_EOL;
-			$len = 4095 - strlen($pretext);
-			while (strlen($text) >= 4069)
-			{
-				$len--;
-				$text = mb_substr($org_text, -$len);
-				//To avoid open tags, we need to encode html-chars again, after the text was shortend
-				$text = $this->htmlentitiesForTelegram($text);
-				$text = $pretext . $text;
-			}
+			$remaining_len = $maxlen - mb_strlen($pretext) - mb_strlen($title);
+			$offset = mb_strlen($text) - $remaining_len;
+			$text = $this->formatters->tag_aware_substr($text, $offset);
+			$text = $title . $pretext . $text;
 		}
 		return $text;
 	}
@@ -195,12 +200,12 @@ class telegram_api
 	private function prepare_button_text($text)
 	{
 		$text = strip_tags($text);
+		//Button-texts do not need html-encoding
+		$text = html_entity_decode($text);
 		if (mb_strlen($text) > 24)
 		{
 			$text = mb_substr($text, 0, 20) . ' ...'; //Multibyte-safe cut
 		}
-		//Button-texts do not need html-encoding
-		$text = html_entity_decode($text);
 		return $text;
 
 	}
@@ -217,7 +222,7 @@ class telegram_api
 		$allowed_tags_bar_separated = implode('|', $allowed_tags);
 		//Match for opening tags with optional attributes, followed by any text, followed by the same closing tag.
 		//Use https://regexper.com/ to visualize the pattern
-		//("\\" must be replaced by "\" and "/" by "\/" for this tool )
+		//("\\" (backreference) must be replaced by "\" and "/" by "\/" for this tool )
 		//https://regexper.com/#%26lt%3B%28%28list%7Cof%7Callowed%7Ctags%29%28%3F%3A%28%3F%3A%5Cs%2B%5Cw%2B%3F%28%3F%3A%5Cs*%3D%5Cs*%28%3F%3A%5C%22%5B%5E%5C%22%5D*%5C%22%7C'%5B%5E'%5D*'%29%29%29%2B%5Cs*%7C%5Cs*%29%29%26gt%3B%28.*%3F%29%26lt%3B%5C%2F%5C2%5Cs*%26gt%3B
 		$pattern = "~&lt;(($allowed_tags_bar_separated)(?:(?:\s+\w+?(?:\s*=\s*(?:\"[^\"]*\"|'[^']*')))+\s*|\s*))&gt;(.*?)&lt;/\\2\s*&gt;~is";
 		//Groups: 1: Full tag-content including attributs, 2: tag-name, 3: content between tags.
@@ -248,6 +253,7 @@ class telegram_api
 		//Add a non printable space (ZWSP) to all forward slashes, which do not belong to an HTML-Tag.
 		//By that, telegram does not treat the forward slash as the beginning of a command.
 		//$text = preg_replace('~([^<]/)~', "$0\u{200B}", $text);
+
 		return $text;
 	}
 
