@@ -51,6 +51,7 @@ class command_pattern_test extends \phpbb_test_case
 			->disableOriginalConstructor()
 			->setMethods(['sendOrEditMessage'])
 			->getMock();
+		$this->telegram_api->formatters = new \eb\telegram\core\formatters();
 		$this->forum_api = $this->getMockBuilder('\eb\telegram\core\forum_api')
 			->disableOriginalConstructor()
 			->getMock();

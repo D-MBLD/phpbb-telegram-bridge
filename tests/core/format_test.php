@@ -237,6 +237,7 @@ url1 -&gt; <a href="http://google.com">BBCode-Url with text</a>
 with umlauts: ÄÜÖäöüß<i>nested italic</i> text</U> text</I> text</B>
 <CODE>[code]A piece of code[/\u{200B}code]</CODE>
 EOD;
+
 		$tag_info = $this->formatters->parse_tags($input);
 		$expected = [
 			'<a href="http://google.com">BBCode-Url with text</a>',
@@ -252,56 +253,27 @@ EOD;
 		$this->assertEquals($expected, $full_texts);
 	}
 
-	public function tag_aware_substr_data_provider() {
+	public function pure_text_substr_data_provider() {
 		return array (
-			[  0, 'url1 -&gt; <a href="http://google.com">B'], //whole text
-			[ 11, '<a href="http://google.com">BBCode-Url w'], //Before a-tag
-			[ 12, '<a href="http://google.com">BCode-Url wi'], //a-tag would be cut
-			[ 30, '<a href="http://google.com">t</a><B>bold'], //1 before end of a-tag
-			[ 31, '<B>bold <I>italic (self closing br <br/>'], //would lead to empty a-tag
-			[ 33, '<B>bold <I>italic (self closing br <br/>'], //inside ending a-tag
-			[ 35, '<B>bold <I>italic (self closing br <br/>'], //just before B-tag
-			[129, '<B><I><U>ß<i>nested italic</i> text</U> '], //cut the starting i
-			[130, '<B><I><U><i>nested italic</i> text</U> t'], //exactly after starting i
-			[131, '<B><I><U><i>ested italic</i> text</U> te'], //exactly after starting i
+			[ '1<a>2<b>3<c>4</c>5</b>6</a>', 3, '<a><b><c>4</c>5</b>6</a>'], 
+			[ 'ä<a>ö<b>ü<c>Ä</c>Ö</b>Ü</a>', 3, '<a><b><c>Ä</c>Ö</b>Ü</a>'], 
+			[ '<a>2<b>3<c>4</c>5</b>6<selfclosing/></a>', 3, '<a><b><c>4</c>5</b>6<selfclosing/></a>'], 
+			[ '1<a>2<b>3<c>4</c>5</b>6</a>7', 3, '<a><b>5</b>6</a>7'], 
+			[ '<a>2<b>3<c>4</c>5</b>6</a>7', 1, '7'], 
+			[ '<a>2<b>3<c>4</c>5</b>6</a>', 1, '<a>6</a>'], 
+			[ '<a>1</a>', 100, '<a>1</a>'], 
+			[ '<a>1&amp;2</a>', 1, '<a>2</a>'], 
+			[ '<a>1&amp;2</a>', 2, '<a>&amp;2</a>'], 
+			[ '<a>1&amp;2</a>', 3, '<a>1&amp;2</a>'], 
+			[ '12345', 4, '2345'], 
 		);
 	}
 
-	/** @dataProvider tag_aware_substr_data_provider */
-	public function test_tag_aware_substr($offset, $expected_text40)
+	/** @dataProvider pure_text_substr_data_provider */
+	public function test_pure_text_substr($input, $length, $expected)
 	{
-		$input = <<<EOD
-url1 -&gt; <a href="http://google.com">BBCode-Url with text</a>
-<B>bold <I>italic (self closing br <br/>)<U>underlined with umlauts: ÄÜÖäöüß<i>nested italic</i> text</U> text</I> text</B>
-<CODE>[code]A piece of code[/\u{200B}code]</CODE>
-EOD;
-		$input = str_replace("\n", '', $input);
-		$text = $this->formatters->tag_aware_substr($input, $offset);		
-		$this->assertEquals($expected_text40, mb_substr($text,0,40));
-	}
-
-	public function test_tag_aware_substr_len()
-	{
-		$input = <<<EOD
-url1 -&gt; <a href="http://google.com">BBCode-Url with text</a>
-<B>bold <I>italic (self closing br <br/>)<U>underlined with umlauts: ÄÜÖäöüß<i>nested italic</i> text</U> text</I> text</B>
-<CODE>[code]A piece of code[/\u{200B}code]</CODE>
-EOD;
-		$input = str_replace("\n", '', $input);
-		for ($i = 0; $i < mb_strlen($input); $i++)
-		{
-			$text = $this->formatters->tag_aware_substr($input, $i);
-			$exp_len = mb_strlen($input) - $i;
-			$len = mb_strlen($text);
-			$this->assertLessThanOrEqual($exp_len, $len);
-			//Putting the a-tag in front of the text, would lead to
-			//an empty end-a-tag. Thus the offset is moved even
-			//behind the end-a-tag, which sums up to 31 chars.
-			$this->assertGreaterThanOrEqual($exp_len, $len+32);
-			$print[] = "$i: $exp_len -> $len";
-		}
-		//For output of length-info:
-		//$this->assertEquals('', implode("\n", $print));
+		$output = $this->formatters->pure_text_substr($input, $length);
+		$this->assertEquals($expected, $output);
 	}
 
 }

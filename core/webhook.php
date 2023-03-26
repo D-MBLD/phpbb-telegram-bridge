@@ -459,13 +459,17 @@ class webhook {
 			{
 				$prop_text = \substr($prop_text, 0, 100) . ' ...(shortened)...';
 			}
+			if ($prop_text)
+			{
+				$prop_text = htmlentities($prop_text);
+			}
 			//Warning: Don't assign prop_text again. It's a reference and would overwrite
 			//the content of the text-property.
 			$prop_entities = &$this->get_ref_to_prop($input, 'entities');
 			if ($prop_entities && count($prop_entities) > 10)
 			{
 				$prop_entities = 'array too long (' . count($prop_entities) . ') for display';
-			}
+			}			
 			$originalCommand = $command;
 			$command['admin_info'] = '<b><u>Telegram request echo</u></b><br>';
 			$command['admin_info'] .= '<i>(Can be switched off in the admin page of the forum)</i><br>';
@@ -478,7 +482,7 @@ class webhook {
 		{
 			return;
 		}
-		$postdata = $this->telegram_api->prepareMessage($command['admin_info']);
+		$postdata = $this->telegram_api->prepareMessage($command['admin_info'], array(), true);
 		$postdata['chat_id'] = $this->admin_telegram_id;
 		$this->telegram_api->sendOrEditMessage($postdata);
 	}

@@ -13,10 +13,12 @@
 class telegram_api
 {
 
-	/* @var \phpbb\config\config */
+	/** @var \phpbb\config\config */
 	protected $config;
-	/* @var \phpbb\language\language */
+	/** @var \phpbb\language\language */
 	protected $language;
+	/** @var \eb\telegram\core\formatters */
+	public $formatters;
 
 	public $debug_output = array();
 
@@ -120,8 +122,13 @@ class telegram_api
 	/** Prepare a text message with optional buttons.
 	 * Buttons are passed as an array with button text as key and command as value.
 	 */
-	public function prepareMessage($text, $buttons = false)
+	public function prepareMessage($text, $buttons = false, $format = false)
 	{
+		if ($format)
+		{
+			//Only to make sure, admin info is formatted also.
+			$text = $this->formatters->format_post_for_telegram($text);
+		}
 		$text = $this->prepareText($text);
 		if ($buttons)
 		{
@@ -172,7 +179,19 @@ class telegram_api
 	private function prepareText($text)
 	{
 		$maxlen = 4096;
+		$pure_text_len = 0;
 		if (mb_strlen($text) > $maxlen)
+		{
+			//Text is probably too long. But note, that for telegram maxlenght, only the pure
+			//text, without html-tags counts.
+			//Even HTML-Entities (&lt; etc.) are counted as one character. In the formatter
+			//functions pure_text_len() and pure_text_substr() these are treated in there full length
+			//as otherwise decoding and encoding would become really tricky.
+
+			//At first we check in more detail, if shortening the text is really necessary.
+			$pure_text_len = $this->formatters->pure_text_len($text);
+		}
+		if ($pure_text_len > $maxlen)
 		{
 			//Split the text a two consecutive ZWSPs, if found
 			$splitmarker = "\u{200B}\u{200B}";
@@ -185,9 +204,8 @@ class telegram_api
 			}
 			// <b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
 			$pretext = $this->language->lang('EBT_TOPIC_SHORTENED') . PHP_EOL . '...' . PHP_EOL;
-			$remaining_len = $maxlen - mb_strlen($pretext) - mb_strlen($title);
-			$offset = mb_strlen($text) - $remaining_len;
-			$text = $this->formatters->tag_aware_substr($text, $offset);
+			$remaining_len = $maxlen - $this->formatters->pure_text_len($pretext) - $this->formatters->pure_text_len($title);
+			$text = $this->formatters->pure_text_substr($text, $remaining_len);
 			$text = $title . $pretext . $text;
 		}
 		return $text;
