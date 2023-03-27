@@ -185,6 +185,12 @@ class formatters
 		$img_pattern = '~<IMG src="([^"]*)">\[img](.*?)\[/img]</IMG>~is';
 		$text = preg_replace($img_pattern, '<a href="$1">&lt;&lt;IMAGE&gt;&gt;</a>', $text);
 
+		//Replace all BBCodes which are just enclosing an URL by "<<BBcode-name>>":
+		//e.g.: [media=30,20]<a href="https://youtube.com/">https://youtube.com/</a>[/media]
+		// --> <a href="https://youtube.com/"><<media>></a>
+		$bburl_pattern = '~\[([^\]\s]+)(?:\s*=[^\]]*)?\s*]\s*<a href="([^"]+)">(.*)</a>\s*\[/\1]~is';
+		$text = preg_replace($bburl_pattern, '<a href="$2">&lt;&lt;$1&gt;&gt;</a>', $text);
+
 		//Add server address to relative links (no http-protokoll) starting with a slash (/)
 		$rel_url_pattern = '~<a href="((?!https?://)/[^"]*)">(.*?)</a>~is';
 		$replace = '<a href="' . generate_board_url(true) . '$1">$2</a>';
@@ -195,17 +201,6 @@ class formatters
 		$replace = '<a href="' . generate_board_url(false) . '/$1">$2</a>';
 		$text = preg_replace($rel_url_pattern, $replace, $text);
 
-		//Add a non printable space (ZWSP) to all forward slashes.
-		//By that, telegram does not treat the forward slash as the beginning of a command.
-		//Exclude double // and slashes belonging to html-tags
-		$text = preg_replace('~([^<]/)([^/])~', "$1\u{200B}$2", $text);
-
-		//Revert this, for all hrefs in anchors.
-		//By that, telegram does not treat the forward slash as the beginning of a command.
-		do
-		{
-			$text = preg_replace("~(<a href=\"[^\"]*/)\u{200B}([^\"]*\">)~", '$1$2', $text, 1, $count);
-		} while ($count > 0);
 		return $text;
 	}
 

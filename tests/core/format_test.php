@@ -203,28 +203,46 @@ Image with relative link2: <IMG src="/path/to/image/image.jpg"><s>[img]</s>./sty
 <e>[/list]</e></LIST></r>
 EOD;
 		$expected = <<<EOD
-mention -&gt; [quote]Quote something[/\u{200B}quote]
-bot_command -&gt; /\u{200B}should not be treated as command 
+mention -&gt; [quote]Quote something[/quote]
+bot_command -&gt; /should not be treated as command 
 url1 -&gt; <a href="http://google.com">BBCode-Url with text</a>
-url2 -&gt; <a href="http://google.com">http://\u{200B}google.com</a> (BBCode-Url without text)
-url3 without bbcode: <a href="http://google.com">http://\u{200B}google.com</a> 
+url2 -&gt; <a href="http://google.com">http://google.com</a> (BBCode-Url without text)
+url3 without bbcode: <a href="http://google.com">http://google.com</a> 
 email -&gt; email@for.you (Email in BBCode) 
 email without BBCode: email@for.you
 <B>bold text</B>
 <I>italic text</I>
 <U>underlined text</U>
-HTML-tags: &lt;strike&gt;Has no effect&lt;/\u{200B}strike&gt;
-<CODE>[code]A piece of code[/\u{200B}code]</CODE>
+HTML-tags: &lt;strike&gt;Has no effect&lt;/strike&gt;
+<CODE>[code]A piece of code[/code]</CODE>
 <a href="https://upload.wikimedia.org/wikipedia/commons/4/4a/Dot-yellow.gif">&lt;&lt;IMAGE&gt;&gt;</a> 
 Image with relative link1: <a href="http://server.name/phpbb/path/to/image/image.jpg">&lt;&lt;IMAGE&gt;&gt;</a>
 Image with relative link2: <a href="http://server.name/path/to/image/image.jpg">&lt;&lt;IMAGE&gt;&gt;</a>
-[attachment]an attachment[/\u{200B}attachment] 
-[color=red]Red color[/\u{200B}color]
-[size=110]A bit bigger[/\u{200B}size]
+[attachment]an attachment[/attachment] 
+[color=red]Red color[/color]
+[size=110]A bit bigger[/size]
 [list]Start of List
 [*]first list item
-[/\u{200B}list]
+[/list]
 EOD;
+		$formatted = $this->formatters->format_post_for_telegram($input);
+		$this->assertEquals($expected, $formatted);
+	}
+
+	/** Test the formatting of unknown (custom) BBCodes with enclosed urls.
+	 */
+	public function test_format_bbcode_with_url()
+	{
+		//Function generate_board_url called in formatters->format_post_for_telegram
+		//expects some globals to be set.
+		/*
+		global $config, $user;
+		$config = $this->config;
+		$user = $this->user;
+		 //This is the typical DB-content for a post.
+		 */
+		$input = '[my_bbcode=option]<URL url="http://google.com">http://google.com</URL>[/my_bbcode]';
+		$expected = '<a href="http://google.com">&lt;&lt;my_bbcode&gt;&gt;</a>';
 		$formatted = $this->formatters->format_post_for_telegram($input);
 		$this->assertEquals($expected, $formatted);
 	}
@@ -235,14 +253,14 @@ EOD;
 url1 -&gt; <a href="http://google.com">BBCode-Url with text</a>
 <B>bold <I>italic (self closing br <br/>)<U>underlined 
 with umlauts: ÄÜÖäöüß<i>nested italic</i> text</U> text</I> text</B>
-<CODE>[code]A piece of code[/\u{200B}code]</CODE>
+<CODE>[code]A piece of code[/code]</CODE>
 EOD;
 
 		$tag_info = $this->formatters->parse_tags($input);
 		$expected = [
 			'<a href="http://google.com">BBCode-Url with text</a>',
 			"<B>bold <I>italic (self closing br <br/>)<U>underlined \nwith umlauts: ÄÜÖäöüß<i>nested italic</i> text</U> text</I> text</B>",
-			'<CODE>[code]A piece of code[/\u{200B}code]</CODE>',
+			'<CODE>[code]A piece of code[/code]</CODE>',
 			"<I>italic (self closing br <br/>)<U>underlined \nwith umlauts: ÄÜÖäöüß<i>nested italic</i> text</U> text</I>",
 			'<br/>',
 			"<U>underlined \nwith umlauts: ÄÜÖäöüß<i>nested italic</i> text</U>",

@@ -175,9 +175,12 @@ class telegram_api
 		return $message;
 	}
 
-	/** Shorten the text if necessary. Keep the html-tags intact. */
+	/** Shorten the text if necessary. Keep the html-tags intact.
+	 * Care for words beginning with a slash, that they are not treated as commands.
+	 */
 	private function prepareText($text)
 	{
+		$text = $this->disable_telegram_commands($text);
 		$maxlen = 4096;
 		$pure_text_len = 0;
 		if (mb_strlen($text) > $maxlen)
@@ -208,6 +211,21 @@ class telegram_api
 			$text = $this->formatters->pure_text_substr($text, $remaining_len);
 			$text = $title . $pretext . $text;
 		}
+		return $text;
+	}
+
+	private function disable_telegram_commands($text)
+	{
+		//Add a non printable space (ZWSP) to all forward slashes.
+		//By that, telegram does not treat the forward slash as the beginning of a command.
+		//Exclude double // and slashes belonging to html-tags
+		$text = preg_replace('~([^<]/)([^/])~', "$1\u{200B}$2", $text);
+
+		//Revert this, for all hrefs in anchors, as the url must stay in tact.
+		do
+		{
+			$text = preg_replace("~(<a href=\"[^\"]*/)\u{200B}([^\"]*\">)~", '$1$2', $text, 1, $count);
+		} while ($count > 0);
 		return $text;
 	}
 
