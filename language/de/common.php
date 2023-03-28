@@ -118,6 +118,7 @@ $lang = array_merge($lang, [
 	'EBT_CANCEL' => 'Abbrechen',
 	'EBT_TOPIC_SAVED' => 'Der folgende Beitrag wurde gespeichert:',
 	'EBT_TOPIC_SAVE_FAILED' => 'Der neue Beitrag konnte nicht gespeichert werden. (!?)',
+	'EBT_NO_COMMAND_HERE' => "<b>Eingabe von Telegram Kommandos ist hier nicht möglich!</b>\n",
 
 	//Illegal call
 	'EBT_GROUP_OR_CHANNEL_CALL' => 'Das Forum kann nicht über Gruppen oder Kanäle aufgerufen werden.',

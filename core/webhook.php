@@ -350,6 +350,11 @@ class webhook {
 
 	private function create_command_for_text_input($command)
 	{
+		$tg_command = $this->create_command_for_telegram_commands($command);
+		if ($tg_command)
+		{
+			return $tg_command;
+		}
 		/* If a text message was send, the action depends on the
 		current chat state.
 		*/
@@ -407,11 +412,58 @@ class webhook {
 				}
 				//No break in case of other text input
 			default:
-				$command['action'] = $text == '/start' ? 'allForums' : 'showPermissions';
+				$command['action'] = 'showPermissions';
 				if (strstr('0TFP', $chat_state) == false)
 				{
 					$command['admin_info'] = "Unexpected chat state on text-input: $chat_state\n";
 				}
+		}
+		return $command;
+	}
+
+	/** Handle the telegram commands /start and /update */
+	private function create_command_for_telegram_commands($command)
+	{
+		/* If a text message was send, the action depends on the
+		current chat state.
+		*/
+		$chat_state = $command['chatState'] ?? false;
+		$text = $command['text'];
+		//If the previous message would just be updated, it would
+		//be difficult for the user to realize, that the update really
+		//happened. Therefore we always send a new message:
+		unset($command['message_id']);
+		if ($text != '/start' && $text != '/update')
+		{
+			return false;
+		}
+		switch ($chat_state)
+		{
+			case 'V':
+				return false; //Not handled here
+			case '1':
+				//Entered text should be a new post for an existing topic
+				$command['action'] = 'noCommandForPost';
+				break;
+			case '2':
+				//Entered text should be the title for a new topic
+				$command['action'] = 'noCommandForTitle';
+				break;
+			case '3':
+				//Entered text should be the text for a new topic
+				$command['action'] = 'noCommandForText';
+				break;
+			case 'T':
+					$command['action'] = $text == '/update' ? 'allForumTopics' : 'allForums';
+				break;
+			case 'F':
+				$command['action'] = 'allForums';
+				break;
+			case 'P':
+				$command['action'] = $text == '/update' ? 'showTopic' : 'allForums';
+				break;
+			default:
+				return false;
 		}
 		return $command;
 	}

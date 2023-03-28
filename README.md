@@ -20,6 +20,13 @@ Don't worry, this is really very easy: https://core.telegram.org/bots#how-do-i-c
 Just think about a good name and description. Nothing else is needed for this extension.
 Well, you need the bot token in the following step.
 
+## Define Bot Commands
+
+If you like, you may define the commands start and update for the bot. Therefore navigate with BotFather to 
+"edit commands" and enter something like
+start - Show all forums
+update - Update
+
 ## Enable and customise the extension
 Go to "ACP" > "Customise" > "Extensions" and enable the "Telegram Bridge" extension.
 

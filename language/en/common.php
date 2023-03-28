@@ -117,6 +117,7 @@ $lang = array_merge($lang, [
 	'EBT_CANCEL' => 'Cancel',
 	'EBT_TOPIC_SAVED' => 'The following topic was saved:',
 	'EBT_TOPIC_SAVE_FAILED' => 'The new post could not be saved. (!?)',
+	'EBT_NO_COMMAND_HERE' => "<b>Telegram commands cannot be entered here!</b>\n",
 
 	//Illegal call
 	'EBT_GROUP_OR_CHANNEL_CALL' => 'The forum cannot be called via groups or channels.',

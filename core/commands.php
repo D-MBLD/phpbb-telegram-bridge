@@ -348,7 +348,7 @@ class commands
 		return [$text, $buttons];
 	}
 
-	public function onNewPost($command)
+	public function onNewPost($command, $warning = '')
 	{
 		if (!$command['permissions']['u_ebt_post'])
 		{
@@ -359,13 +359,18 @@ class commands
 		//set state "Waiting for reply-text"
 		$this->forum_api->store_telegram_chat_state($chat_id, $topic_id, 1);
 		// Send your reply or use the cancel button
-		$text = $this->language->lang('EBT_REQUEST_POST');
+		$text = $warning . $this->language->lang('EBT_REQUEST_POST');
 		$buttons = array($this->language->lang('EBT_CANCEL') => 'back');
 
 		return [$text, $buttons];
 	}
 
-	public function onNewTopicTitle($command)
+	public function onNoCommandForPost($command)
+	{
+		return $this->onNewPost($command, $this->language->lang('EBT_NO_COMMAND_HERE'));
+	}
+
+	public function onNewTopicTitle($command, $warning = '')
 	{
 		if (!$command['permissions']['u_ebt_post'])
 		{
@@ -374,12 +379,17 @@ class commands
 		//Set state "Waiting for Title" (without changing forum_id)
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 2);
 		// Send the title for your new post or use the cancel button
-		$text = $this->language->lang('EBT_REQUEST_TITLE');
+		$text = $warning . $this->language->lang('EBT_REQUEST_TITLE');
 		$buttons = array($this->language->lang('EBT_CANCEL') => 'allForumTopics');
 		return [$text, $buttons];
 	}
 
-	public function onNewTopicText($command)
+	public function onNoCommandForTitle($command)
+	{
+		return $this->onNewTopicTitle($command, $this->language->lang('EBT_NO_COMMAND_HERE'));
+	}
+
+	public function onNewTopicText($command, $warning = '')
 	{
 		if (!$command['permissions']['u_ebt_post'])
 		{
@@ -392,9 +402,16 @@ class commands
 		$this->forum_api->store_telegram_chat_state($command['chat_id'], 0, 3, $title);
 
 		// Send the text for your new post with title <b>$title</b> or use the cancel button.
-		$text = $this->language->lang('EBT_REQUEST_TEXT_FOR_TITLE', $title);
+		$text = $warning . $this->language->lang('EBT_REQUEST_TEXT_FOR_TITLE', $title);
 		$buttons = array($this->language->lang('EBT_CANCEL') => 'allForumTopics');
 		return [$text, $buttons];
+	}
+
+	public function onNoCommandForText($command)
+	{
+		//Don't overwrite the previous title with the new text !
+		$command['text'] = $command['title'];
+		return $this->onNewTopicText($command, $this->language->lang('EBT_NO_COMMAND_HERE'));
 	}
 
 	public function onSaveNewTopic($command)
