@@ -521,7 +521,7 @@ class webhook {
 			if ($prop_entities && count($prop_entities) > 10)
 			{
 				$prop_entities = 'array too long (' . count($prop_entities) . ') for display';
-			}			
+			}
 			$originalCommand = $command;
 			$command['admin_info'] = '<b><u>Telegram request echo</u></b><br>';
 			$command['admin_info'] .= '<i>(Can be switched off in the admin page of the forum)</i><br>';

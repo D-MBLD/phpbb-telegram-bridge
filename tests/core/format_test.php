@@ -178,6 +178,7 @@ class format_test extends \phpbb_test_case
 		global $config, $user;
 		$config = $this->config;
 		$user = $this->user;
+		
 		 //This is the typical DB-content for a post.
 		$input = <<<'EOD'
 <r>mention -&gt; <QUOTE><s>[quote]</s>Quote something<e>[/quote]</e></QUOTE>
@@ -235,12 +236,10 @@ EOD;
 	{
 		//Function generate_board_url called in formatters->format_post_for_telegram
 		//expects some globals to be set.
-		/*
 		global $config, $user;
 		$config = $this->config;
 		$user = $this->user;
-		 //This is the typical DB-content for a post.
-		 */
+
 		$input = '[my_bbcode=option]<URL url="http://google.com">http://google.com</URL>[/my_bbcode]';
 		$expected = '<a href="http://google.com">&lt;&lt;my_bbcode&gt;&gt;</a>';
 		$formatted = $this->formatters->format_post_for_telegram($input);

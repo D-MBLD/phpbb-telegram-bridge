@@ -33,7 +33,8 @@ class formatters
 	 * Example: Length of "A <b><i><u>formatted</u></i></b> Text" would be
 	 * the same as the length of "A formatted Text".
 	 */
-	public function pure_text_len($tagged_text) {
+	public function pure_text_len($tagged_text)
+	{
 		$text_parts = $this->split_at_tags($tagged_text);
 		return($text_parts[0]['len'] + mb_strlen($text_parts[0]['text']));
 	}
@@ -45,7 +46,8 @@ class formatters
 	 * (There is one exception: HTML-Entities like &amp; are counted by
 	 * telegram as 1 character, whereas here it is treated as 5 chars.)
 	  */
-	public function pure_text_substr($tagged_text, $length) {
+	public function pure_text_substr($tagged_text, $length)
+	{
 		$text_parts = $this->split_at_tags($tagged_text);
 		$first = true;
 		foreach ($text_parts as $part)
@@ -89,7 +91,7 @@ class formatters
 	 * 'O' contains the open tags, at the corresponding text position.
 	 */
 	public function split_at_tags($tagged_text)
-	{		
+	{
 		$tag_info = $this->parse_tags($tagged_text);
 		foreach ($tag_info as $tag)
 		{
@@ -132,7 +134,7 @@ class formatters
 			$start = $current_offset + $stag_len;
 			$end = $next_offset - $etag_len;
 			$pure_text = mb_substr($tagged_text, $start, $end - $start);
-			$pure_text = html_entity_decode($pure_text); 
+			$pure_text = html_entity_decode($pure_text);
 			$result[$offsets[$i]]['text'] = $pure_text;
 		}
 		//Last entry has no tags
@@ -140,7 +142,7 @@ class formatters
 
 		krsort($result); //Fill length from end to beginning
 		$pure_len = 0;
-		foreach($result as &$entry)
+		foreach ($result as &$entry)
 		{
 			$entry['len'] = $pure_len;
 			$pure_len += mb_strlen($entry['text']);

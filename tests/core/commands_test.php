@@ -22,6 +22,10 @@ class command_pattern_test extends \phpbb_test_case
 	public function setUp(): void
 	{
 		parent::setUp();
+		$this->user = $this->getMockBuilder('\phpbb\user')
+			->disableOriginalConstructor()
+			->getMock();
+		$this->user->host = "server.name"; //expected by generate_board_url()
 		$this->config = $this->getMockBuilder('\phpbb\config\config')
 			->disableOriginalConstructor()
 			->getMock();
@@ -96,20 +100,34 @@ class command_pattern_test extends \phpbb_test_case
 			->willReturnMap([ //Map param(s) to return value
 				['eb_telegram_admin_telegram_id', '12345'],
 				['site_home_url', 'home_url'],
-				['eb_telegram_secret', '123abc']
+				['eb_telegram_secret', '123abc'],
+				//Following values are expected by function generate_board_url
+				['force_server_vars', true],
+				['server_protocol', 'http://'],
+				['server_name', 'server.name'],
+				['server_port', ''],
+				['script_path', '/phpbb'],
+				['cookie_secure', ''],
 			]);
 		$this->config->expects($this->any())
 			->method('offsetExists')
 			->willReturnMap([ //Map param(s) to return value
 				['eb_telegram_admin_telegram_id', true],
 				['site_home_url', true],
-				['eb_telegram_secret', true]
+				['eb_telegram_secret', true],
 			]);
 	
 	}
 
 	public function test01_howToRegister()
 	{
+		// When the admin info is formatted, the function generate_board_url
+		// is called in formatters->format_post_for_telegram and
+		// expects some globals to be set.
+		global $config, $user;
+		$config = $this->config;
+		$user = $this->user;
+
 		$this->defaultSetup(['forum_api->find_telegram_user']);
 		//Test if admin receives the information also
 		// No default-setup: Don't return a user for this testcase
