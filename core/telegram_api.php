@@ -181,6 +181,7 @@ class telegram_api
 	private function prepareText($text)
 	{
 		$text = $this->disable_telegram_commands($text);
+		$text = $this->replace_html_break($text);
 		$maxlen = 4096;
 		$pure_text_len = 0;
 		if (mb_strlen($text) > $maxlen)
@@ -220,6 +221,22 @@ class telegram_api
 		//By that, telegram does not treat the forward slash as the beginning of a command.
 		//Exclude double // and slashes belonging to html-tags
 		$text = preg_replace('~([^<]/)([^/])~', "$1\u{200B}$2", $text);
+
+		//Revert this, for all hrefs in anchors, as the url must stay in tact.
+		do
+		{
+			$text = preg_replace("~(<a href=\"[^\"]*/)\u{200B}([^\"]*\">)~", '$1$2', $text, 1, $count);
+		} while ($count > 0);
+		return $text;
+	}
+
+	/** <br>-Tags are not allowed in telegram */
+	private function replace_html_break($text)
+	{
+		//Add a non printable space (ZWSP) to all forward slashes.
+		//By that, telegram does not treat the forward slash as the beginning of a command.
+		//Exclude double // and slashes belonging to html-tags
+		$text = preg_replace('~<br/?>~', PHP_EOL, $text);
 
 		//Revert this, for all hrefs in anchors, as the url must stay in tact.
 		do
