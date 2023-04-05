@@ -23,8 +23,8 @@ Well, you need the bot token in the following step.
 ## Define Bot Commands
 
 If you like, you may define the commands start and update for the bot. Therefore navigate with BotFather to 
-"edit commands" and enter something like
-start - Show all forums
+"edit commands" and enter something like  
+start - Show all forums  
 update - Update
 
 ## Enable and customise the extension
