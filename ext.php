@@ -29,12 +29,21 @@ class ext extends \phpbb\extension\base
 	*/
 	public function disable_step($old_state)
 	{
-		//Delete from phpbb_user_notifications where method = 'notification.method.telegram'.
-		//Maybe this needs to be implemented in a migration class with a special disable-method
-		//which is called here. The base class only has db/migration injected, but not DB itself.
-
+		//Move the telegram specific entries from phpbb_user_notifications 
+		//into a backup table.
+		//The implementation is moved into a migration class because the extension\base class
+		//does not have the necessary services injected.
 		$migration = $this->migrator->get_migration('\eb\telegram\migrations\delete_method');
-		$migration->delete_notification_method();
+		$migration->backup_user_notifications();
 		return false;
 	}
+
+	public function enable_step($old_state)
+	{
+		$finished = parent::enable_step($old_state);
+		$migration = $this->migrator->get_migration('\eb\telegram\migrations\delete_method');
+		$migration->restore_user_notifications();
+		return $finished;
+	}
+
 }
