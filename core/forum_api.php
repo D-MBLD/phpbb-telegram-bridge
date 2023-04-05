@@ -399,7 +399,8 @@ class forum_api {
 		{
 			include($this->phpbb_root_path . 'includes/functions_messenger.' . $this->php_ext);
 		}
-		$messenger = new \messenger();
+		//Parameter false: Don't queue the message
+		$messenger = new \messenger(false);
 		$messenger->template('@eb_telegram/verify_telegram_id', $user['user_lang'], '', '');
 
 		$messenger->set_addresses($user);
