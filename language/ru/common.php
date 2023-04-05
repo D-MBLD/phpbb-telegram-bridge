@@ -117,6 +117,7 @@ $lang = array_merge($lang, [
 	'EBT_CANCEL' => 'Отмена',
 	'EBT_TOPIC_SAVED' => 'Тема создана:',
 	'EBT_TOPIC_SAVE_FAILED' => 'Новая тема не может быть сохранена. (Ошибка!?)',
+	'EBT_NO_COMMAND_HERE' => "<b>Команды Telegram здесь ввести нельзя!</b>\n", //Translated with deepl
 
 	//Illegal call
 	'EBT_GROUP_OR_CHANNEL_CALL' => 'К конференции нельзя обратиться через группы или каналы.',
