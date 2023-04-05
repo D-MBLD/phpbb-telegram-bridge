@@ -32,9 +32,6 @@ class ext extends \phpbb\extension\base
 		//Delete from phpbb_user_notifications where method = 'notification.method.telegram'.
 		//Maybe this needs to be implemented in a migration class with a special disable-method
 		//which is called here. The base class only has db/migration injected, but not DB itself.
-
-		$migration = $this->migrator->get_migration('\eb\telegram\migrations\delete_method');
-		$migration->delete_notification_method();
 		return false;
 	}
 }
