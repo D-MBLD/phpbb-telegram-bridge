@@ -4,13 +4,13 @@
 
 **Important**: If you update from a previous version, de-activate the extension, before installing the new version.
 
-Note: Unfortunately, as a side effect, the notification settings of the users get lost, when the extension is deactivated.
+Note: Unfortunately, as a side effect, the notification settings of the users get lost, when an extension with a version prior to 1.0.4-dev is deactivated. You can avoid that, by installing the intermediate version 1.0.3-post_dev and following exactly the process described there.
 ## Installation
 
 ### From release
 Download the latest [release zip](https://github.com/D-MBLD/phpbb-telegram-bridge/releases) and expand it into the extension folder (\<forums-root\>/ext) of your forum.
 
-### From newest gitHub version.
+### From newest gitHub version (master branch).
 Create in the extension directory (usually \<forums-root\>/ext) the subdirectories eb/telegram. Download the code as zip (See "code"-button in GitHub) and extract everything below "phpbb-telegram-bridge-master" directly into the eb/telegram subdirectory.
 
 ## Create a Telegram Bot
