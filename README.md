@@ -4,7 +4,7 @@
 
 **Important**: If you update from a previous version, de-activate the extension, before installing the new version.
 
-Note: Unfortunately, as a side effect, the notification settings of the users get lost, when an extension with a version prior to 1.0.4-dev is deactivated. You can avoid that, by installing the intermediate version 1.0.3-post_dev and following exactly the process described there.
+Note: Unfortunately, as a side effect, the notification settings of the users get lost, when an extension with a version prior to 1.0.4-dev is deactivated. You can avoid that, by installing the intermediate version v1.0.3-prepare1.0.4 and following exactly the process described there.
 ## Installation
 
 ### From release
