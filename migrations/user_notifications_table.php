@@ -12,7 +12,7 @@ namespace eb\telegram\migrations;
 
 /** Create a table, which holds the user notification settings,
  * while the extension is deactivated.
- * The forum does not allow methods to be stored in the original 
+ * The forum does not allow methods to be stored in the original
  * user_notifications table, while the method class is missing.
  */
 class user_notifications_table extends \phpbb\db\migration\migration
