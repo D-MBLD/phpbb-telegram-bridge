@@ -1,5 +1,3 @@
-Subject: (ignored in Telegram)
-
-<b>{AUTHOR_NAME}</b> создал новую тему <b><a href="{U_TOPIC}">{TOPIC_TITLE}</a></b> в форуме <b><a href="{U_FORUM}">{FORUM_NAME}</a></b>:
+Subject:<b>{AUTHOR_NAME}</b> создал новую тему <b><a href="{U_TOPIC}">{TOPIC_TITLE}</a></b> в форуме <b><a href="{U_FORUM}">{FORUM_NAME}</a></b>:
 
 {TELEGRAM_MESSAGE}
