@@ -89,7 +89,7 @@ jobs:
 
     # START MySQL and MariaDB Job
     mysql-tests:
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-latest
         strategy:
             matrix:
                 include:
@@ -203,7 +203,7 @@ jobs:
 
     # START PostgreSQL Job
     postgres-tests:
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-latest
         strategy:
             matrix:
                 include:
@@ -303,7 +303,7 @@ jobs:
 
     # START Other Tests Job (SQLite 3 and mssql)
     other-tests:
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-latest
         strategy:
             matrix:
                 include:
