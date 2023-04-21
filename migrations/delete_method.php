@@ -38,12 +38,12 @@ class delete_method extends \phpbb\db\migration\migration
 	public function backup_user_notifications()
 	{
 		$table_exists = $this->db_tools->sql_table_exists($this->table_prefix . 'eb_user_notifications');
-	
+
 		if ($table_exists)
 		{
 			$sql = 'DELETE FROM '. $this->table_prefix . 'eb_user_notifications';
 			$result = $this->db->sql_query($sql);
-			
+
 			$sql = 'INSERT INTO ' . $this->table_prefix . 'eb_user_notifications';
 			$sql .= ' SELECT * FROM '. USER_NOTIFICATIONS_TABLE;
 			$sql .= " WHERE method = 'eb.telegram.notification.method.telegram'";
@@ -58,7 +58,7 @@ class delete_method extends \phpbb\db\migration\migration
 	public function restore_user_notifications()
 	{
 		$table_exists = $this->db_tools->sql_table_exists($this->table_prefix . 'eb_user_notifications');
-	
+
 		if ($table_exists)
 		{
 			$sql = 'DELETE FROM '. USER_NOTIFICATIONS_TABLE;

@@ -207,7 +207,7 @@ class telegram_api
 				$text = substr($text,$pos + strlen($splitmarker));
 			}
 			// <b>Warning: Topic is too long and was cut. Telegram doesn \'t allow more than 4096 characters !</b>',
-			$pretext = $this->language->lang('EBT_TOPIC_SHORTENED') . PHP_EOL . '...' . PHP_EOL;
+			$pretext = PHP_EOL . $this->language->lang('EBT_TOPIC_SHORTENED') . PHP_EOL . '...' . PHP_EOL;
 			$remaining_len = $maxlen - $this->formatters->pure_text_len($pretext) - $this->formatters->pure_text_len($title);
 			$text = $this->formatters->pure_text_substr($text, $remaining_len);
 			$text = $title . $pretext . $text;

@@ -29,7 +29,7 @@ class ext extends \phpbb\extension\base
 	*/
 	public function disable_step($old_state)
 	{
-		//Move the telegram specific entries from phpbb_user_notifications 
+		//Move the telegram specific entries from phpbb_user_notifications
 		//into a backup table.
 		//The implementation is moved into a migration class because the extension\base class
 		//does not have the necessary services injected.

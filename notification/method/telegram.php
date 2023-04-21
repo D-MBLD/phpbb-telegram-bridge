@@ -214,8 +214,13 @@ class telegram extends \phpbb\notification\method\messenger_base
 			/* Send with break=true only prepares the text, but does not send the message */
 			$messenger->send(NOTIFY_EMAIL, true);
 
-			$this->msg = $messenger->msg;
+			$splitmarker = "\u{200B}\u{200B}";
+			//The splitmarker makes sure, that the subject is shown, even if the message
+			//is shortended due to the length limit of telegram.
+			//(See telegram_api->prepareText)
+			$this->msg = $messenger->subject . PHP_EOL . $splitmarker . PHP_EOL . $messenger->msg;
 
+			$this->language->set_user_language($user['user_lang'], true);
 			// Lets send to Telegram
 			$this->send($telegram_id, $this->msg, $topic_id, $permissions);
 
